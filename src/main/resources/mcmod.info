@@ -1,0 +1,16 @@
+[
+{
+  "modid": "YADM",
+  "name": "YADM - Yes another Dimension Manager",
+  "description": "Creates and provides custom Dimensions.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/DerOli82/yadm",
+  "updateUrl": "",
+  "authorList": ["DerOli82"],
+  "credits": "Greetings to the BakermanLP Community.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
