@@ -6,6 +6,9 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import de.alaoli.games.minecraft.mods.yadm.command.ManageCommand;
+import de.alaoli.games.minecraft.mods.yadm.command.TeleportCommand;
 import de.alaoli.games.minecraft.mods.yadm.proxy.CommonProxy;
 
 
@@ -29,8 +32,8 @@ public class YADM
 	 ********************************************************************************/
 
 	@SidedProxy(
-		clientSide = "de.alaoli.games.minecraft.mods.limitedresources.proxy.ClientProxy", 
-		serverSide = "de.alaoli.games.minecraft.mods.limitedresources.proxy.ServerProxy"
+		clientSide = "de.alaoli.games.minecraft.mods.yadm.proxy.ClientProxy", 
+		serverSide = "de.alaoli.games.minecraft.mods.yadm.proxy.ServerProxy"
 	)
 	public static CommonProxy proxy;
 		
@@ -51,6 +54,15 @@ public class YADM
     public void init( FMLInitializationEvent event )
     {
     	proxy.registerRenderers();
+
+    	
+    }
+    
+    @EventHandler
+    public void serverInit( FMLServerStartingEvent event )
+    {
+		event.registerServerCommand( new ManageCommand() );
+		event.registerServerCommand( new TeleportCommand() );
     }
     
 	/********************************************************************************
