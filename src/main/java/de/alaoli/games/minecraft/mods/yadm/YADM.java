@@ -8,7 +8,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import de.alaoli.games.minecraft.mods.yadm.command.ManageCommand;
-import de.alaoli.games.minecraft.mods.yadm.command.TeleportCommand;
 import de.alaoli.games.minecraft.mods.yadm.proxy.CommonProxy;
 
 
@@ -62,7 +61,6 @@ public class YADM
     public void serverInit( FMLServerStartingEvent event )
     {
 		event.registerServerCommand( new ManageCommand() );
-		event.registerServerCommand( new TeleportCommand() );
     }
     
 	/********************************************************************************
