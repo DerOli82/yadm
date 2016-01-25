@@ -24,6 +24,7 @@ public class ManageCommand implements ICommand
 	public static final String COMMAND = "yadm";
 	
 	public static final String SUBCOMMAND_HELP		= "help";
+	public static final String SUBCOMMAND_PROVIDERS	= "providers";
 	public static final String SUBCOMMAND_TYPES		= "types";
 	public static final String SUBCOMMAND_TP		= "tp";
 	public static final String SUBCOMMAND_CREATE	= "create";
@@ -68,6 +69,7 @@ public class ManageCommand implements ICommand
 		/**
 		 * @TODO
 		 */
+		result.append("manage");
 		return result.toString();
 	}
 
@@ -94,10 +96,6 @@ public class ManageCommand implements ICommand
 			case SUBCOMMAND_HELP:
 				this.processCommandHelp( sender, argQueue );
 			break;
-			
-			case SUBCOMMAND_TYPES:
-				this.processCommandTypes( sender, argQueue );
-			break;			
 
 			case SUBCOMMAND_TP:
 				this.processCommandTP( sender, argQueue );
@@ -125,6 +123,7 @@ public class ManageCommand implements ICommand
 	   List<String> list = new ArrayList<String>();
 	   
 	   list.add( SUBCOMMAND_HELP );
+	   list.add( SUBCOMMAND_PROVIDERS );
 	   list.add( SUBCOMMAND_TYPES );
 	   list.add( SUBCOMMAND_TP );
 	   list.add( SUBCOMMAND_CREATE );
@@ -153,25 +152,7 @@ public class ManageCommand implements ICommand
 	{
 		sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
 	}
-	
-	/**
-	 * Return World Types
-	 * 
-	 * @param ICommandSender
-	 * @param String[]
-	 */
-	private void processCommandTypes( ICommandSender sender, Queue<String> argQueue )
-	{
-		YADimensionManager dm = YADimensionManager.getInstance();
-		
-		sender.addChatMessage( new ChatComponentText( "Possible World Types:" ) );
-		
-		for( String type : dm.getWorldTypes() )
-		{
-			sender.addChatMessage( new ChatComponentText( "  - " + type ) );	
-		}
-	}
-	
+
 	/**
 	 * Teleport Command
 	 * 
@@ -263,53 +244,34 @@ public class ManageCommand implements ICommand
 	private void processCommandCreate( ICommandSender sender, Queue<String> argQueue )
 	{
 		//Usage
-		if( argQueue.isEmpty() )
+		if( argQueue.size() < 2 )
 		{
-			sender.addChatMessage( new ChatComponentText( "Usage: /" + COMMAND + " create <dimensionName> <worldType>" ) );
+			sender.addChatMessage( new ChatComponentText( "Usage: /" + COMMAND + " create <dimensionName> <dimensionPattern>" ) );
 			return;
 		}
-		YADimensionManager dm = YADimensionManager.getInstance();
-		String dimensionName = argQueue.remove();
-
-		//World Type
-		if( argQueue.isEmpty() )
+		String name = argQueue.remove();
+		String pattern = argQueue.remove();
+		
+		try
 		{
-			sender.addChatMessage( new ChatComponentText( "Usage: /" + COMMAND + " create <dimensionName> <worldType>" ) );
-			return;
-		}
-		String worldType = argQueue.remove();
-		
-		
-		EntityPlayerMP player = (EntityPlayerMP) sender.getEntityWorld().getPlayerEntityByName(sender.getCommandSenderName());
-		Coordinate coordinate;
-		Dimension dim;
-		
-		
-		
-		try 
-		{
-			dim = dm.createDimension( dimensionName, worldType );
+			Dimension dimension = YADimensionManager.createDimension( name, pattern );	
 			
 			if( Config.Dimensions.teleportOnCreate )
 			{
-				coordinate = new Coordinate( 
-					dim.getId(),
+				EntityPlayerMP player = (EntityPlayerMP) sender.getEntityWorld().getPlayerEntityByName(sender.getCommandSenderName());
+				Coordinate coordinate = new Coordinate( 
+					dimension.getId(),
 					(int) player.posX,
 					(int) player.posY,
 					(int) player.posZ
 				);
 				TeleportUtil.teleport( player, coordinate );
-			}
-			
-		} 
-		catch ( RuntimeException e )
+			}			
+		}
+		catch( RuntimeException e )
 		{
 			sender.addChatMessage( new ChatComponentText( e.getMessage() ) );
-			
 		}
-		
-		
-		
 	}	
 	
 

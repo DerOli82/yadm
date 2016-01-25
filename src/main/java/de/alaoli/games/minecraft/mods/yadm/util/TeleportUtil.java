@@ -16,7 +16,6 @@ public class TeleportUtil
 		 * @TODO Check if teleport target is blocked		
 		 */
 		DimensionManager.initDimension( coordinate.getDimId() );
-		
 		ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
 		WorldServer world = DimensionManager.getWorld( coordinate.getDimId() );
 		float pitch = player.rotationPitch;
