@@ -1,13 +1,12 @@
 package de.alaoli.games.minecraft.mods.yadm;
 
-import net.minecraftforge.common.config.Configuration;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import de.alaoli.games.minecraft.mods.yadm.command.ManageCommand;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import de.alaoli.games.minecraft.mods.yadm.proxy.CommonProxy;
 
 
@@ -15,27 +14,25 @@ import de.alaoli.games.minecraft.mods.yadm.proxy.CommonProxy;
 public class YADM
 {
 	/********************************************************************************
-	 * Mod Info
+	 * Constant
 	 ********************************************************************************/
 
-	public static final String MODID	= "YADM";
+	public static final String MODID	= "yadm";
 	public static final String NAME		= "YADM - Yes another Dimension Manager";
 	public static final String VERSION	= "0.1.0";
 						
-	/********************************************************************************
-	 * Attributes
-	 ********************************************************************************/
-
 	/********************************************************************************
 	 * Forge
 	 ********************************************************************************/
 
 	@SidedProxy(
 		clientSide = "de.alaoli.games.minecraft.mods.yadm.proxy.ClientProxy", 
-		serverSide = "de.alaoli.games.minecraft.mods.yadm.proxy.ServerProxy"
+		serverSide = "de.alaoli.games.minecraft.mods.yadm.proxy.CommonProxy"
 	)
 	public static CommonProxy proxy;
 		
+	public static SimpleNetworkWrapper network;
+	
 	/********************************************************************************
 	 * Methods - Forge Event Handler
 	 ********************************************************************************/
@@ -43,28 +40,18 @@ public class YADM
     @EventHandler 
     public void preInit( FMLPreInitializationEvent event ) 
     {
-    	Configuration configFile = new Configuration( event.getSuggestedConfigurationFile() );
-    	
-    	Config.init( configFile );
-
+    	YADM.proxy.preInit( event );
     }
     
     @EventHandler
     public void init( FMLInitializationEvent event )
     {
-    	proxy.registerRenderers();
-
-    	
+    	YADM.proxy.init( event );
     }
     
     @EventHandler
     public void serverInit( FMLServerStartingEvent event )
     {
-		event.registerServerCommand( new ManageCommand() );
+    	YADM.proxy.serverInit( event );
     }
-    
-	/********************************************************************************
-	 * Methods - Getter / Setter
-	 ********************************************************************************/    
-
 }
