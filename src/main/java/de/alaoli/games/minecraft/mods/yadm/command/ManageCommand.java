@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import de.alaoli.games.minecraft.mods.yadm.Config;
+import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
@@ -171,9 +172,9 @@ public class ManageCommand implements ICommand
 		Coordinate coordinate;
 		EntityPlayerMP player;
 		
-		YADimensionManager dm = YADimensionManager.getInstance();
+		YADimensionManager dm = YADM.proxy.getDimensionManager();
 		String dimensionName = argQueue.remove();
-		
+		/*
 		//Does Dimension exists
 		if( !dm.existsDimension( dimensionName ) )
 		{
@@ -254,7 +255,11 @@ public class ManageCommand implements ICommand
 		
 		try
 		{
-			Dimension dimension = YADimensionManager.createDimension( name, pattern );	
+			Dimension dimension = (Dimension) YADM.proxy.getDimensionManager().create( name );	
+			dimension.setPatternName( pattern );
+			
+			YADM.proxy.getDimensionManager().register( dimension );
+			YADM.proxy.getDimensionManager().init( dimension );
 			
 			if( Config.Dimensions.teleportOnCreate )
 			{

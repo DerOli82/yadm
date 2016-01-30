@@ -1,6 +1,8 @@
 package de.alaoli.games.minecraft.mods.yadm.data;
 
-public class DimensionPattern 
+import com.google.gson.annotations.Expose;
+
+public class DimensionPattern extends DataObject
 {
 	/********************************************************************************
 	 * Constants
@@ -16,21 +18,27 @@ public class DimensionPattern
 	 * Attributes
 	 ********************************************************************************/
 	
-	private String name;
-	
+	@Expose
 	private String provider;
 	
+	@Expose
 	private String type;
 	
+	@Expose
 	private Long seed;
 	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
 	
+	public DimensionPattern( String name ) 
+	{
+		super( name );
+	}
+	
 	public DimensionPattern( String name, String provider, String type, Long seed )
 	{
-		this.name = name;
+		super( name );
 		this.provider = provider;
 		this.type = type;
 		this.seed = seed;
@@ -39,11 +47,6 @@ public class DimensionPattern
 	/********************************************************************************
 	 * Methods - Getter/Setter
 	 ********************************************************************************/
-	
-	public String getName() 
-	{
-		return this.name;
-	}
 
 	public String getProvider() 
 	{
@@ -59,4 +62,21 @@ public class DimensionPattern
 	{
 		return this.seed;
 	}
+
+	public void setProvider( String provider )
+	{
+		this.provider = provider;
+	}
+
+	public void setType( String type )
+	{
+		this.type = type;
+	}
+
+	public void setSeed( Long seed ) 
+	{
+		this.seed = seed;
+	}
+	
+	
 }
