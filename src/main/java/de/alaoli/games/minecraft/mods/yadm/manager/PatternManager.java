@@ -130,6 +130,23 @@ public class PatternManager extends AbstractManager
 	}
 
 	/********************************************************************************
+	 * Methods - Getter/Setter
+	 ********************************************************************************/
+	
+	public WorldType getWorldType( String name )
+	{
+		return this.worldTypes.get( name );
+	}
+	
+	public WorldProvider getProvider( String name ) throws ClassNotFoundException, InstantiationException, IllegalAccessException 
+	{
+		String providerName = this.worldProviders.get( 0 );
+		WorldProvider provider = (WorldProvider) Class.forName( providerName ).newInstance();
+		
+		return provider;
+	}
+	
+	/********************************************************************************
 	 * Methods - Implements AbstractManager
 	 ********************************************************************************/
 	
