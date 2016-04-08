@@ -1,9 +1,12 @@
 package de.alaoli.games.minecraft.mods.yadm.data;
 
+import java.util.Random;
+
 import com.google.gson.annotations.Expose;
 
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.WorldType;
 import net.minecraftforge.common.DimensionManager;
 
 public class Dimension extends DataObject
@@ -24,7 +27,12 @@ public class Dimension extends DataObject
 	@Expose
 	private String typeName;
 	
+	@Expose
+	private Long seed;
+	
 	private DimensionPattern pattern;
+	
+	private WorldType type;
 	
 	private WorldServer worldServer;
 	
@@ -51,7 +59,7 @@ public class Dimension extends DataObject
 		super( name );
 		
 		this.id = id;
-		this.patternName = patternName;
+		this.setPatternName( patternName );
 		
 		this.isRegistered = false;
 	}	
@@ -85,6 +93,22 @@ public class Dimension extends DataObject
 		return this.typeName;
 	}
 
+	public Long getSeed()
+	{
+		//Get from pattern
+		if( this.seed == null )
+		{
+			this.seed = this.getPattern().getSeed();
+			
+			//No seed set -> generate Random
+			if( this.seed == null )
+			{
+				this.seed = (new Random()).nextLong();
+			}
+		}
+		return this.seed;
+	}
+	
 	public DimensionPattern getPattern()
 	{
 		//Get reference
@@ -93,6 +117,16 @@ public class Dimension extends DataObject
 			this.pattern = (DimensionPattern) YADM.proxy.getPatternManager().get( this.patternName );
 		}
 		return this.pattern;
+	}
+	
+	public WorldType getType()
+	{
+		//Get reference
+		if( this.type == null )
+		{
+			this.type = YADM.proxy.getPatternManager().getWorldType( this.typeName );
+		}
+		return this.type;
 	}
 	
 	public WorldServer getWorldServer() 
@@ -109,9 +143,10 @@ public class Dimension extends DataObject
 	{
 		this.patternName = patternName;
 		
-		//Copy Provider & Type
+		//Copy Provider, Type and Seed
 		this.providerName = this.getPattern().getProvider();
 		this.typeName = this.getPattern().getType();
+		this.seed = (this.getPattern().getSeed() != null ) ? this.getPattern().getSeed() : (new Random()).nextLong();
 	}
 	
 	public void setProviderName( String providerName )
