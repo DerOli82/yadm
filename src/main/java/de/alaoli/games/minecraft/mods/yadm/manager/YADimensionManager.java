@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map.Entry;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
@@ -18,10 +17,27 @@ import de.alaoli.games.minecraft.mods.yadm.data.DataObject;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.network.DimensionSyncMessage;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldProviderGeneric;
+import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.DimensionManager;
 
 public class YADimensionManager extends AbstractManager 
 {
+	public Dimension getById( int id )
+	{
+		Dimension dimension;
+		
+		for( Entry<String, DataObject> entry : this.getAll() )
+		{
+			dimension = (Dimension) entry.getValue();
+			
+			if( dimension.getId() == id )
+			{
+				return dimension;
+			}
+		}
+		return null;
+	}
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -50,13 +66,25 @@ public class YADimensionManager extends AbstractManager
 		{
 			return;
 		}
-		DimensionManager.registerProviderType( dimension.getId(), WorldProviderGeneric.class, false );
-		DimensionManager.registerDimension( dimension.getId(), dimension.getId() );
 		
-		YADM.network.sendToServer( new DimensionSyncMessage( dimension.getId() ) );
-		YADM.network.sendToAll( new DimensionSyncMessage( dimension.getId() ));
-		
-		dimension.setRegistered( true );
+		try 
+		{
+			//TODO World Provider
+			WorldProvider provider = YADM.proxy.getPatternManager().getProvider("");
+			
+			DimensionManager.registerProviderType( dimension.getId(), WorldProviderGeneric.class, false );
+			
+			DimensionManager.registerDimension( dimension.getId(), dimension.getId() );
+			
+			YADM.network.sendToServer( new DimensionSyncMessage( dimension.getId() ) );
+			YADM.network.sendToAll( new DimensionSyncMessage( dimension.getId() ));
+			
+			dimension.setRegistered( true );			
+		} 
+		catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) 
+		{
+			Log.error( e.getMessage() );
+		}
 	}
 	
 	public void unregister( Dimension dimension )
@@ -136,6 +164,8 @@ public class YADimensionManager extends AbstractManager
 					dimension	= gson.fromJson( reader, Dimension.class );
 
 					this.add( dimension );
+					this.register( dimension );
+					this.init( dimension );
 					reader.close();
 				}
 				catch ( IOException e ) 

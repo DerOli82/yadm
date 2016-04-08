@@ -38,7 +38,7 @@ public abstract class AbstractManager
 	public void reload()
 	{
 		//safety first
-		if( this.isDirty() )
+		if( this.dirty )
 		{
 			this.save();
 		}
