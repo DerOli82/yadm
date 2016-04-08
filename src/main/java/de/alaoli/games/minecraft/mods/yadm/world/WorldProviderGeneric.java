@@ -39,7 +39,7 @@ public class WorldProviderGeneric extends WorldProvider
 	@Override
 	public IChunkProvider createChunkGenerator() 
 	{
-		return this.getDimension().getType().getChunkGenerator( this.worldObj, null );
+		return this.getDimension().getType().getChunkGenerator( this.worldObj, this.getDimension().getGeneratorOptions() );
 	}
 
 	@Override

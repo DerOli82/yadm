@@ -101,18 +101,21 @@ public class PatternManager extends AbstractManager
 			DimensionPattern.PROVIDER_OVERWORLD,
 			DimensionPattern.PROVIDER_OVERWORLD,
 			DimensionPattern.TYPE_DEFAULT,
+			null,
 			null
 		));
 		this.add( new DimensionPattern( 
 			DimensionPattern.PROVIDER_NETHER,
 			DimensionPattern.PROVIDER_NETHER,
 			DimensionPattern.TYPE_DEFAULT,
+			null,
 			null
 		));
 		this.add( new DimensionPattern( 
 			DimensionPattern.PROVIDER_END,
 			DimensionPattern.PROVIDER_END,
 			DimensionPattern.TYPE_DEFAULT,
+			null,
 			null
 		));
 		this.dirty = true;

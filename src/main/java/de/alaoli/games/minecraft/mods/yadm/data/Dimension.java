@@ -9,26 +9,17 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.DimensionManager;
 
-public class Dimension extends DataObject
+public class Dimension extends DimensionPattern
 {
 	/**********************************************************************
 	 * Attributes 
 	 **********************************************************************/
 
 	@Expose
-	private int id;
+	protected int id;
 	
 	@Expose
-	private String patternName;
-	
-	@Expose
-	private String providerName;
-	
-	@Expose
-	private String typeName;
-	
-	@Expose
-	private Long seed;
+	protected String patternName;
 	
 	private DimensionPattern pattern;
 	
@@ -82,33 +73,7 @@ public class Dimension extends DataObject
 	{
 		return this.patternName;
 	}
-	
-	public String getProviderName() 
-	{
-		return this.providerName;
-	}
 
-	public String getTypeName() 
-	{
-		return this.typeName;
-	}
-
-	public Long getSeed()
-	{
-		//Get from pattern
-		if( this.seed == null )
-		{
-			this.seed = this.getPattern().getSeed();
-			
-			//No seed set -> generate Random
-			if( this.seed == null )
-			{
-				this.seed = (new Random()).nextLong();
-			}
-		}
-		return this.seed;
-	}
-	
 	public DimensionPattern getPattern()
 	{
 		//Get reference
@@ -143,22 +108,13 @@ public class Dimension extends DataObject
 	{
 		this.patternName = patternName;
 		
-		//Copy Provider, Type and Seed
-		this.providerName = this.getPattern().getProvider();
-		this.typeName = this.getPattern().getType();
+		//Copy provider, type, generator options and seed if seed null -> random
+		this.providerName = this.getPattern().getProviderName();
+		this.typeName = this.getPattern().getTypeName();
+		this.generatorOptions = this.getPattern().getGeneratorOptions();
 		this.seed = (this.getPattern().getSeed() != null ) ? this.getPattern().getSeed() : (new Random()).nextLong();
 	}
-	
-	public void setProviderName( String providerName )
-	{
-		this.providerName = providerName;
-	}
-	
-	public void setTypeName( String typeName )
-	{
-		this.typeName = typeName;
-	}
-	
+
 	public void setRegistered( boolean isRegistered )
 	{
 		this.isRegistered = isRegistered;

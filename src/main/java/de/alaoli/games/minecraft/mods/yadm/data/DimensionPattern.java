@@ -2,7 +2,7 @@ package de.alaoli.games.minecraft.mods.yadm.data;
 
 import com.google.gson.annotations.Expose;
 
-public class DimensionPattern extends DataObject
+public class DimensionPattern implements DataObject
 {
 	/********************************************************************************
 	 * Constants
@@ -19,28 +19,36 @@ public class DimensionPattern extends DataObject
 	 ********************************************************************************/
 	
 	@Expose
-	private String provider;
+	protected String name;
 	
 	@Expose
-	private String type;
+	protected String providerName;
 	
 	@Expose
-	private Long seed;
+	protected String typeName;
+	
+	@Expose
+	protected String generatorOptions;
+	
+	@Expose
+	protected Long seed;
+	
 	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
-	
-	public DimensionPattern( String name ) 
+
+	public DimensionPattern( String name )
 	{
-		super( name );
+		this.name = name;
 	}
 	
-	public DimensionPattern( String name, String provider, String type, Long seed )
+	public DimensionPattern( String name, String providerName, String typeName, String generatorOptions, Long seed )
 	{
-		super( name );
-		this.provider = provider;
-		this.type = type;
+		this.name = name;
+		this.providerName = providerName;
+		this.typeName = typeName;
+		this.generatorOptions = generatorOptions;
 		this.seed = seed;
 	}
 	
@@ -48,29 +56,39 @@ public class DimensionPattern extends DataObject
 	 * Methods - Getter/Setter
 	 ********************************************************************************/
 
-	public String getProvider() 
+	public String getProviderName() 
 	{
-		return this.provider;
+		return this.providerName;
 	}
 
-	public String getType() 
+	public String getTypeName() 
 	{
-		return this.type;
+		return this.typeName;
 	}
 
+	public String getGeneratorOptions()
+	{
+		return this.generatorOptions;
+	}
+	
 	public Long getSeed() 
 	{
 		return this.seed;
 	}
 
-	public void setProvider( String provider )
+	public void setProviderName( String providerName )
 	{
-		this.provider = provider;
+		this.providerName = providerName;
 	}
 
-	public void setType( String type )
+	public void setTypeName( String typeName )
 	{
-		this.type = type;
+		this.typeName = typeName;
+	}
+
+	public void setGeneratorOptions( String generatorOptions ) 
+	{
+		this.generatorOptions = generatorOptions;
 	}
 
 	public void setSeed( Long seed ) 
@@ -78,5 +96,13 @@ public class DimensionPattern extends DataObject
 		this.seed = seed;
 	}
 	
+	/********************************************************************************
+	 * Methods - Implements DataObject
+	 ********************************************************************************/	
 	
+	@Override
+	public String getName()
+	{
+		return this.name;
+	}
 }
