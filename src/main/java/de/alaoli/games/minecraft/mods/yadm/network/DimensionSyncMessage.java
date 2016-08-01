@@ -1,23 +1,22 @@
 package de.alaoli.games.minecraft.mods.yadm.network;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import gnu.trove.list.array.TIntArrayList;
+import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 
 public class DimensionSyncMessage implements IMessage 
 {
 	/********************************************************************************
-	 * Constant
-	 ********************************************************************************/
-	
-	public static final int MAX_BYTES = 4;
-	
-	/********************************************************************************
 	 * Attribute
 	 ********************************************************************************/
 	
-	private TIntArrayList dimensionIds;
+	private Set<Dimension> dimensions;
 	
 	/********************************************************************************
 	 * Methods
@@ -25,27 +24,27 @@ public class DimensionSyncMessage implements IMessage
 	
 	public DimensionSyncMessage()
 	{
-		this.dimensionIds = new TIntArrayList();
+		this.dimensions = new HashSet<Dimension>();
 	}
 	
-	public DimensionSyncMessage( int dimensionId )
+	public DimensionSyncMessage( Dimension dimension )
 	{
-		this.dimensionIds = new TIntArrayList();
-		this.dimensionIds.add( dimensionId );
+		this.dimensions = new HashSet<Dimension>();
+		this.dimensions.add( dimension );
 	}
 	
-	public DimensionSyncMessage( TIntArrayList dimensionIds )
+	public DimensionSyncMessage( Set<Dimension> dimensions )
 	{
-		this.dimensionIds = dimensionIds;
+		this.dimensions = dimensions;
 	}
 	
 	/********************************************************************************
 	 * Methods - Getter/Setter
 	 ********************************************************************************/
 	 
-	 public TIntArrayList getDimensionIds()
+	 public Set<Dimension> getDimensions()
 	 {
-		 return this.dimensionIds;
+		 return this.dimensions;
 	 }
 	 
 	/********************************************************************************
@@ -55,23 +54,53 @@ public class DimensionSyncMessage implements IMessage
 	@Override
 	public void fromBytes(ByteBuf buffer ) 
 	{	
-		int size = ByteBufUtils.readVarInt( buffer, MAX_BYTES );
+		PacketBuffer packet;
+		NBTTagCompound tagCompound;
+		Dimension dimension;
+		
+		int size = buffer.readInt();
 		
 		for( int i = 0; i < size; i++ )
 		{
-			this.dimensionIds.add( ByteBufUtils.readVarInt( buffer, MAX_BYTES ) );
+			try 
+			{
+				dimension 	= new Dimension();
+				packet		= new PacketBuffer( buffer );
+				tagCompound = packet.readNBTTagCompoundFromBuffer();
+				
+				dimension.readFromNBT( tagCompound );
+				this.dimensions.add( dimension );
+			} 
+			catch ( IOException e ) 
+			{
+				e.printStackTrace();
+			}
 		}
-		
 	}
 
 	@Override
 	public void toBytes(ByteBuf buffer) 
 	{
-		ByteBufUtils.writeVarInt( buffer, this.dimensionIds.size(), MAX_BYTES );
+		PacketBuffer packet;
+		NBTTagCompound tagCompound;
 		
-		for( int i = 0; i < this.dimensionIds.size(); i++ )
-		{
-			ByteBufUtils.writeVarInt( buffer, this.dimensionIds.get( i ), MAX_BYTES );
+		buffer.writeInt( this.dimensions.size() );
+		
+		for( Dimension dimension : this.dimensions )
+		{						
+			try 
+			{
+				packet		= new PacketBuffer( buffer );
+				tagCompound	= new NBTTagCompound();
+				
+				dimension.writeToNBT( tagCompound );
+				packet.writeNBTTagCompoundToBuffer(tagCompound);
+			} 
+			catch ( IOException e )
+			{
+				e.printStackTrace();
+			}
+			
 		}
 	}
 }
