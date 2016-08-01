@@ -5,6 +5,7 @@ import java.util.Random;
 import com.google.gson.annotations.Expose;
 
 import de.alaoli.games.minecraft.mods.yadm.YADM;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.DimensionManager;
@@ -33,6 +34,11 @@ public class Dimension extends DimensionPattern
 	 * Methods 
 	 **********************************************************************/
 
+	public Dimension()
+	{
+		
+	}
+	
 	public Dimension( String name )
 	{
 		super( name );
@@ -119,4 +125,27 @@ public class Dimension extends DimensionPattern
 	{
 		this.isRegistered = isRegistered;
 	}
+
+	/********************************************************************************
+	 * Methods - Implements DataObject
+	 ********************************************************************************/	
+
+	@Override
+	public void writeToNBT( NBTTagCompound tagCompound ) 
+	{
+		super.writeToNBT( tagCompound );
+		
+		tagCompound.setInteger( "id", this.id );
+		tagCompound.setString( "patternName", this.patternName );
+	}
+
+	@Override
+	public void readFromNBT( NBTTagCompound tagCompound ) 
+	{
+		super.readFromNBT( tagCompound );
+		
+		this.id = tagCompound.getInteger( "id" );
+		this.patternName = tagCompound.getString( "patternName" );
+		
+	}	
 }
