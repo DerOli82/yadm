@@ -7,7 +7,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import de.alaoli.games.minecraft.mods.yadm.proxy.CommonProxy;
 
 
@@ -28,12 +27,10 @@ public class YADM
 
 	@SidedProxy(
 		clientSide = "de.alaoli.games.minecraft.mods.yadm.proxy.ClientProxy", 
-		serverSide = "de.alaoli.games.minecraft.mods.yadm.proxy.CommonProxy"
+		serverSide = "de.alaoli.games.minecraft.mods.yadm.proxy.ServerProxy"
 	)
 	public static CommonProxy proxy;
 		
-	public static SimpleNetworkWrapper network;
-	
 	/********************************************************************************
 	 * Methods - Forge Event Handler
 	 ********************************************************************************/

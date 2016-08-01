@@ -9,7 +9,7 @@ import de.alaoli.games.minecraft.mods.yadm.network.DimensionSyncHandler;
 import de.alaoli.games.minecraft.mods.yadm.network.DimensionSyncMessage;
 import net.minecraft.entity.player.EntityPlayerMP;
 
-public class ClientProxy extends CommonProxy
+public class ServerProxy extends CommonProxy
 {
 	/********************************************************************************
 	 * Methods - FML
@@ -20,7 +20,7 @@ public class ClientProxy extends CommonProxy
 	{
 		super.preInit( event );
 		
-		network.registerMessage( DimensionSyncHandler.class, DimensionSyncMessage.class, 0, Side.CLIENT );
+		network.registerMessage( DimensionSyncHandler.class, DimensionSyncMessage.class, 0, Side.SERVER );
 	}	
 	
 	/********************************************************************************
@@ -30,12 +30,12 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public void syncDimension( Dimension dimension )
 	{
-		network.sendToServer( new DimensionSyncMessage( dimension ) );
+		network.sendToAll( new DimensionSyncMessage( dimension ));
 	}
-
+	
 	@Override
-	public void syncDimension(Set<Dimension> dimensions, EntityPlayerMP player) {
-		// TODO Auto-generated method stub
-		
+	public void syncDimension( Set<Dimension> dimensions, EntityPlayerMP player )
+	{
+		network.sendTo(new DimensionSyncMessage( dimensions ), player);
 	}
 }
