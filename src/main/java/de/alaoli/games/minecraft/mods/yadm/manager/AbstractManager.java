@@ -76,6 +76,11 @@ public abstract class AbstractManager
 		return this.dirty;
 	}
 	
+	public boolean isEmpty()
+	{
+		return this.data.isEmpty();
+	}
+	
 	/********************************************************************************
 	 * Methods - Getter/Setter
 	 ********************************************************************************/
