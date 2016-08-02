@@ -18,6 +18,11 @@ import com.google.gson.stream.JsonWriter;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.DataObject;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionPattern;
+import de.alaoli.games.minecraft.mods.yadm.interceptor.RegisterWorldChunkManagerInterceptor;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.matcher.ElementMatchers;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.DimensionManager;
@@ -141,12 +146,39 @@ public class PatternManager extends AbstractManager
 		return this.worldTypes.get( name );
 	}
 	
-	public WorldProvider getProvider( String name ) throws ClassNotFoundException, InstantiationException, IllegalAccessException 
+	public WorldProvider getProvider( String name ) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException 
 	{
-		String providerName = this.worldProviders.get( 0 );
-		WorldProvider provider = (WorldProvider) Class.forName( providerName ).newInstance();
+		String providerName = null;
 		
-		return provider;
+		switch( name )
+		{
+			case DimensionPattern.PROVIDER_NETHER :
+				providerName = this.worldProviders.get( -1 );
+				break;
+				
+			case DimensionPattern.PROVIDER_OVERWORLD :
+				providerName = this.worldProviders.get( 0 );
+				break;
+				
+			case DimensionPattern.PROVIDER_END :
+				providerName = this.worldProviders.get( 1 );
+				break;				
+				
+			default :
+				//TODO Custom Provider
+				providerName = this.worldProviders.get( 0 );
+				break;
+		}
+		Class<?> dynamicType = new ByteBuddy()
+			.subclass( Class.forName( providerName ) )
+			.method( ElementMatchers.named("registerWorldChunkManager") )
+			.intercept( MethodDelegation.to( RegisterWorldChunkManagerInterceptor.class ) )
+			.make()
+			.load( getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER )
+			.getLoaded();
+			
+		
+		return (WorldProvider) dynamicType.newInstance();
 	}
 	
 	/********************************************************************************

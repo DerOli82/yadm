@@ -15,7 +15,6 @@ import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.DataObject;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.world.WorldProviderGeneric;
 import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.DimensionManager;
 
@@ -61,25 +60,25 @@ public class YADimensionManager extends AbstractManager
 	public void register( Dimension dimension )
 	{
 		//Nothing to do
-		if( dimension.isRegistered() )
+		if( ( dimension.isRegistered() ) || 
+			( DimensionManager.isDimensionRegistered( dimension.getId() ) ) )
 		{
 			return;
 		}
 		
 		try 
 		{
-			//TODO World Provider
-			WorldProvider provider = YADM.proxy.getPatternManager().getProvider("");
+			WorldProvider provider = YADM.proxy.getPatternManager().getProvider( dimension.getProviderName() );
 			
-			DimensionManager.registerProviderType( dimension.getId(), WorldProviderGeneric.class, false );
+			DimensionManager.registerProviderType( dimension.getId(), provider.getClass(), false );
 			DimensionManager.registerDimension( dimension.getId(), dimension.getId() );
 			dimension.setRegistered( true );
 			
 			YADM.proxy.syncDimension( dimension );
 		} 
-		catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) 
+		catch ( Exception e) 
 		{
-			Log.error( e.getMessage() );
+			e.printStackTrace();
 		}
 	}
 	

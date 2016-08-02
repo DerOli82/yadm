@@ -151,6 +151,9 @@ public class ManageCommand implements ICommand
 	 */
 	private void processCommandHelp( ICommandSender sender, Queue<String> argQueue )
 	{
+		EntityPlayerMP player = (EntityPlayerMP) sender.getEntityWorld().getPlayerEntityByName(sender.getCommandSenderName());
+		
+		sender.addChatMessage( new ChatComponentText( "Dim: " + String.valueOf( player.dimension ) ) );
 		sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
 	}
 
