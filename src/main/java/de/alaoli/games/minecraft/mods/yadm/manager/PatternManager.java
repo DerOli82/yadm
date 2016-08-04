@@ -15,13 +15,22 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.DataObject;
+import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionPattern;
-import de.alaoli.games.minecraft.mods.yadm.interceptor.RegisterWorldChunkManagerInterceptor;
+import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.DimensionFieldAccessor;
+import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.GetDimensionNameInterceptor;
+import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.GetSeedInterceptor;
+import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.RegisterWorldChunkManagerPostInterceptor;
+import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.RegisterWorldChunkManagerPreInterceptor;
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.implementation.SuperMethodCall;
 import net.bytebuddy.matcher.ElementMatchers;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldType;
@@ -48,6 +57,7 @@ public class PatternManager extends AbstractManager
 		this.initTypes();
 	}
 
+	@SuppressWarnings( "unchecked" )
 	private void initProvider()
 	{
 		this.worldProviders = new HashMap<Integer, String>();
@@ -146,7 +156,7 @@ public class PatternManager extends AbstractManager
 		return this.worldTypes.get( name );
 	}
 	
-	public WorldProvider getProvider( String name ) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException 
+	public WorldProvider getProvider( String name ) throws ClassNotFoundException, InstantiationException, IllegalAccessException 
 	{
 		String providerName = null;
 		
@@ -169,14 +179,39 @@ public class PatternManager extends AbstractManager
 				providerName = this.worldProviders.get( 0 );
 				break;
 		}
+		Class providerClass = Class.forName( providerName );
+		
+		String registerWorldChunkManagerMethodName = ReflectionHelper.findMethod( 
+			WorldProvider.class, (WorldProvider)providerClass.newInstance(), 
+			new String[]{ "func_76572_b", "registerWorldChunkManager" } 
+		).getName();
+		String getDimensionNameMethodName = ReflectionHelper.findMethod( 
+			WorldProvider.class, (WorldProvider)providerClass.newInstance(), 
+			new String[]{ "func_80007_l", "getDimensionName" } 
+		).getName();
+		String getSeedMethodName = ReflectionHelper.findMethod( 
+			WorldProvider.class, (WorldProvider)providerClass.newInstance(), 
+			new String[]{ "func_72905_C", "getSeed" } 
+		).getName();	
+		
 		Class<?> dynamicType = new ByteBuddy()
-			.subclass( Class.forName( providerName ) )
-			.method( ElementMatchers.named("registerWorldChunkManager") )
-			.intercept( MethodDelegation.to( RegisterWorldChunkManagerInterceptor.class ) )
+			.subclass( providerClass )
+			.defineField( "dimensionYADM", Dimension.class, Visibility.PROTECTED )
+			.implement( DimensionFieldAccessor.class )
+			.intercept( FieldAccessor.ofBeanProperty() )
+			.method( ElementMatchers.named( registerWorldChunkManagerMethodName ) )
+			.intercept( 
+				MethodDelegation.to( RegisterWorldChunkManagerPreInterceptor.class )
+				.andThen( SuperMethodCall.INSTANCE
+				.andThen( MethodDelegation.to( RegisterWorldChunkManagerPostInterceptor.class ) ) ) 
+			)
+			.method( ElementMatchers.named( getDimensionNameMethodName ) )
+			.intercept( MethodDelegation.to( GetDimensionNameInterceptor.class ) )
+			.method( ElementMatchers.named( getSeedMethodName ) )
+			.intercept( MethodDelegation.to( GetSeedInterceptor.class ) )
 			.make()
 			.load( getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER )
 			.getLoaded();
-			
 		
 		return (WorldProvider) dynamicType.newInstance();
 	}
