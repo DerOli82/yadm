@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.DataObject;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
@@ -16,6 +18,7 @@ import net.minecraftforge.event.world.WorldEvent;
 public class DimensionEvent 
 {
     @SubscribeEvent
+    @SideOnly( Side.SERVER )
     public void onClientConnected( FMLNetworkEvent.ServerConnectionFromClientEvent event )
     {
     	//Sync Dimensions
@@ -32,7 +35,7 @@ public class DimensionEvent
 	    	YADM.proxy.syncDimension(dimensions, player);
     	}
     }
-    
+
 	@SubscribeEvent
 	public void onWorldSave( WorldEvent.Save event )
 	{
