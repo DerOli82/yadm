@@ -15,6 +15,9 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.World;
+import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.common.DimensionManager;
 
 public class ManageCommand implements ICommand
 {
@@ -25,6 +28,7 @@ public class ManageCommand implements ICommand
 	public static final String COMMAND = "yadm";
 	
 	public static final String SUBCOMMAND_HELP		= "help";
+	public static final String SUBCOMMAND_INFO		= "info";
 	public static final String SUBCOMMAND_PROVIDERS	= "providers";
 	public static final String SUBCOMMAND_TYPES		= "types";
 	public static final String SUBCOMMAND_TP		= "tp";
@@ -70,7 +74,7 @@ public class ManageCommand implements ICommand
 		/**
 		 * @TODO
 		 */
-		result.append("manage");
+		result.append("todo");
 		return result.toString();
 	}
 
@@ -98,6 +102,10 @@ public class ManageCommand implements ICommand
 				this.processCommandHelp( sender, argQueue );
 			break;
 
+			case SUBCOMMAND_INFO :
+				this.processCommandInfo( sender, argQueue );
+				break;
+				
 			case SUBCOMMAND_TP:
 				this.processCommandTP( sender, argQueue );
 				break;
@@ -157,6 +165,25 @@ public class ManageCommand implements ICommand
 		sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
 	}
 
+	/**
+	 * Command Usage
+	 * 
+	 * @param ICommandSender
+	 * @param String[]
+	 */
+	private void processCommandInfo( ICommandSender sender, Queue<String> argQueue )
+	{
+		int dimId = sender.getEntityWorld().provider.dimensionId;
+		World world = DimensionManager.getWorld( dimId );
+		WorldInfo worldInfo = world.getWorldInfo();
+		
+		sender.addChatMessage( new ChatComponentText( "Current dimension info:" ) );
+		sender.addChatMessage( new ChatComponentText( "Name: " + world.provider.getDimensionName() ) );
+		sender.addChatMessage( new ChatComponentText( "Dim: " + world.provider.dimensionId ) );
+		sender.addChatMessage( new ChatComponentText( "Seed: " + world.getSeed() ) );
+		sender.addChatMessage( new ChatComponentText( "GenOpt: " + world.provider.field_82913_c ) );
+	}
+	
 	/**
 	 * Teleport Command
 	 * 
