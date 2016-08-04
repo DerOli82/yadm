@@ -21,21 +21,21 @@ public class ClientProxy extends CommonProxy
 		super.preInit( event );
 		
 		network.registerMessage( DimensionSyncHandler.class, DimensionSyncMessage.class, 0, Side.CLIENT );
-	}	
-	
+	}
+
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
-	
+
 	@Override
-	public void syncDimension( Dimension dimension )
+	public void syncDimension( Dimension dimension ) 
 	{
-		network.sendToServer( new DimensionSyncMessage( dimension ) );
+		// Nothing to do
 	}
 
 	@Override
-	public void syncDimension(Set<Dimension> dimensions, EntityPlayerMP player) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void syncDimension( Set<Dimension> dimensions, EntityPlayerMP player )
+	{
+		// Nothing to do
+	}	
 }
