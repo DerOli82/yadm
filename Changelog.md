@@ -1,5 +1,9 @@
 # Changelog
 
+# Version 0.3.1
+
+Versions, Versions, Versions...
+
 # Version 0.3.0
 
 First functional version:
