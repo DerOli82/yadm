@@ -1,40 +1,36 @@
 package de.alaoli.games.minecraft.mods.yadm.proxy;
 
 import java.io.File;
-import java.util.Set;
-
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.event.FMLServerStoppingEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.command.ManageCommand;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.event.DimensionEvent;
-import de.alaoli.games.minecraft.mods.yadm.manager.PatternManager;
+import de.alaoli.games.minecraft.mods.yadm.event.DimensionFMLEvent;
+import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
-import net.minecraft.entity.player.EntityPlayerMP;
+import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 
-public abstract class CommonProxy 
+public class CommonProxy 
 {	
 	/********************************************************************************
 	 * Attributes
 	 ********************************************************************************/
 
-	public static SimpleNetworkWrapper network;
-	
-	protected PatternManager patternManager;
+	protected TemplateManager templateManager;
 	
 	protected YADimensionManager dimensionManager;
 
 	public CommonProxy()
 	{
-		this.patternManager = new PatternManager();
+		this.templateManager = new TemplateManager();
 		this.dimensionManager = new YADimensionManager();
 	}
 	
@@ -51,16 +47,18 @@ public abstract class CommonProxy
 		path.append( event.getModConfigurationDirectory().toString() );
 		path.append( File.separator );
 		path.append( YADM.MODID );
+		path.append( "-templates" );
 		path.append( File.separator );
 		
-		this.patternManager.setSavePath( path.toString() );
-		this.patternManager.load();
+		this.templateManager.setSavePath( path.toString() );
+		this.templateManager.load();
 		
-		network = NetworkRegistry.INSTANCE.newSimpleChannel( YADM.MODID );
+		MessageDispatcher.register();
 	}
 	
 	public void init( FMLInitializationEvent event )
 	{
+		FMLCommonHandler.instance().bus().register( new DimensionFMLEvent() );
 		MinecraftForge.EVENT_BUS.register( new DimensionEvent() );
 	}
 	
@@ -82,7 +80,7 @@ public abstract class CommonProxy
 		event.registerServerCommand( new ManageCommand() );
 	}
 
-	public void serverStopping( FMLServerStoppingEvent event ) 
+	public void serverStopped( FMLServerStoppedEvent event ) 
 	{
 		this.dimensionManager.unregisterAll();
 		this.dimensionManager.save();
@@ -92,16 +90,19 @@ public abstract class CommonProxy
 	 * Methods
 	 ********************************************************************************/
 	
-	public abstract void syncDimension( Dimension dimension ); 
-	public abstract void syncDimension( Set<Dimension> dimensions, EntityPlayerMP player ); 
+	public void registerDimension( Dimension dimension )
+	{
+		this.dimensionManager.register( dimension );
+		this.dimensionManager.init( dimension );
+	}
 	
 	/********************************************************************************
 	 * Methods - Getter/Setter
 	 ********************************************************************************/
 	
-	public PatternManager getPatternManager()
+	public TemplateManager getTemplateManager()
 	{
-		return this.patternManager;
+		return this.templateManager;
 	}
 	
 	public YADimensionManager getDimensionManager()
