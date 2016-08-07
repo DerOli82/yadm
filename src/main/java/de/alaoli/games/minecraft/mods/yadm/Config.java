@@ -21,8 +21,6 @@ public class Config
 		public static boolean teleportOnCreate = true;
 	}
 	
-	private static String jsonPath;
-	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
