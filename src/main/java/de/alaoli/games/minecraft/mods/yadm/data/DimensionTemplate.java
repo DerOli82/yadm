@@ -2,9 +2,7 @@ package de.alaoli.games.minecraft.mods.yadm.data;
 
 import com.google.gson.annotations.Expose;
 
-import net.minecraft.nbt.NBTTagCompound;
-
-public class DimensionPattern implements DataObject
+public class DimensionTemplate implements DataObject
 {
 	/********************************************************************************
 	 * Constants
@@ -39,18 +37,13 @@ public class DimensionPattern implements DataObject
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
-
-	public DimensionPattern()
-	{
-		
-	}
 	
-	public DimensionPattern( String name )
+	public DimensionTemplate( String name )
 	{
 		this.name = name;
 	}
 	
-	public DimensionPattern( String name, String providerName, String typeName, String generatorOptions, Long seed )
+	public DimensionTemplate( String name, String providerName, String typeName, String generatorOptions, Long seed )
 	{
 		this.name = name;
 		this.providerName = providerName;
@@ -62,7 +55,7 @@ public class DimensionPattern implements DataObject
 	/********************************************************************************
 	 * Methods - Getter/Setter
 	 ********************************************************************************/
-
+	
 	public String getProviderName() 
 	{
 		return this.providerName;
@@ -111,41 +104,5 @@ public class DimensionPattern implements DataObject
 	public String getName()
 	{
 		return this.name;
-	}
-
-	@Override
-	public void writeToNBT( NBTTagCompound tagCompound )
-	{
-		tagCompound.setString( "name", this.name );
-		tagCompound.setString( "providerName", this.providerName );
-		tagCompound.setString( "typeName", this.typeName );
-		
-		//Optional
-		if( this.generatorOptions != null )
-		{
-			tagCompound.setString( "generatorOptions", this.generatorOptions );
-		}
-		if( this.seed != null )
-		{
-			tagCompound.setLong( "seed", this.seed );
-		}
-	}
-
-	@Override
-	public void readFromNBT( NBTTagCompound tagCompound ) 
-	{
-		this.name = 			tagCompound.getString( "name" );
-		this.providerName = 	tagCompound.getString( "providerName" );
-		this.typeName = 		tagCompound.getString( "typeName" );
-		
-		//Optional
-		if( tagCompound.hasKey("generatorOptions" ) )
-		{
-			this.generatorOptions = tagCompound.getString( "generatorOptions" );
-		}
-		if( tagCompound.hasKey("seed" ) )
-		{
-			this.seed = tagCompound.getLong( "seed" );
-		}
 	}
 }

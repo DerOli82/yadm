@@ -1,16 +1,10 @@
 package de.alaoli.games.minecraft.mods.yadm.data;
 
-import java.util.Random;
-
 import com.google.gson.annotations.Expose;
 
-import de.alaoli.games.minecraft.mods.yadm.YADM;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.WorldType;
-import net.minecraftforge.common.DimensionManager;
 
-public class Dimension extends DimensionPattern
+public class Dimension implements DataObject, NBTData
 {
 	/**********************************************************************
 	 * Attributes 
@@ -20,13 +14,10 @@ public class Dimension extends DimensionPattern
 	protected int id;
 	
 	@Expose
-	protected String patternName;
+	protected String name;
 	
-	private DimensionPattern pattern;
-	
-	private WorldType type;
-	
-	private WorldServer worldServer;
+	@Expose
+	protected DimensionSettings settings;
 	
 	private boolean isRegistered;
 	
@@ -34,32 +25,17 @@ public class Dimension extends DimensionPattern
 	 * Methods 
 	 **********************************************************************/
 
-	public Dimension()
+	public Dimension( NBTTagCompound tagCompound ) 
 	{
-		
+		this.readFromNBT( tagCompound );
 	}
 	
-	public Dimension( String name )
+	public Dimension( int id, String name, DimensionSettings settings )
 	{
-		super( name );
-	}
-	
-	public Dimension( int id, String name )
-	{
-		super( name );
-		
 		this.id = id;
+		this.name = name;
+		this.settings = settings;
 	}
-	
-	public Dimension( int id, String name, String patternName )
-	{
-		super( name );
-		
-		this.id = id;
-		this.setPatternName( patternName );
-		
-		this.isRegistered = false;
-	}	
 	
 	public boolean isRegistered()
 	{
@@ -75,52 +51,11 @@ public class Dimension extends DimensionPattern
 		return this.id;
 	}
 
-	public String getPatternName()
+	public DimensionSettings getSettings()
 	{
-		return this.patternName;
-	}
-
-	public DimensionPattern getPattern()
-	{
-		//Get reference
-		if( this.pattern == null )
-		{
-			this.pattern = (DimensionPattern) YADM.proxy.getPatternManager().get( this.patternName );
-		}
-		return this.pattern;
+		return this.settings;
 	}
 	
-	public WorldType getType()
-	{
-		//Get reference
-		if( this.type == null )
-		{
-			this.type = YADM.proxy.getPatternManager().getWorldType( this.typeName );
-		}
-		return this.type;
-	}
-	
-	public WorldServer getWorldServer() 
-	{
-		//Get reference		
-		if( this.worldServer == null ) 
-		{
-			this.worldServer = DimensionManager.getWorld( this.id );
-		}
-		return this.worldServer;
-	}
-
-	public void setPatternName( String patternName )
-	{
-		this.patternName = patternName;
-		
-		//Copy provider, type, generator options and seed if seed null -> random
-		this.providerName = this.getPattern().getProviderName();
-		this.typeName = this.getPattern().getTypeName();
-		this.generatorOptions = this.getPattern().getGeneratorOptions();
-		this.seed = (this.getPattern().getSeed() != null ) ? this.getPattern().getSeed() : (new Random()).nextLong();
-	}
-
 	public void setRegistered( boolean isRegistered )
 	{
 		this.isRegistered = isRegistered;
@@ -131,21 +66,32 @@ public class Dimension extends DimensionPattern
 	 ********************************************************************************/	
 
 	@Override
-	public void writeToNBT( NBTTagCompound tagCompound ) 
+	public String getName() 
 	{
-		super.writeToNBT( tagCompound );
+		return this.name;
+	}	
+	
+	/********************************************************************************
+	 * Methods - Implements NBTData
+	 ********************************************************************************/	
+	
+	@Override
+	public void writeToNBT( NBTTagCompound tagCompound ) 
+	{	
+		NBTTagCompound settingsTagCompound = new NBTTagCompound();
+		
+		this.settings.writeToNBT(settingsTagCompound);
 		
 		tagCompound.setInteger( "id", this.id );
-		tagCompound.setString( "patternName", this.patternName );
+		tagCompound.setString( "name", this.name );
+		tagCompound.setTag( "settings", settingsTagCompound );
 	}
 
 	@Override
 	public void readFromNBT( NBTTagCompound tagCompound ) 
 	{
-		super.readFromNBT( tagCompound );
-		
 		this.id = tagCompound.getInteger( "id" );
-		this.patternName = tagCompound.getString( "patternName" );
-		
-	}	
+		this.name = tagCompound.getString( "name" );
+		this.settings = new DimensionSettings( tagCompound.getCompoundTag( "settings" ) );
+	}
 }
