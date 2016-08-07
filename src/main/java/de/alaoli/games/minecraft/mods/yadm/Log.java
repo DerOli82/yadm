@@ -14,6 +14,16 @@ public class Log
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
+
+	/**
+	 * Logs a message object with the INFO level.
+	 * 
+	 * @param String
+	 */
+	public static void info( String msg )
+	{
+		LOGGER.info( msg );
+	}
 	
 	/**
 	 * Logs a message object with the WARN level.
