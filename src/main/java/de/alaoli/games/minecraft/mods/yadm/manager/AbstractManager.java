@@ -29,8 +29,6 @@ public abstract class AbstractManager
 		this.dirty = false;
 	}
 	
-	public abstract DataObject create( String name );
-	
 	public abstract void load();
 	
 	public abstract void save();
@@ -49,11 +47,13 @@ public abstract class AbstractManager
 	public void add( DataObject dataObject )
 	{
 		this.data.put( dataObject.getName(), dataObject );
+		this.markDirty();
 	}
 	
 	public void remove( DataObject dataObject )
 	{
 		this.data.remove( dataObject.getName() );
+		this.markDirty();
 	}
 	
 	public boolean exists( DataObject dataObject )
