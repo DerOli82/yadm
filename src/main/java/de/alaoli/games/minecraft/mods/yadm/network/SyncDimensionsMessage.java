@@ -10,7 +10,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 
-public class DimensionSyncMessage implements IMessage 
+public class SyncDimensionsMessage implements IMessage 
 {
 	/********************************************************************************
 	 * Attribute
@@ -22,18 +22,18 @@ public class DimensionSyncMessage implements IMessage
 	 * Methods
 	 ********************************************************************************/
 	
-	public DimensionSyncMessage()
+	public SyncDimensionsMessage()
 	{
 		this.dimensions = new HashSet<Dimension>();
 	}
 	
-	public DimensionSyncMessage( Dimension dimension )
+	public SyncDimensionsMessage( Dimension dimension )
 	{
-		this.dimensions = new HashSet<Dimension>();
+		this();
 		this.dimensions.add( dimension );
 	}
 	
-	public DimensionSyncMessage( Set<Dimension> dimensions )
+	public SyncDimensionsMessage( Set<Dimension> dimensions )
 	{
 		this.dimensions = dimensions;
 	}
@@ -52,7 +52,7 @@ public class DimensionSyncMessage implements IMessage
 	 ********************************************************************************/
 	
 	@Override
-	public void fromBytes(ByteBuf buffer ) 
+	public void fromBytes( ByteBuf buffer ) 
 	{	
 		PacketBuffer packet;
 		NBTTagCompound tagCompound;
@@ -64,11 +64,9 @@ public class DimensionSyncMessage implements IMessage
 		{
 			try 
 			{
-				dimension 	= new Dimension();
-				packet		= new PacketBuffer( buffer );
-				tagCompound = packet.readNBTTagCompoundFromBuffer();
+				packet = new PacketBuffer( buffer );
+				dimension = new Dimension( packet.readNBTTagCompoundFromBuffer() );
 				
-				dimension.readFromNBT( tagCompound );
 				this.dimensions.add( dimension );
 			} 
 			catch ( IOException e ) 
@@ -79,7 +77,7 @@ public class DimensionSyncMessage implements IMessage
 	}
 
 	@Override
-	public void toBytes(ByteBuf buffer) 
+	public void toBytes( ByteBuf buffer) 
 	{
 		PacketBuffer packet;
 		NBTTagCompound tagCompound;
