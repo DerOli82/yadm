@@ -1,6 +1,8 @@
 package de.alaoli.games.minecraft.mods.yadm.util;
 
+import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
+import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.teleport.DimensionTeleport;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -12,23 +14,23 @@ public class TeleportUtil
 {
 	public static void teleport( EntityPlayerMP player, Coordinate coordinate )
 	{
-		/**
-		 * @TODO Check if teleport target is blocked		
-		 */
-		DimensionManager.initDimension( coordinate.getDimId() );
 		ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
-		WorldServer world = DimensionManager.getWorld( coordinate.getDimId() );
-		float pitch = player.rotationPitch;
-		float yaw = player.rotationYaw;
 		
-		scm.transferPlayerToDimension( player, coordinate.getDimId(), new DimensionTeleport( world ) );
-		
-		player.playerNetServerHandler.setPlayerLocation( 
-			coordinate.getX(), 
-			coordinate.getY(), 
-			coordinate.getZ(), 
-			yaw,
-			pitch
-		);
+		Dimension dimension = YADM.proxy.getDimensionManager().getById( coordinate.dimId ); 
+		WorldServer target = DimensionManager.getWorld( dimension.getId() );
+				
+		if( target != null )
+		{
+			if( player.isRiding() )
+			{
+				player.mountEntity( null );
+			}
+			if( player.isSneaking() )
+			{
+				player.setSneaking( false );
+			}
+			scm.transferPlayerToDimension(player, coordinate.dimId, new DimensionTeleport( target, coordinate ) );
+			//player.playerNetServerHandler.sendPacket( new S2BPacketChangeGameState( 1, 0.0F ) );
+		}
 	}
 }
