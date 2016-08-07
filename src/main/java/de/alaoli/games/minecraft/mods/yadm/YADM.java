@@ -6,7 +6,7 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.event.FMLServerStoppingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import de.alaoli.games.minecraft.mods.yadm.proxy.CommonProxy;
 
 
@@ -19,14 +19,14 @@ public class YADM
 
 	public static final String MODID	= "yadm";
 	public static final String NAME		= "YADM - Yes another Dimension Manager";
-	public static final String VERSION	= "0.3.1";
+	public static final String VERSION	= "0.4.0";
 						
 	/********************************************************************************
 	 * Forge
 	 ********************************************************************************/
 
 	@SidedProxy(
-		clientSide = "de.alaoli.games.minecraft.mods.yadm.proxy.ClientProxy", 
+		clientSide = "de.alaoli.games.minecraft.mods.yadm.proxy.CommonProxy", 
 		serverSide = "de.alaoli.games.minecraft.mods.yadm.proxy.ServerProxy"
 	)
 	public static CommonProxy proxy;
@@ -54,9 +54,8 @@ public class YADM
     }
     
     @EventHandler
-    public void serverStopping(FMLServerStoppingEvent event)
+    public void serverStopped(FMLServerStoppedEvent event)
     {
-    	YADM.proxy.serverStopping( event );
+    	YADM.proxy.serverStopped( event );
     }    
-    
 }
