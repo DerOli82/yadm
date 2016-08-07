@@ -10,11 +10,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.Log;
-import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.DataObject;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.data.DimensionTemplate;
+import de.alaoli.games.minecraft.mods.yadm.data.DimensionSettings;
+import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.DimensionManager;
 
@@ -60,21 +63,34 @@ public class YADimensionManager extends AbstractManager
 	public void register( Dimension dimension )
 	{
 		//Nothing to do
-		if( ( dimension.isRegistered() ) || 
-			( DimensionManager.isDimensionRegistered( dimension.getId() ) ) )
+		if( dimension.isRegistered() ) { return; }
+			
+		if( DimensionManager.isDimensionRegistered( dimension.getId() ) )
 		{
+			dimension.setRegistered(true);
 			return;
 		}
 		
 		try 
 		{
-			WorldProvider provider = YADM.proxy.getPatternManager().getProvider( dimension.getProviderName() );
+			WorldProvider provider = WorldBuilder.instance.createProvider( dimension );
+			int providerId = WorldBuilder.instance.registerProvider( provider, false );
 			
-			DimensionManager.registerProviderType( dimension.getId(), provider.getClass(), false );
-			DimensionManager.registerDimension( dimension.getId(), dimension.getId() );
+			DimensionManager.registerDimension( dimension.getId(), providerId );
+			dimension.getSettings().setProviderId( providerId );
 			dimension.setRegistered( true );
 			
-			YADM.proxy.syncDimension( dimension );
+			StringBuilder msg = new StringBuilder()
+				.append( "Register Dimension '" )
+				.append( dimension.getName() )
+				.append( "' with ID '" )
+				.append( dimension.getId() )
+				.append( "' and Provider '" )
+				.append( dimension.getSettings().getProviderName() )
+				.append( "' with ID '" )
+				.append( dimension.getSettings().getProviderId() )
+				.append( "'." );
+			Log.info( msg.toString() );
 		} 
 		catch ( Exception e) 
 		{
@@ -84,7 +100,65 @@ public class YADimensionManager extends AbstractManager
 	
 	public void unregister( Dimension dimension )
 	{
-		DimensionManager.unregisterDimension( dimension.getId() );
+		StringBuilder msg;
+		
+		if( DimensionManager.isDimensionRegistered( dimension.getId() ) )
+		{
+			try
+			{
+				msg = new StringBuilder()
+					.append( "Unregister Dimension '" )
+					.append( dimension.getName() )
+					.append( "' with ID '" )
+					.append( dimension.getId() )
+					.append( "'." );
+				Log.info( msg.toString() );
+				
+				DimensionManager.unregisterDimension( dimension.getId() );
+			}
+			catch( Exception e )
+			{
+				msg = new StringBuilder()
+					.append( "Couldn't unregister Dimension '" )
+					.append( dimension.getName() )
+					.append( "' with ID '" )
+					.append( dimension.getId() )
+					.append( "'.");
+				Log.info( msg.toString() );
+			}
+			try
+			{
+				msg = new StringBuilder()
+					.append( "Unregister Provider '" )
+					.append( dimension.getSettings().getProviderName() )
+					.append( "' with ID '" )
+					.append( dimension.getSettings().getProviderId() )
+					.append( "'." );
+				Log.info( msg.toString() );
+				
+				//DimensionManager.unregisterProviderType( dimension.getSettings().getProviderId() );
+			}
+			catch( Exception e )
+			{
+				msg = new StringBuilder()
+					.append( "Couldn't unregister Provider '" )
+					.append( dimension.getSettings().getProviderName() )
+					.append( "' with ID '" )
+					.append( dimension.getSettings().getProviderId() )
+					.append( "'.");
+				Log.info( msg.toString() );
+			}			
+		}
+		else
+		{
+			msg = new StringBuilder()
+				.append( "Dimension '" )
+				.append( dimension.getName() )
+				.append( "' with ID '" )
+				.append( dimension.getId() )
+				.append( "' already unregistered.");
+			Log.info( msg.toString() );			
+		}
 		dimension.setRegistered( false );
 	}
 	
@@ -115,24 +189,23 @@ public class YADimensionManager extends AbstractManager
 			{
 				this.unregister( dimension );
 			}
-		}		
+		}
 	}
 	
-	/********************************************************************************
-	 * Methods - Implements AbstractManager
-	 ********************************************************************************/
-	
-	@Override
-	public DataObject create( String name ) 
+	public Dimension create( String name, DimensionTemplate pattern ) 
 	{
-		Dimension dimension = new Dimension( this.nextDimensionId(), name );
+		Dimension dimension = new Dimension( this.nextDimensionId(), name, new DimensionSettings( pattern ) );
 		
 		this.add( dimension );
 		this.dirty = true;
 
 		return dimension;
 	}
-
+	
+	/********************************************************************************
+	 * Methods - Implements AbstractManager
+	 ********************************************************************************/
+	
 	@Override
 	public void load() 
 	{
