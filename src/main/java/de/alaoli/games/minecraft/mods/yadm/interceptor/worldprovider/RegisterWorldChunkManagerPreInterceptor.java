@@ -3,6 +3,7 @@ package de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.WorldProviderInterceptor;
+import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.This;
 import net.minecraft.world.WorldProvider;
@@ -15,20 +16,18 @@ public class RegisterWorldChunkManagerPreInterceptor extends WorldProviderInterc
 	{
 		ReflectionHelper.setPrivateValue( 
 			WorldInfo.class, worldInfo, 
-			dimension.getName(), new String[] { "field_76106_k", "levelName" } 
-		);
-		/*
-		ReflectionHelper.setPrivateValue( 
-			WorldInfo.class, worldInfo, 
-			dimension.getSeed(), new String[] { "field_76100_a", "randomSeed" } 
-		);*/
-		ReflectionHelper.setPrivateValue( 
-			WorldInfo.class, worldInfo, 
-			dimension.getType(), new String[] { "field_76098_b", "terrainType" } 
+			dimension.getSettings().getSeed(), 
+			new String[] { "field_76100_a", "randomSeed" } 
 		);
 		ReflectionHelper.setPrivateValue( 
 			WorldInfo.class, worldInfo, 
-			dimension.getGeneratorOptions(), new String[] { "field_82576_c", "generatorOptions" } 
+			WorldBuilder.instance.getWorldType( dimension.getSettings().getTypeName() ), 
+			new String[] { "field_76098_b", "terrainType" } 
+		);
+		ReflectionHelper.setPrivateValue( 
+			WorldInfo.class, worldInfo, 
+			dimension.getSettings().getGeneratorOptions(),
+			new String[] { "field_82576_c", "generatorOptions" } 
 		);		
 	}
 	
@@ -46,18 +45,15 @@ public class RegisterWorldChunkManagerPreInterceptor extends WorldProviderInterc
 			if( clazz == DerivedWorldInfo.class )
 			{
 				worldInfo = (WorldInfo) ReflectionHelper.getPrivateValue( 
-					DerivedWorldInfo.class, (DerivedWorldInfo)worldInfo, 
+					DerivedWorldInfo.class, 
+					(DerivedWorldInfo)worldInfo, 
 					new String[] { "field_76115_a", "theWorldInfo" } 
 				);
-				reflectionWorldInfo( worldInfo, dimension );
-				
-				//Get DerivedWorldInfo again
-				worldInfo = thiz.worldObj.getWorldInfo();
 			}
 			reflectionWorldInfo( worldInfo, dimension );
 			
-			thiz.terrainType	= dimension.getType();
-			thiz.field_82913_c	= dimension.getGeneratorOptions();
+			thiz.terrainType = WorldBuilder.instance.getWorldType( dimension.getSettings().getTypeName() ); 
+			thiz.field_82913_c = dimension.getSettings().getGeneratorOptions();
 		}
 		catch ( Exception e ) 
 		{
