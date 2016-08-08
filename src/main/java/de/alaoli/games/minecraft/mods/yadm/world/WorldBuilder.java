@@ -3,6 +3,7 @@ package de.alaoli.games.minecraft.mods.yadm.world;
 import java.lang.reflect.Field;
 import java.util.Hashtable;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionTemplate;
@@ -30,6 +31,8 @@ public class WorldBuilder
 	 ********************************************************************************/
 		
 	public static final WorldBuilder instance = new WorldBuilder();
+	
+	private static int nextId = Config.Provider.beginsWithId;
 	
 	private Hashtable<Integer, Class<? extends WorldProvider>> worldProviders;
 
@@ -161,9 +164,7 @@ public class WorldBuilder
 	}	
 	
 	public int registerProvider( WorldProvider provider, boolean keepLoaded )
-	{
-		int nextId = 0;
-		
+	{		
 		while( !DimensionManager.registerProviderType( nextId, provider.getClass(), keepLoaded))
 		{
 			nextId++;
