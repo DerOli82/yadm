@@ -1,6 +1,5 @@
 package de.alaoli.games.minecraft.mods.yadm.util;
 
-import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.teleport.DimensionTeleport;
@@ -12,11 +11,11 @@ import net.minecraftforge.common.DimensionManager;
 
 public class TeleportUtil 
 {
-	public static void teleport( EntityPlayerMP player, Coordinate coordinate )
+	public static boolean teleport( EntityPlayerMP player, Dimension dimension, Coordinate coordinate )
 	{
-		ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
+		if( !dimension.canTeleport() || ( dimension == null ) ) { return false; }
 		
-		Dimension dimension = YADM.proxy.getDimensionManager().getById( coordinate.dimId ); 
+		ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager(); 
 		WorldServer target = DimensionManager.getWorld( dimension.getId() );
 				
 		if( target != null )
@@ -29,8 +28,10 @@ public class TeleportUtil
 			{
 				player.setSneaking( false );
 			}
-			scm.transferPlayerToDimension(player, coordinate.dimId, new DimensionTeleport( target, coordinate ) );
+			scm.transferPlayerToDimension(player, dimension.getId(), new DimensionTeleport( target, coordinate ) );
 			//player.playerNetServerHandler.sendPacket( new S2BPacketChangeGameState( 1, 0.0F ) );
+			return true;
 		}
+		return false;
 	}
 }
