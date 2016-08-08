@@ -163,9 +163,7 @@ public class YADimensionManager extends AbstractManager
 	
 	public void delete( Dimension dimension )
 	{
-		
-		
-		if( Config.Dimension.backupDimensionOnRemove )
+		if( Config.Dimension.backupDimensionOnDelete )
 		{
 			this.backup( dimension );
 		}

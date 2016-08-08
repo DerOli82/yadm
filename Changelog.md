@@ -2,6 +2,7 @@
 
 # Version 0.4.0
 
+Fix some Client<->Server problems
 Added basic function chat commands:
 - delete
 - list dimensions
