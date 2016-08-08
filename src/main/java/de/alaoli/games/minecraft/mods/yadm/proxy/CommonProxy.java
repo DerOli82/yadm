@@ -8,7 +8,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
-import de.alaoli.games.minecraft.mods.yadm.command.ManageCommand;
+import de.alaoli.games.minecraft.mods.yadm.command.DefaultCommand;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.event.DimensionEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.DimensionFMLEvent;
@@ -64,26 +64,19 @@ public class CommonProxy
 	
 	public void serverStarting( FMLServerStartingEvent event )
 	{
-		StringBuilder path = new StringBuilder();
-		
-		path.append( event.getServer().getEntityWorld().getSaveHandler().getWorldDirectory().getAbsolutePath() );
-		path.append( File.separator );
-		path.append( "data" );
-		path.append( File.separator );
-		path.append( YADM.MODID );
-		path.append( File.separator );
-
-		this.dimensionManager.setSavePath( path.toString() );
+		this.dimensionManager.setSavePath( 
+			event.getServer().getEntityWorld().getSaveHandler().getWorldDirectory().getAbsolutePath() 
+		);
 		this.dimensionManager.load();
-		this.dimensionManager.registerAll();
+		this.dimensionManager.register();
 		
-		event.registerServerCommand( new ManageCommand() );
+		event.registerServerCommand( DefaultCommand.instance );
 	}
 
 	public void serverStopped( FMLServerStoppedEvent event ) 
 	{
-		this.dimensionManager.unregisterAll();
 		this.dimensionManager.save();
+		this.dimensionManager.cleanup();
 	}
 	
 	/********************************************************************************

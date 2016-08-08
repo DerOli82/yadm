@@ -19,6 +19,8 @@ public class Dimension implements DataObject, NBTData
 	@Expose
 	protected DimensionSettings settings;
 	
+	private boolean deleted;
+	
 	private boolean isRegistered;
 	
 	/**********************************************************************
@@ -28,6 +30,8 @@ public class Dimension implements DataObject, NBTData
 	public Dimension( NBTTagCompound tagCompound ) 
 	{
 		this.readFromNBT( tagCompound );
+		this.isRegistered = false;
+		this.deleted = false;
 	}
 	
 	public Dimension( int id, String name, DimensionSettings settings )
@@ -35,6 +39,8 @@ public class Dimension implements DataObject, NBTData
 		this.id = id;
 		this.name = name;
 		this.settings = settings;
+		this.isRegistered = false;
+		this.deleted = false;
 	}
 	
 	public boolean isRegistered()
@@ -42,6 +48,21 @@ public class Dimension implements DataObject, NBTData
 		return this.isRegistered;
 	}
 	
+
+	public void markDeleted() 
+	{
+		StringBuilder name = new StringBuilder()
+			.append( "DELETED Dimension '" )
+			.append( this.name )
+			.append( "'" );
+		this.name = name.toString();
+		this.deleted = true;
+	}
+	
+	public boolean canTeleport()
+	{
+		return this.isRegistered && !this.deleted;
+	}
 	/**********************************************************************
 	 * Methods - Getter/Setter
 	 **********************************************************************/
@@ -69,7 +90,7 @@ public class Dimension implements DataObject, NBTData
 	public String getName() 
 	{
 		return this.name;
-	}	
+	}
 	
 	/********************************************************************************
 	 * Methods - Implements NBTData
@@ -94,4 +115,6 @@ public class Dimension implements DataObject, NBTData
 		this.name = tagCompound.getString( "name" );
 		this.settings = new DimensionSettings( tagCompound.getCompoundTag( "settings" ) );
 	}
+
+
 }

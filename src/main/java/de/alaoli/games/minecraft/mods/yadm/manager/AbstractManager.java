@@ -81,6 +81,11 @@ public abstract class AbstractManager
 		return this.data.isEmpty();
 	}
 	
+	protected void clear()
+	{
+		this.data.clear();
+	}
+	
 	/********************************************************************************
 	 * Methods - Getter/Setter
 	 ********************************************************************************/
