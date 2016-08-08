@@ -38,15 +38,15 @@ public class WorldBuilder
 
 	private Hashtable<String, WorldType> worldTypes;	
 	
-	private WorldBuilder()
+	/********************************************************************************
+	 * Methods
+	 ********************************************************************************/
+	
+	private WorldBuilder() 
 	{
 		this.initProvider();
 		this.initTypes();
 	}
-	
-	/********************************************************************************
-	 * Methods
-	 ********************************************************************************/
 	
 	@SuppressWarnings( "unchecked" )
 	private void initProvider()
@@ -182,5 +182,13 @@ public class WorldBuilder
 		return this.worldTypes.get( name );
 	}
 	
-
+	public Hashtable<String, WorldType> getWorldTypes()
+	{
+		return this.worldTypes;
+	}
+	
+	public Hashtable<Integer, Class<? extends WorldProvider>> getWorldProviders()
+	{
+		return this.worldProviders;
+	}	
 }
