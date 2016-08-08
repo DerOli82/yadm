@@ -1,5 +1,16 @@
 # Changelog
 
+# Version 0.4.0
+
+Added basic function chat commands:
+- delete
+- list dimensions
+- list providers
+- list types
+- tp
+- info
+- reload
+
 # Version 0.3.1
 
 Versions, Versions, Versions...
