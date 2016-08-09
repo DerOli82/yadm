@@ -1,101 +1,106 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
-import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
 
-public abstract class Command
+public abstract class Command implements ICommand
 {
+	/********************************************************************************
+	 * Attribute
+	 ********************************************************************************/
+	
+	private Command parent;
+	
+	/********************************************************************************
+	 * Methods
+	 ********************************************************************************/
+	
+	public Command( Command parent )
+	{
+		this.parent = parent;
+	}
+	
+	public boolean hasParent()
+	{
+		if( this.parent == null )
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	public Command getParent()
+	{
+		return this.parent;
+	}
+	
 	public int getRequiredPermissionLevel() 
 	{
 		return 4;
 	}
+
+	public abstract void processCommand( ICommandSender sender, Queue<String> args );
+	
+	/********************************************************************************
+	 * Interface - ICommand
+	 ********************************************************************************/
+	
+	@Override
+	public int compareTo( Object obj ) 
+	{
+		return  this.getCommandName().compareTo( ((ICommand)obj).getCommandName() );
+	}
+
+	@Override
+	public boolean canCommandSenderUseCommand(ICommandSender sender )
+	{
+		return sender.canCommandSenderUseCommand( this.getRequiredPermissionLevel(), this.getCommandName() );
+	}
+	
+	@Override
+	public boolean isUsernameIndex( String[] p_82358_1_, int p_82358_2_ )
+	{
+		return false;
+	}
     
-	public boolean IsInt( String str )
+	@Override
+	public String getCommandUsage( ICommandSender sender ) 
 	{
-	    if( str == null ) { return false; }
-	    int length = str.length();
-	    if( length == 0 ){ return false; }
-	    int i = 0;
-	    
-	    if( str.charAt(0) == '-' )
-	    {
-            if( length == 1 ) { return false; }
-            i = 1;
-	    }
-	    for( ; i < length; i++ )
-	    {
-	        if( !Character.isDigit(str.charAt( i ) ) ) { return false; }
-	    }
-	    return true;
-	}    
-	
-	public Dimension parseDimension( ICommandSender sender, Queue<String> args  )
-	{
-		if( args.isEmpty() ) { return null; }
-		String name = args.remove();
+		String usage = this.getCommandName();
 		
-		if( this.IsInt( name ) )
+		if( this.hasParent() )
 		{
-			int id = Integer.valueOf( name );
-			
-			if( !YADimensionManager.instance.exists( id ) )
-			{
-				sender.addChatMessage( new ChatComponentText( "Dimension '" + id + "' doesn't exists." ) );
-				return null;
-			}
-			return YADimensionManager.instance.get( id );
+			usage = this.getParent().getCommandUsage( sender ) + " " + usage;
 		}
-		else
-		{
-			if( !YADimensionManager.instance.exists( name ) )
-			{
-				sender.addChatMessage( new ChatComponentText( "Dimension '" + name + "' doesn't exists." ) );
-				return null;
-			}
-			return (Dimension) YADimensionManager.instance.get( name );
-		}
+		return usage;
 	}
 	
-	public Coordinate parseCoordinate( ICommandSender sender, Queue<String> args  )
+	@Override
+	public List getCommandAliases() 
 	{
-		if( args.size() < 3 ) { return null; }
-		
-		String x = args.remove();
-		String y = args.remove();
-		String z = args.remove();
-		
-		if( ( this.IsInt( x ) ) && ( this.IsInt( y ) ) && ( this.IsInt( z ) ) )
-		{
-			return new Coordinate( Integer.valueOf( x ),Integer.valueOf( y ),Integer.valueOf( z ) );
-		}
+		List<String> list = new ArrayList<String>();
+		list.add( this.getCommandName() );
 		return null;
+	}	
+	
+	@Override
+	public List addTabCompletionOptions( ICommandSender sender, String[] args )
+	{
+		List<String> list = new ArrayList<String>();
+		list.add( this.getCommandName() );
 		
+		return list;
 	}
 	
-	public EntityPlayer parsePlayer( ICommandSender sender, Queue<String> args  )
+	@Override
+	public void processCommand( ICommandSender sender, String[] args )
 	{
-		if( args.isEmpty() ) { return null; }
-		
-		String name = args.remove();
-		List<EntityPlayer> players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
-		
-		if( players == null ) { return null; }
-		
-		for( EntityPlayer player : players )
-		{
-			if( player.getDisplayName().toLowerCase().equals( name.toLowerCase() ) )
-			{
-				return player;
-			}
-		}
-		return null;
+		this.processCommand( sender, new LinkedList<String>( Arrays.asList( args ) ) );
 	}
 }

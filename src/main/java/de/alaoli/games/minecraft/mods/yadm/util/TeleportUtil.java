@@ -7,60 +7,81 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
 public class TeleportUtil 
 {
-	public static void emergencyTeleport( EntityPlayerMP player)
+	private static final int OFFSETY = 3;
+	
+	private static void preparePlayer( EntityPlayer player )
+	{
+		if( player.isRiding() )
+		{
+			player.mountEntity( null );
+		}
+		if( player.isSneaking() )
+		{
+			player.setSneaking( false );
+		}
+	}
+	
+	public static void emergencyTeleport( EntityPlayer player )
 	{
 		ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
-		WorldServer target = DimensionManager.getWorld( 0 );
+		WorldServer target = MinecraftServer.getServer().worldServerForDimension( 0 );
 		
 		
 		if( target != null )
 		{
-			if( player.isRiding() )
-			{
-				player.mountEntity( null );
-			}
-			if( player.isSneaking() )
-			{
-				player.setSneaking( false );
-			}
+			preparePlayer( player );
 			
 			Coordinate coordinate = new Coordinate(
 				target.getSpawnPoint().posX,
-				target.getSpawnPoint().posY+5,
+				target.getSpawnPoint().posY + OFFSETY,
 				target.getSpawnPoint().posZ
 			);
-			scm.transferPlayerToDimension( player, 0, new DimensionTeleport( target, coordinate ) );
+			scm.transferPlayerToDimension( (EntityPlayerMP)player, 0, new DimensionTeleport( target, coordinate ) );
 		}
 		
 	}
 	
-	public static boolean teleport( EntityPlayerMP player, Dimension dimension, Coordinate coordinate )
+	public static boolean teleport( EntityPlayer player, Dimension dimension )
 	{
-		if( !dimension.canTeleport() || ( dimension == null ) ) { return false; }
+		if( ( dimension == null ) || !dimension.canTeleport() || ( player == null ) ) { return false; }
 		
-		ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager(); 
+		WorldServer target = MinecraftServer.getServer().worldServerForDimension( dimension.getId() );
+		if( target == null ) { return false; }
+		
+		Coordinate coordinate = new Coordinate(
+			target.getSpawnPoint().posX,
+			target.getSpawnPoint().posY + OFFSETY,
+			target.getSpawnPoint().posZ
+		);
+		
+		return teleport( player, dimension, coordinate, target );
+	}
+	
+	public static boolean teleport( EntityPlayer player, Dimension dimension, Coordinate coordinate )
+	{
+		if( ( dimension == null ) || !dimension.canTeleport() || ( player == null ) ) { return false; }
+		 
 		WorldServer target = DimensionManager.getWorld( dimension.getId() );
 				
-		if( target != null )
-		{
-			if( player.isRiding() )
-			{
-				player.mountEntity( null );
-			}
-			if( player.isSneaking() )
-			{
-				player.setSneaking( false );
-			}
-			scm.transferPlayerToDimension(player, dimension.getId(), new DimensionTeleport( target, coordinate ) );
-			//player.playerNetServerHandler.sendPacket( new S2BPacketChangeGameState( 1, 0.0F ) );
-			return true;
-		}
-		return false;
+		if( target == null ) { return false; }
+			
+		return teleport( player, dimension, coordinate, target );
+	}
+	
+	public static boolean teleport( EntityPlayer player, Dimension dimension, Coordinate coordinate, WorldServer target )
+	{
+		if( ( dimension == null ) || !dimension.canTeleport() || ( player == null ) || ( target == null ) ) { return false; }
+		
+		preparePlayer( player );
+		
+		ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
+		scm.transferPlayerToDimension((EntityPlayerMP)player, dimension.getId(), new DimensionTeleport( target, coordinate ) );
+		
+		return true;
 	}
 }

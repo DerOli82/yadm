@@ -7,6 +7,7 @@ import java.util.Queue;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.util.CommandUtil;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -14,39 +15,48 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.WorldServer;
 
-public class DeleteSubCommand extends Command implements SubCommand
+public class DeleteCommand extends Command
 {
-	public static final DeleteSubCommand instance = new DeleteSubCommand();
+	/********************************************************************************
+	 * Methods
+	 ********************************************************************************/
 	
-	private DeleteSubCommand() {}
-	
-	@Override
-	public String getCommandName()
+	public DeleteCommand( Command parent ) 
 	{
-		return "delete";
+		super( parent );
 	}
+
+	/********************************************************************************
+	 * Override - ICommand, Command
+	 ********************************************************************************/
 	
 	@Override
 	public int getRequiredPermissionLevel() 
 	{
-		return 4;
-	}
+		return 2;
+	}	
 	
 	@Override
-	public String getCommandUsage( ICommandSender sender )
+	public String getCommandName() 
 	{
-		return "Usage: /" + DefaultCommand.COMMAND + " delete <dimensionName>";
+		return "delete";
 	}
 
 	@Override
-	public void processCommand( ICommandSender sender, Queue<String> args )
+	public String getCommandUsage( ICommandSender sender ) 
+	{
+		return super.getCommandUsage( sender ) + " <dimensionName>";
+	}
+	
+	@Override
+	public void processCommand( ICommandSender sender, Queue<String> args ) 
 	{
 		if( args.isEmpty() )
 		{
 			sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
 			return;
 		}
-		Dimension dimension = this.parseDimension( sender, args );
+		Dimension dimension = CommandUtil.parseDimension( sender, args );
 		
 		if( dimension == null ) { return; }
 		
@@ -62,5 +72,4 @@ public class DeleteSubCommand extends Command implements SubCommand
 		YADM.proxy.unregisterDimension( dimension );
 		sender.addChatMessage( new ChatComponentText( "Dimension '" + dimension.getName() + "' removed." ) );
 	}
-
 }

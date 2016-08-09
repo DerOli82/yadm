@@ -8,7 +8,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
-import de.alaoli.games.minecraft.mods.yadm.command.DefaultCommand;
+import de.alaoli.games.minecraft.mods.yadm.command.YADMCommandGroup;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.event.DimensionEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.DimensionFMLEvent;
@@ -56,7 +56,7 @@ public class CommonProxy
 		YADimensionManager.instance.load();
 		YADimensionManager.instance.register();
 		
-		event.registerServerCommand( DefaultCommand.instance );
+		event.registerServerCommand( new YADMCommandGroup() );
 	}
 
 	public void serverStopped( FMLServerStoppedEvent event ) 

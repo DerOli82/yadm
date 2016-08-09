@@ -8,17 +8,20 @@ import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 
-public class InfoSubCommand implements SubCommand
+public class InfoCommand extends Command
 {
-	public static final InfoSubCommand instance = new InfoSubCommand();
+	/********************************************************************************
+	 * Methods
+	 ********************************************************************************/
 	
-	private InfoSubCommand() {}
-	
-	@Override
-	public String getCommandName()
+	public InfoCommand( Command parent ) 
 	{
-		return "info";
+		super( parent );
 	}
+
+	/********************************************************************************
+	 * Override - ICommand, Command
+	 ********************************************************************************/
 	
 	@Override
 	public int getRequiredPermissionLevel() 
@@ -27,10 +30,9 @@ public class InfoSubCommand implements SubCommand
 	}
 	
 	@Override
-	public String getCommandUsage( ICommandSender sender )
+	public String getCommandName() 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return "info";
 	}
 
 	@Override
@@ -45,5 +47,4 @@ public class InfoSubCommand implements SubCommand
 		sender.addChatMessage( new ChatComponentText( "Seed: " + world.getSeed() ) );
 		sender.addChatMessage( new ChatComponentText( "GenOpt: " + world.provider.field_82913_c ) );
 	}
-
 }

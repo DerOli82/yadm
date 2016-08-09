@@ -13,41 +13,50 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
-public class CreateSubCommand implements SubCommand
+public class CreateCommand extends Command
 {
-	public static final CreateSubCommand instance = new CreateSubCommand();
+	/********************************************************************************
+	 * Methods
+	 ********************************************************************************/
 	
-	private CreateSubCommand() {}
-	
-	@Override
-	public String getCommandName()
+	public CreateCommand( Command parent ) 
 	{
-		return "create";
+		super( parent );
 	}
+
+	/********************************************************************************
+	 * Override - ICommand, Command
+	 ********************************************************************************/
 	
 	@Override
 	public int getRequiredPermissionLevel() 
 	{
-		return 4;
+		return 2;
 	}
 	
 	@Override
-	public String getCommandUsage( ICommandSender sender )
+	public String getCommandName() 
 	{
-		return "/" + DefaultCommand.COMMAND + " create <dimensionName> <templateName>";
+		return "create";
+	}
+
+	@Override
+	public String getCommandUsage( ICommandSender sender ) 
+	{
+		return super.getCommandUsage( sender ) + " <dimensionName> <templateName>";
 	}
 	
 	@Override
-	public void processCommand( ICommandSender sender, Queue<String> argQueue ) 
+	public void processCommand( ICommandSender sender, Queue<String> args ) 
 	{
 		//Usage
-		if( argQueue.size() < 2 )
+		if( args.size() < 2 )
 		{
-			sender.addChatMessage( new ChatComponentText( "Usage: " + this.getCommandUsage( sender ) ) );
+			sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
 			return;
 		}
-		String name = argQueue.remove();
-		String templateName = argQueue.remove();
+		String name = args.remove();
+		String templateName = args.remove();
 		
 		if( YADimensionManager.instance.exists( name ) )
 		{
@@ -83,4 +92,5 @@ public class CreateSubCommand implements SubCommand
 			sender.addChatMessage( new ChatComponentText( e.getMessage() ) );
 		}	
 	}
+
 }

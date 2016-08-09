@@ -1,7 +1,10 @@
 # Changelog
 
 # Version 0.4.1
+Fixes https://github.com/DerOli82/yadm/issues/2
 Fixes https://github.com/DerOli82/yadm/issues/3
+Rewoked chat command structure
+Added permission level
 
 # Version 0.4.0
 
