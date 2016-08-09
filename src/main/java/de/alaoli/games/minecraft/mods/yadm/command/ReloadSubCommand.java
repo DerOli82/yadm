@@ -2,7 +2,7 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 
 import java.util.Queue;
 
-import de.alaoli.games.minecraft.mods.yadm.YADM;
+import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import net.minecraft.command.ICommandSender;
 
 public class ReloadSubCommand implements SubCommand
@@ -33,7 +33,7 @@ public class ReloadSubCommand implements SubCommand
 	@Override
 	public void processCommand( ICommandSender sender, Queue<String> args ) 
 	{
-		YADM.proxy.getTemplateManager().reload();
+		TemplateManager.instance.reload();
 	}
 
 }

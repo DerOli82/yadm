@@ -18,9 +18,17 @@ import de.alaoli.games.minecraft.mods.yadm.data.DimensionTemplate;
 public class TemplateManager extends AbstractManager
 {
 	/********************************************************************************
+	 * Attribute
+	 ********************************************************************************/
+	
+	public static final TemplateManager instance = new TemplateManager();
+	
+	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
 
+	private TemplateManager() {}
+	
 	/**
 	 * Create Overworld, Nether and The End as default templates
 	 */

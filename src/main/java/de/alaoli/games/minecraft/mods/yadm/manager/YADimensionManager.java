@@ -32,15 +32,31 @@ public class YADimensionManager extends AbstractManager
 	 * Attributes
 	 ********************************************************************************/
 	
+	public static final YADimensionManager instance = new YADimensionManager();
+	
 	private static int nextId = Config.Dimension.beginsWithId;
 	
 	private Set<Dimension> deletedDimensions;
 	
 	/********************************************************************************
+	 * Methods
+	 ********************************************************************************/
+	
+	private YADimensionManager() {}
+	
+	
+	public boolean exists( int id )
+	{
+		if( this.get( id ) == null ) { return false; }
+		
+		return true;
+	}
+	
+	/********************************************************************************
 	 * Methods - Getter/Setter
 	 ********************************************************************************/
 
-	public Dimension getById( int id )
+	public Dimension get( int id )
 	{
 		Dimension dimension;
 		
@@ -191,6 +207,7 @@ public class YADimensionManager extends AbstractManager
 		
 		dimension.markDeleted();
 		this.markDirty();
+		DimensionManager.unloadWorld( dimension.getId() );
 	}
 	
 	public void unregister( Dimension dimension )
@@ -313,7 +330,7 @@ public class YADimensionManager extends AbstractManager
 	/********************************************************************************
 	 * Methods - Implements/Override AbstractManager
 	 ********************************************************************************/
-
+	
 	@Override
 	public void load() 
 	{

@@ -12,9 +12,9 @@ import cpw.mods.fml.common.network.FMLOutboundHandler;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import de.alaoli.games.minecraft.mods.yadm.Log;
-import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.DataObject;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
 import de.alaoli.games.minecraft.mods.yadm.network.SyncDimensionsMessage;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -27,7 +27,7 @@ public class DimensionFMLEvent
     {
     	Log.info( "Client connected..." );
 
-    	if( !YADM.proxy.getDimensionManager().isEmpty() )
+    	if( !YADimensionManager.instance.isEmpty() )
     	{
 	    	EntityPlayerMP player = ((NetHandlerPlayServer) event.handler).playerEntity;
 	    	
@@ -40,7 +40,7 @@ public class DimensionFMLEvent
 	    	Dimension dimension;
 	    	Set<Dimension> dimensions = new HashSet<Dimension>(); 
 	    	
-	    	for( Entry<String, DataObject> entry : YADM.proxy.getDimensionManager().getAll() )
+	    	for( Entry<String, DataObject> entry : YADimensionManager.instance.getAll() )
 	    	{
 	    		dimension = (Dimension)entry.getValue();
 	    		dimensions.add( dimension );

@@ -1,8 +1,8 @@
 package de.alaoli.games.minecraft.mods.yadm.interceptor;
 
-import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.DimensionFieldAccessor;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 
 public abstract class WorldProviderInterceptor 
 {
@@ -10,7 +10,7 @@ public abstract class WorldProviderInterceptor
 	{
 		if( worldProvider.getDimensionYADM() == null )
 		{
-			Dimension dimension = YADM.proxy.getDimensionManager().getById( dimId );
+			Dimension dimension = YADimensionManager.instance.get( dimId );
 			
 			worldProvider.setDimensionYADM( dimension );
 		}

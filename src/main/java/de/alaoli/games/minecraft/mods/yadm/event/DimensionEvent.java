@@ -3,7 +3,7 @@ package de.alaoli.games.minecraft.mods.yadm.event;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import de.alaoli.games.minecraft.mods.yadm.YADM;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraftforge.event.world.WorldEvent;
 
 public class DimensionEvent 
@@ -11,7 +11,7 @@ public class DimensionEvent
 	@SubscribeEvent
 	public void onWorldSave( WorldEvent.Save event )
 	{
-		YADM.proxy.getDimensionManager().save();
+		YADimensionManager.instance.save();
 	}
 	
 	@SubscribeEvent
@@ -23,7 +23,7 @@ public class DimensionEvent
         {
 			Log.info( "Unload remote world dimensions..." );
 			
-            YADM.proxy.getDimensionManager().unregisterAll();
+            YADimensionManager.instance.unregisterAll();
         }*/
 	}
 }

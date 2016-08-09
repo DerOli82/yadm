@@ -21,20 +21,6 @@ import net.minecraftforge.common.config.Configuration;
 public class CommonProxy 
 {	
 	/********************************************************************************
-	 * Attributes
-	 ********************************************************************************/
-
-	protected TemplateManager templateManager;
-	
-	protected YADimensionManager dimensionManager;
-
-	public CommonProxy()
-	{
-		this.templateManager = new TemplateManager();
-		this.dimensionManager = new YADimensionManager();
-	}
-	
-	/********************************************************************************
 	 * Methods - FML
 	 ********************************************************************************/
 	
@@ -50,8 +36,8 @@ public class CommonProxy
 		path.append( "-templates" );
 		path.append( File.separator );
 		
-		this.templateManager.setSavePath( path.toString() );
-		this.templateManager.load();
+		TemplateManager.instance.setSavePath( path.toString() );
+		TemplateManager.instance.load();
 		
 		MessageDispatcher.register();
 	}
@@ -64,19 +50,19 @@ public class CommonProxy
 	
 	public void serverStarting( FMLServerStartingEvent event )
 	{
-		this.dimensionManager.setSavePath( 
+		YADimensionManager.instance.setSavePath( 
 			event.getServer().getEntityWorld().getSaveHandler().getWorldDirectory().getAbsolutePath() 
 		);
-		this.dimensionManager.load();
-		this.dimensionManager.register();
+		YADimensionManager.instance.load();
+		YADimensionManager.instance.register();
 		
 		event.registerServerCommand( DefaultCommand.instance );
 	}
 
 	public void serverStopped( FMLServerStoppedEvent event ) 
 	{
-		this.dimensionManager.save();
-		this.dimensionManager.cleanup();
+		YADimensionManager.instance.save();
+		YADimensionManager.instance.cleanup();
 	}
 	
 	/********************************************************************************
@@ -85,21 +71,7 @@ public class CommonProxy
 	
 	public void registerDimension( Dimension dimension )
 	{
-		this.dimensionManager.register( dimension );
-		this.dimensionManager.init( dimension );
-	}
-	
-	/********************************************************************************
-	 * Methods - Getter/Setter
-	 ********************************************************************************/
-	
-	public TemplateManager getTemplateManager()
-	{
-		return this.templateManager;
-	}
-	
-	public YADimensionManager getDimensionManager()
-	{
-		return this.dimensionManager;
+		YADimensionManager.instance.register( dimension );
+		YADimensionManager.instance.init( dimension );
 	}
 }

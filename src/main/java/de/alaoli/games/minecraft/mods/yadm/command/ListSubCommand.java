@@ -1,12 +1,11 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
 import java.util.Queue;
-import java.util.Set;
 import java.util.Map.Entry;
 
-import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.DataObject;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
@@ -55,7 +54,7 @@ public class ListSubCommand implements SubCommand
 				
 				sender.addChatMessage( new ChatComponentText( "Registered Dimensions:" ) );
 				
-				for( Entry<String, DataObject> entry : YADM.proxy.getDimensionManager().getAll() )
+				for( Entry<String, DataObject> entry : YADimensionManager.instance.getAll() )
 				{
 					dimension = (Dimension)entry.getValue();
 					msg = new StringBuilder()
@@ -122,7 +121,6 @@ public class ListSubCommand implements SubCommand
 				sender.addChatMessage( new ChatComponentText( this.getCommandName() ) );
 				break;
 		}
-		
 	}
 
 }
