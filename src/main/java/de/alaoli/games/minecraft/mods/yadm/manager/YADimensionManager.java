@@ -4,10 +4,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-
 import org.apache.commons.io.FileUtils;
 
 import com.google.gson.Gson;
@@ -23,7 +22,9 @@ import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionTemplate;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionSettings;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
 public class YADimensionManager extends AbstractManager 
@@ -36,13 +37,16 @@ public class YADimensionManager extends AbstractManager
 	
 	private static int nextId = Config.Dimension.beginsWithId;
 	
-	private Set<Dimension> deletedDimensions;
+	private Map<Integer, Dimension> deletedDimensions;
 	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
 	
-	private YADimensionManager() {}
+	private YADimensionManager() 
+	{
+		this.deletedDimensions = new HashMap<Integer, Dimension>();
+	}
 	
 	
 	public boolean exists( int id )
@@ -179,13 +183,6 @@ public class YADimensionManager extends AbstractManager
 	
 	public void delete( Dimension dimension )
 	{
-		if( Config.Dimension.backupDimensionOnDelete )
-		{
-			this.backup( dimension );
-		}
-		if( this.deletedDimensions == null ) {
-			this.deletedDimensions = new HashSet<Dimension>();
-		}
 		//Delete dimension json file		
 		StringBuilder path = new StringBuilder()
 			.append( this.getSavePath() )
@@ -202,7 +199,7 @@ public class YADimensionManager extends AbstractManager
 		{
 			file.delete();
 		}
-		this.deletedDimensions.add( dimension );
+		this.deletedDimensions.put( dimension.getId(), dimension );
 		this.remove( dimension );
 		
 		dimension.markDeleted();
@@ -248,7 +245,7 @@ public class YADimensionManager extends AbstractManager
 					.append( "'." );
 				Log.info( msg.toString() );
 				
-				//DimensionManager.unregisterProviderType( dimension.getSettings().getProviderId() );
+				DimensionManager.unregisterProviderType( dimension.getSettings().getProviderId() );
 			}
 			catch( Exception e )
 			{
@@ -289,6 +286,39 @@ public class YADimensionManager extends AbstractManager
 		}
 	}
 	
+	public void cleanup( World world )
+	{
+		if( !this.deletedDimensions.containsKey( world.provider.dimensionId ) ) { return; }
+		
+		Dimension dimension = this.deletedDimensions.get( world.provider.dimensionId );
+		this.deletedDimensions.remove( dimension );
+		
+		((WorldServer)world).flush();
+		this.unregister( dimension );
+		
+		//Delete dimension folder
+		StringBuilder path = new StringBuilder()
+			.append( this.getSavePath() )
+			.append( File.separator )
+			.append( "DIM" )
+			.append( dimension.getId() )
+			.append( File.separator );
+		File file = new File( path.toString() );
+			
+		if( ( file.exists() ) && ( file.isDirectory() ) )
+		{
+			try 
+			{
+				FileUtils.deleteDirectory(file);
+				Log.info( "Dimenson folder 'DIM" + dimension.getId() + "' deleted!" );
+			}
+			catch ( IOException e ) 
+			{
+				e.printStackTrace();
+			}
+		}	
+	}
+	
 	/**
 	 * Unregister all dimensions
 	 * Teleport players from deleted dimensions to overworld spawn
@@ -296,34 +326,7 @@ public class YADimensionManager extends AbstractManager
 	 */
 	public void cleanup()
 	{
-		File file;
-		StringBuilder path;
-		
 		this.unregisterAll();
-		
-		for( Dimension dimension : this.deletedDimensions )
-		{
-			//Delete dimension folder
-			path = new StringBuilder()
-				.append( this.getSavePath() )
-				.append( File.separator )
-				.append( "DIM" )
-				.append( dimension.getId() )
-				.append( File.separator );
-			file = new File( path.toString() );
-				
-			if( ( file.exists() ) && ( file.isDirectory() ) )
-			{
-				try 
-				{
-					FileUtils.deleteDirectory(file);
-				}
-				catch ( IOException e ) 
-				{
-					e.printStackTrace();
-				}
-			}	
-		}
 		this.clear();	
 	}
 	
@@ -418,11 +421,9 @@ public class YADimensionManager extends AbstractManager
 	}
 	
 	@Override
-	protected void clear()
+	public void clear()
 	{
 		super.clear();
-		
 		this.deletedDimensions.clear();
-		this.deletedDimensions = null;
 	}
 }

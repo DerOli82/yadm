@@ -23,5 +23,10 @@ public class MessageDispatcher
 			RegisterDimensionMessage.class, 
 			id++, Side.CLIENT 
 		);
+		network.registerMessage( 
+			UnegisterDimensionHandler.class, 
+			UnregisterDimensionMessage.class, 
+			id++, Side.CLIENT 
+		);
 	}
 }

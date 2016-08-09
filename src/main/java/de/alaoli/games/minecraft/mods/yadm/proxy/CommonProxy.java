@@ -74,4 +74,9 @@ public class CommonProxy
 		YADimensionManager.instance.register( dimension );
 		YADimensionManager.instance.init( dimension );
 	}
+	
+	public void unregisterDimension( Dimension dimension )
+	{
+		//Nothing to do here
+	}
 }

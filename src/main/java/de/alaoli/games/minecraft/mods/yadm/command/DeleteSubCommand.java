@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
+import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
@@ -58,6 +59,7 @@ public class DeleteSubCommand extends Command implements SubCommand
 			TeleportUtil.emergencyTeleport( player );
 		}
 		YADimensionManager.instance.delete( dimension );
+		YADM.proxy.unregisterDimension( dimension );
 		sender.addChatMessage( new ChatComponentText( "Dimension '" + dimension.getName() + "' removed." ) );
 	}
 

@@ -1,5 +1,8 @@
 # Changelog
 
+# Version 0.4.1
+Fixes https://github.com/DerOli82/yadm/issues/3
+
 # Version 0.4.0
 
 Fix some Client<->Server problems
