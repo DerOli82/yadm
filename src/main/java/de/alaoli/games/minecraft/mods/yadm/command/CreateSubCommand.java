@@ -4,12 +4,13 @@ import java.util.Queue;
 
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
-import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionTemplate;
+import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
 public class CreateSubCommand implements SubCommand
@@ -33,7 +34,7 @@ public class CreateSubCommand implements SubCommand
 	@Override
 	public String getCommandUsage( ICommandSender sender )
 	{
-		return "";
+		return "/" + DefaultCommand.COMMAND + " create <dimensionName> <templateName>";
 	}
 	
 	@Override
@@ -48,44 +49,37 @@ public class CreateSubCommand implements SubCommand
 		String name = argQueue.remove();
 		String templateName = argQueue.remove();
 		
-		if( YADM.proxy.getDimensionManager().exists( name ) )
+		if( YADimensionManager.instance.exists( name ) )
 		{
 			sender.addChatMessage( new ChatComponentText( "Dimension '" + name + "' already exists." ) );
 			return;
 		}
-		if( !YADM.proxy.getTemplateManager().exists( templateName ) ) 
+		if( !TemplateManager.instance.exists( templateName ) ) 
 		{
 			sender.addChatMessage( new ChatComponentText( "Template '" + templateName + "' doesn't exists." ) );
 			return;
 		}
-		DimensionTemplate template = (DimensionTemplate) YADM.proxy.getTemplateManager().get( templateName );
+		DimensionTemplate template = (DimensionTemplate) TemplateManager.instance.get( templateName );
 		
 		try
 		{
-			Dimension dimension = YADM.proxy.getDimensionManager().create( name, template );	
+			Dimension dimension = YADimensionManager.instance.create( name, template );	
 			
 			YADM.proxy.registerDimension( dimension );
 			
 			if( Config.Dimension.teleportOnCreate )
 			{
-				EntityPlayerMP player = (EntityPlayerMP) sender.getEntityWorld().getPlayerEntityByName(sender.getCommandSenderName());
+				EntityPlayer player = sender.getEntityWorld().getPlayerEntityByName( sender.getCommandSenderName() );
 
-				Coordinate coordinate = new Coordinate( 
-					0,
-					150,
-					0
-				);
-				if( !TeleportUtil.teleport( player, dimension, coordinate ) )
+				if( !TeleportUtil.teleport( player, dimension ) )
 				{
-					/**
-					 * @TODO more infos?
-					 */
 					sender.addChatMessage( new ChatComponentText( "Can't teleport to dimension" ) );
 				}
 			}			
 		}
 		catch( RuntimeException e )
 		{
+			e.printStackTrace();
 			sender.addChatMessage( new ChatComponentText( e.getMessage() ) );
 		}	
 	}
