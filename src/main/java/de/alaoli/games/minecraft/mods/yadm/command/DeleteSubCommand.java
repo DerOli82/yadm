@@ -4,17 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
-import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraft.world.WorldServer;
 
-public class DeleteSubCommand implements SubCommand
+public class DeleteSubCommand extends Command implements SubCommand
 {
 	public static final DeleteSubCommand instance = new DeleteSubCommand();
 	
@@ -46,24 +45,20 @@ public class DeleteSubCommand implements SubCommand
 			sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
 			return;
 		}
-		String name = args.remove();
+		Dimension dimension = this.parseDimension( sender, args );
 		
-		if( !YADM.proxy.getDimensionManager().exists( name ) )
-		{
-			sender.addChatMessage( new ChatComponentText( "Dimension '" + name + "' doesn't exists." ) );
-			return;
-		}
-		Dimension dimension = (Dimension) YADM.proxy.getDimensionManager().get( name );
-		World world = DimensionManager.getWorld( dimension.getId() );
-		List<EntityPlayerMP> players = new ArrayList<EntityPlayerMP>((List<EntityPlayerMP>)world.playerEntities);
+		if( dimension == null ) { return; }
+		
+		WorldServer world = MinecraftServer.getServer().worldServerForDimension( dimension.getId() );
+		List<EntityPlayerMP> players = new ArrayList<EntityPlayerMP>(world.playerEntities);
 		
 		//Teleport all players out
 		for( EntityPlayerMP player : players )
 		{
 			TeleportUtil.emergencyTeleport( player );
 		}
-		YADM.proxy.getDimensionManager().delete( name );
-		sender.addChatMessage( new ChatComponentText( "Dimension '" + name + "' removed." ) );
+		YADimensionManager.instance.delete( dimension );
+		sender.addChatMessage( new ChatComponentText( "Dimension '" + dimension.getName() + "' removed." ) );
 	}
 
 }
