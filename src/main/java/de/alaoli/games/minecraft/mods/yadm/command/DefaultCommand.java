@@ -7,11 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import net.minecraft.command.CommandBase;
+import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
-public class DefaultCommand extends CommandBase
+public class DefaultCommand extends Command implements ICommand
 {
 	/********************************************************************************
 	 * Constants
@@ -28,6 +28,7 @@ public class DefaultCommand extends CommandBase
 	private static Map<String, SubCommand> subcommands = new HashMap<String, SubCommand>();
 	
 	private List<String> aliases;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -134,8 +135,14 @@ public class DefaultCommand extends CommandBase
 	}
 
 	@Override
-	public boolean isUsernameIndex(String[] list, int p_82358_2_) {
-		// TODO Auto-generated method stub
+	public boolean isUsernameIndex(String[] list, int p_82358_2_) 
+	{
 		return false;
+	}
+
+	@Override
+	public int compareTo( Object obj ) 
+	{
+		return  this.getCommandName().compareTo( ((ICommand)obj).getCommandName() );
 	}
 }
