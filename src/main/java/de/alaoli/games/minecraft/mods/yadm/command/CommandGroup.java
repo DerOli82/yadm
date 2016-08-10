@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+
+import org.apache.commons.lang3.ArrayUtils;
+
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
@@ -74,9 +77,23 @@ public abstract class CommandGroup extends Command
 	{
 		List<String> list = new ArrayList<String>();
 		
+		if( this.commands.containsKey( args[ 0 ] ) )
+		{
+			Command command = this.commands.get( args[ 0 ] );
+			
+			if( command instanceof CommandGroup )
+			{
+				return ((CommandGroup)command).addTabCompletionOptions( sender, ArrayUtils.remove( args, 0 ) );
+			}
+			return list;
+		}
+		
 		for( String command : this.commands.keySet() )
 		{
-			list.add( command );
+			if( command.regionMatches( 0, args[ 0 ], 0, args[ 0 ].length() ) )
+			{
+				list.add( command );
+			}
 		}
 		return list;
 	}
