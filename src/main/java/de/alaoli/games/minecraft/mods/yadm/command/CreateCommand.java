@@ -8,6 +8,7 @@ import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionTemplate;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.util.CommandUtil;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -66,6 +67,11 @@ public class CreateCommand extends Command
 		if( !TemplateManager.instance.exists( templateName ) ) 
 		{
 			sender.addChatMessage( new ChatComponentText( "Template '" + templateName + "' doesn't exists." ) );
+			return;
+		}
+		if( CommandUtil.isInt( name ) )
+		{
+			sender.addChatMessage( new ChatComponentText( "Numbers aren't allowed for dimension names" ) );
 			return;
 		}
 		DimensionTemplate template = (DimensionTemplate) TemplateManager.instance.get( templateName );
