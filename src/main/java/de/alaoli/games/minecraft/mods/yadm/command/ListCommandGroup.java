@@ -1,5 +1,10 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
+import java.util.Queue;
+
+import net.minecraft.command.ICommandSender;
+import net.minecraft.util.ChatComponentText;
+
 public class ListCommandGroup extends CommandGroup
 {
 	/********************************************************************************
@@ -30,4 +35,14 @@ public class ListCommandGroup extends CommandGroup
 	{
 		return "list";
 	}
+	
+	@Override
+	public void processCommand( ICommandSender sender, Queue<String> args )
+	{
+		if( args.isEmpty() )
+		{
+			args.add( "dimension" );
+		}
+		super.processCommand( sender, args );
+	}	
 }
