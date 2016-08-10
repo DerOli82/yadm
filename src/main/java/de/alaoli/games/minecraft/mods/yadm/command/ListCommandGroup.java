@@ -3,7 +3,6 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 import java.util.Queue;
 
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.ChatComponentText;
 
 public class ListCommandGroup extends CommandGroup
 {
