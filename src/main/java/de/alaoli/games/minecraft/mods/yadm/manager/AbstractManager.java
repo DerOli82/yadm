@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.alaoli.games.minecraft.mods.yadm.data.DataObject;
-
 public abstract class AbstractManager 
 {
 	/********************************************************************************
@@ -15,7 +13,7 @@ public abstract class AbstractManager
 	
 	private String savePath;
 	
-	private Map<String, DataObject> data;
+	private Map<String, Manageable> data;
 	
 	protected boolean dirty;
 	
@@ -25,7 +23,7 @@ public abstract class AbstractManager
 	
 	public AbstractManager()
 	{
-		this.data = new HashMap<String, DataObject>();
+		this.data = new HashMap<String, Manageable>();
 		this.dirty = false;
 	}
 	
@@ -44,21 +42,21 @@ public abstract class AbstractManager
 		this.load();
 	}
 	
-	public void add( DataObject dataObject )
+	public void add( Manageable data )
 	{
-		this.data.put( dataObject.getName(), dataObject );
+		this.data.put( data.getManageableName(), data );
 		this.markDirty();
 	}
 	
-	public void remove( DataObject dataObject )
+	public void remove( Manageable data )
 	{
-		this.data.remove( dataObject.getName() );
+		this.data.remove( data.getManageableName() );
 		this.markDirty();
 	}
 	
-	public boolean exists( DataObject dataObject )
+	public boolean exists( Manageable data )
 	{
-		return this.data.containsKey( dataObject.getName() );
+		return this.data.containsKey( data.getManageableName() );
 	}
 	
 	public boolean exists( String name )
@@ -100,12 +98,12 @@ public abstract class AbstractManager
 		this.savePath = savePath;
 	}	
 	
-	public DataObject get( String name )
+	public Manageable get( String name )
 	{
 		return this.data.get( name );
 	}
 	
-	public Set<Entry<String, DataObject>> getAll()
+	public Set<Entry<String, Manageable>> getAll()
 	{
 		return this.data.entrySet();
 	}
