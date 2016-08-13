@@ -3,5 +3,5 @@
 **Write once, use a lot**
 
 - Template based dimension creation
-- Write your customized dimension templates ( See Wiki: TODO https://github.com/DerOli82/yadm/wiki/Templates )
-- Create and manage your dimensions ingame ( See Wiki: https://github.com/DerOli82/yadm/wiki/2-Dimensionss )
+- Write your customized dimension templates ( See Wiki: https://github.com/DerOli82/yadm/wiki/1-Templates )
+- Create and manage your dimensions ingame ( See Wiki: https://github.com/DerOli82/yadm/wiki/2-Dimensions )
