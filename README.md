@@ -1,4 +1,4 @@
-# YADM - Yes Another Dimension Manager Mod for Minecraft
+# YADM - Yes Another Dimension Manager - Mod for Minecraft
 
 **Write once, use a lot**
 
