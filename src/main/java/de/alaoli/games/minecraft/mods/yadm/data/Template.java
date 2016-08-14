@@ -1,24 +1,23 @@
 package de.alaoli.games.minecraft.mods.yadm.data;
 
-import java.lang.reflect.Type;
-
-import com.google.gson.InstanceCreator;
-import com.google.gson.annotations.Expose;
-
-import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingGroup;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
+import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 
-public class Template extends SettingGroup implements Manageable
+public class Template extends SettingGroup implements Manageable, JsonSerializable
 {
 	/********************************************************************************
 	 * Attributes
 	 ********************************************************************************/
 	
-	private String group; 
+	private String groupName; 
 	
-	@Expose
 	private String name;
 
 	/********************************************************************************
@@ -27,10 +26,10 @@ public class Template extends SettingGroup implements Manageable
 	
 	public Template() {}
 	
-	public Template( String name, String group )
+	public Template( String name, String groupName )
 	{
 		this.name = name;
-		this.group = group;
+		this.groupName = groupName;
 	}
 	
 	public String getName()
@@ -45,7 +44,7 @@ public class Template extends SettingGroup implements Manageable
 	@Override
 	public String getManageableGroupName() 
 	{
-		return this.group;
+		return this.groupName;
 	}
 	
 	@Override
@@ -68,5 +67,31 @@ public class Template extends SettingGroup implements Manageable
 	public boolean isRequired() 
 	{
 		return true;
+	}
+	
+	/********************************************************************************
+	 * Methods - Implement JsonSerializable
+	 ********************************************************************************/
+
+	@Override
+	public JsonElement serialize( JsonSerializationContext context ) 
+	{
+		JsonObject result = super.serialize( context ).getAsJsonObject();
+		
+		result.addProperty( "name", this.name );
+		
+		return result;
+	}
+
+	@Override
+	public void deserialize( JsonElement json, JsonDeserializationContext context )
+	{
+		JsonObject data = json.getAsJsonObject();
+		
+		if( !data.has( "name" ) ) { 
+			throw new JsonParseException( "Template requires a name." ); 
+		}
+		this.name = data.get( "name" ).getAsString();
+		super.deserialize( json, context );
 	}
 }

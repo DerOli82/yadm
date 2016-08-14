@@ -1,8 +1,5 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
-import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.data.Template;
-
 public enum SettingType 
 {
 	WORLDPROVIDER( "worldProvider", WorldProviderSetting.class ),

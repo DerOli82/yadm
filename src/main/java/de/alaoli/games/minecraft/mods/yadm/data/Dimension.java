@@ -1,23 +1,18 @@
 package de.alaoli.games.minecraft.mods.yadm.data;
 
-import java.lang.reflect.Type;
-
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.annotations.Expose;
-
-import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingGroup;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
+import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class Dimension extends SettingGroup implements Manageable, Packageable
+public class Dimension extends SettingGroup implements Manageable, JsonSerializable, Packageable
 {
 	/********************************************************************************
 	 * Attributes
@@ -25,10 +20,8 @@ public class Dimension extends SettingGroup implements Manageable, Packageable
 	
 	private String group; 
 	
-	@Expose
 	private int id;
 	
-	@Expose
 	private String name;
 	
 	private boolean isRegistered;
@@ -92,6 +85,38 @@ public class Dimension extends SettingGroup implements Manageable, Packageable
 	public String getManageableName() 
 	{
 		return this.name;
+	}
+	
+	/********************************************************************************
+	 * Methods - Implement JsonSerializable
+	 ********************************************************************************/
+
+	@Override
+	public JsonElement serialize( JsonSerializationContext context ) 
+	{
+		JsonObject result = super.serialize( context ).getAsJsonObject();
+		
+		result.addProperty( "id", this.id );
+		result.addProperty( "name", this.name );
+		
+		return result;
+	}
+
+	@Override
+	public void deserialize( JsonElement json, JsonDeserializationContext context )
+	{
+		JsonObject data = json.getAsJsonObject();
+
+		if( !data.has( "id" ) ) { 
+			throw new JsonParseException( "Dimension requires a id." ); 
+		}		
+		if( !data.has( "name" ) ) { 
+			throw new JsonParseException( "Dimension requires a name." ); 
+		}
+		this.id = data.get( "id" ).getAsInt();
+		this.name = data.get( "name" ).getAsString();
+		
+		super.deserialize( json, context );
 	}
 	
 	/********************************************************************************

@@ -1,11 +1,14 @@
 package de.alaoli.games.minecraft.mods.yadm.manager;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import org.apache.commons.io.FileUtils;
 
@@ -17,10 +20,12 @@ import com.google.gson.stream.JsonWriter;
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
-import de.alaoli.games.minecraft.mods.yadm.data.DataObject;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.data.DimensionTemplate;
-import de.alaoli.games.minecraft.mods.yadm.data.DimensionSettings;
+import de.alaoli.games.minecraft.mods.yadm.data.Template;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
+import de.alaoli.games.minecraft.mods.yadm.json.DimensionJsonAdapter;
+import de.alaoli.games.minecraft.mods.yadm.json.SettingJsonAdapter;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
@@ -64,7 +69,7 @@ public class YADimensionManager extends AbstractManager
 	{
 		Dimension dimension;
 		
-		for( Entry<String, DataObject> entry : this.getAll() )
+		for( Entry<String, Manageable> entry : this.getAll() )
 		{
 			dimension = (Dimension) entry.getValue();
 			
@@ -97,7 +102,7 @@ public class YADimensionManager extends AbstractManager
 	{
 		Dimension dimension;
 		
-		for( Entry<String, DataObject> entry : this.getAll() )
+		for( Entry<String, Manageable> entry : this.getAll() )
 		{
 			dimension = (Dimension) entry.getValue();
 		
@@ -130,7 +135,9 @@ public class YADimensionManager extends AbstractManager
 			int providerId = WorldBuilder.instance.registerProvider( provider, false );
 			
 			DimensionManager.registerDimension( dimension.getId(), providerId );
-			dimension.getSettings().setProviderId( providerId );
+			
+			WorldProviderSetting providerSetting = (WorldProviderSetting) dimension.get( SettingType.WORLDPROVIDER );
+			providerSetting.setId( providerId );
 			dimension.setRegistered( true );
 			
 			StringBuilder msg = new StringBuilder()
@@ -139,9 +146,9 @@ public class YADimensionManager extends AbstractManager
 				.append( "' with ID '" )
 				.append( dimension.getId() )
 				.append( "' and Provider '" )
-				.append( dimension.getSettings().getProviderName() )
+				.append( providerSetting.getName() )
 				.append( "' with ID '" )
-				.append( dimension.getSettings().getProviderId() )
+				.append( providerSetting.getId() )
 				.append( "'." );
 			Log.info( msg.toString() );
 		} 
@@ -161,10 +168,11 @@ public class YADimensionManager extends AbstractManager
 		DimensionManager.initDimension( dimension.getId() );
 	}
 	
-	public Dimension create( String name, DimensionTemplate pattern ) 
+	public Dimension create( String name, Template template ) 
 	{
-		Dimension dimension = new Dimension( this.nextDimensionId(), name, new DimensionSettings( pattern ) );
+		Dimension dimension = new Dimension( this.nextDimensionId(), name );
 		
+		dimension.add( template.getAll() );
 		this.add( dimension );
 
 		return dimension;
@@ -202,7 +210,6 @@ public class YADimensionManager extends AbstractManager
 		this.deletedDimensions.put( dimension.getId(), dimension );
 		this.remove( dimension );
 		
-		dimension.markDeleted();
 		this.markDirty();
 		DimensionManager.unloadWorld( dimension.getId() );
 	}
@@ -213,6 +220,7 @@ public class YADimensionManager extends AbstractManager
 		
 		if( DimensionManager.isDimensionRegistered( dimension.getId() ) )
 		{
+			WorldProviderSetting providerSetting = (WorldProviderSetting) dimension.get( SettingType.WORLDPROVIDER );
 			try
 			{
 				msg = new StringBuilder()
@@ -239,21 +247,21 @@ public class YADimensionManager extends AbstractManager
 			{
 				msg = new StringBuilder()
 					.append( "Unregister Provider '" )
-					.append( dimension.getSettings().getProviderName() )
+					.append( providerSetting.getName() )
 					.append( "' with ID '" )
-					.append( dimension.getSettings().getProviderId() )
+					.append( providerSetting.getId() )
 					.append( "'." );
 				Log.info( msg.toString() );
 				
-				DimensionManager.unregisterProviderType( dimension.getSettings().getProviderId() );
+				DimensionManager.unregisterProviderType( providerSetting.getId() );
 			}
 			catch( Exception e )
 			{
 				msg = new StringBuilder()
 					.append( "Couldn't unregister Provider '" )
-					.append( dimension.getSettings().getProviderName() )
+					.append( providerSetting.getName() )
 					.append( "' with ID '" )
-					.append( dimension.getSettings().getProviderId() )
+					.append( providerSetting )
 					.append( "'.");
 				Log.info( msg.toString() );
 			}			
@@ -275,7 +283,7 @@ public class YADimensionManager extends AbstractManager
 	{
 		Dimension dimension;
 		
-		for( Entry<String, DataObject> entry : this.getAll() )
+		for( Entry<String, Manageable> entry : this.getAll() )
 		{
 			dimension = (Dimension) entry.getValue();
 		
@@ -338,8 +346,13 @@ public class YADimensionManager extends AbstractManager
 	public void load() 
 	{
 		JsonReader reader;
-		Dimension dimension;
+		Set<Manageable> group;
 		
+		Gson gson = new GsonBuilder()
+			.registerTypeHierarchyAdapter( SettingJsonAdapter.class, new SettingJsonAdapter() )
+			.registerTypeHierarchyAdapter( DimensionJsonAdapter.class, new DimensionJsonAdapter() )
+			.excludeFieldsWithoutExposeAnnotation()
+			.create();		
 		StringBuilder path = new StringBuilder()
 			.append( this.getSavePath() )
 			.append( File.separator )
@@ -348,7 +361,6 @@ public class YADimensionManager extends AbstractManager
 			.append( YADM.MODID )
 			.append( File.separator );
 		File folder	= new File( path.toString() );
-		Gson gson = (new GsonBuilder()).setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
 		
 		//Create folder
 		if( !folder.exists() )
@@ -364,12 +376,16 @@ public class YADimensionManager extends AbstractManager
 			{
 				try 
 				{
-					reader		= new JsonReader( new FileReader( file ) );
-					dimension	= gson.fromJson( reader, Dimension.class );
+					reader = new JsonReader( new InputStreamReader( new FileInputStream( file.toString() ), "UTF-8" ) );
+					group = gson.fromJson( reader, DimensionJsonAdapter.class );
 
-					this.add( dimension );
-					this.register( dimension );
-					this.init( dimension );
+					this.addGroup( group );
+					
+					for( Manageable dimension : group )
+					{
+						this.register( (Dimension)dimension );
+						this.init( (Dimension)dimension );
+					}
 					reader.close();
 				}
 				catch ( IOException e ) 
@@ -388,27 +404,32 @@ public class YADimensionManager extends AbstractManager
 		{
 			return;
 		}
-		File file;
 		JsonWriter writer;
-		StringBuilder pathJson, pathDimension;
+		StringBuilder file;
 		
-		Gson gson = (new GsonBuilder()).setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+		Gson gson = (new GsonBuilder())
+			.excludeFieldsWithoutExposeAnnotation()
+			.registerTypeHierarchyAdapter( SettingJsonAdapter.class, new SettingJsonAdapter() )
+			.registerTypeHierarchyAdapter( DimensionJsonAdapter.class, new DimensionJsonAdapter() )
+			.create();
 
 		try 
 		{
-			for( Entry<String, DataObject> entry : this.getAll() )
+			for( Entry<String, Manageable> entry : this.getAll() )
 			{
-				pathJson = new StringBuilder()
+				file = new StringBuilder()
 					.append( this.getSavePath() )
 					.append( File.separator )
 					.append( "data" )
 					.append( File.separator )
 					.append( YADM.MODID )
 					.append( File.separator)
-					.append( entry.getValue().getName() )
-					.append( ".json" );
-				writer = new JsonWriter( new FileWriter( pathJson.toString() ) );
-				gson.toJson( entry.getValue(), Dimension.class, writer );
+					.append( entry.getKey() )
+					.append( ".json" );				
+				writer = new JsonWriter( new OutputStreamWriter( new FileOutputStream( file.toString() ), "UTF-8" ) );
+				writer.setIndent( "  " );
+				
+				gson.toJson( entry.getValue(), DimensionJsonAdapter.class, writer );
 			
 				writer.close();
 			}

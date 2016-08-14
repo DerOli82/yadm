@@ -1,7 +1,5 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
-import java.lang.reflect.Type;
-
 import com.google.gson.annotations.Expose;
 
 public class WorldProviderSetting implements Setting 
@@ -17,7 +15,7 @@ public class WorldProviderSetting implements Setting
 	/********************************************************************************
 	 * Attributes
 	 ********************************************************************************/
-	
+				
 	private int id;
 	
 	@Expose
@@ -64,10 +62,4 @@ public class WorldProviderSetting implements Setting
 	{
 		return true;
 	}
-
-	@Override
-	public WorldProviderSetting createInstance( Type type ) 
-	{
-		return new WorldProviderSetting();
-	}	
 }
