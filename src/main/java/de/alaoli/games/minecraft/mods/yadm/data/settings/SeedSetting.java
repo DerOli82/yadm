@@ -1,10 +1,14 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
-import java.lang.reflect.Type;
+import java.util.List;
 
 import com.google.gson.annotations.Expose;
 
-public class SeedSetting implements Setting
+import cpw.mods.fml.relauncher.ReflectionHelper;
+import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
+import net.minecraft.world.storage.WorldInfo;
+
+public class SeedSetting implements Setting, Injectable
 {
 	/********************************************************************************
 	 * Attributes
@@ -38,9 +42,31 @@ public class SeedSetting implements Setting
 		return false;
 	}
 
+	/********************************************************************************
+	 * Methods - Implements Injectable
+	 ********************************************************************************/
+
 	@Override
-	public SeedSetting createInstance( Type type ) 
+	public void injectInto( Object target )
 	{
-		return new SeedSetting();
-	}	
+		if( target instanceof WorldInfo )
+		{
+			WorldInfo worldInfo = (WorldInfo)target;
+			
+			ReflectionHelper.setPrivateValue( 
+				WorldInfo.class, worldInfo, 
+				this.value, 
+				new String[] { "field_76100_a", "randomSeed" } 
+			);		
+		}
+	}		
+	
+	@Override
+	public void injectInto( List targets )
+	{
+		for( Object target : targets )
+		{
+			this.injectInto( target );
+		}
+	}		
 }

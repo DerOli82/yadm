@@ -1,18 +1,28 @@
 package de.alaoli.games.minecraft.mods.yadm.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+
+import cpw.mods.fml.relauncher.ReflectionHelper;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingGroup;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
+import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.WorldProvider;
+import net.minecraft.world.storage.DerivedWorldInfo;
+import net.minecraft.world.storage.WorldInfo;
 
-public class Dimension extends SettingGroup implements Manageable, JsonSerializable, Packageable
+public class Dimension extends SettingGroup implements Manageable, JsonSerializable, Packageable, Injectable
 {
 	/********************************************************************************
 	 * Attributes
@@ -149,5 +159,47 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	public void readFromNBT( NBTTagCompound tagCompound ) 
 	{
 
+	}
+
+	/********************************************************************************
+	 * Methods - Implement Injectable
+	 ********************************************************************************/
+
+	@Override
+	public void injectInto( Object target )
+	{
+		if( target instanceof WorldProvider )
+		{
+			WorldProvider worldProvider = (WorldProvider)target;
+			WorldInfo worldInfo = worldProvider.worldObj.getWorldInfo();
+			Class clazz	= worldInfo.getClass();
+
+			//Get and reflect theWorldInfo
+			if( clazz == DerivedWorldInfo.class )
+			{
+				worldInfo = (WorldInfo) ReflectionHelper.getPrivateValue( 
+					DerivedWorldInfo.class, 
+					(DerivedWorldInfo)worldInfo, 
+					new String[] { "field_76115_a", "theWorldInfo" } 
+				);
+			}
+			List targets = new ArrayList();;
+			targets.add( worldProvider );
+			targets.add( worldInfo );
+			
+			for( Setting setting : this.getAll().values() )
+			{
+				if( setting instanceof Injectable )
+				{
+					((Injectable)setting).injectInto( targets );
+				}
+			}
+		}
+	}
+
+	@Override
+	public void injectInto( List targets ) 
+	{
+		//Nothing to do
 	}
 }

@@ -2,7 +2,7 @@ package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
 import com.google.gson.annotations.Expose;
 
-public class WorldProviderSetting implements Setting 
+public class WorldProviderSetting implements Setting
 {
 	/********************************************************************************
 	 * Constants
