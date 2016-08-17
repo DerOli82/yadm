@@ -1,6 +1,7 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
 import java.util.List;
+import java.util.Random;
 
 import com.google.gson.annotations.Expose;
 
@@ -21,6 +22,16 @@ public class SeedSetting implements Setting, Injectable
 	 * Methods
 	 ********************************************************************************/
 	
+	public SeedSetting() 
+	{
+		this.value = (new Random()).nextLong();
+	}
+	
+	public SeedSetting( Long seed )
+	{
+		this.value = seed;
+	}
+	
 	public Long getValue()
 	{
 		return this.value;
@@ -39,7 +50,7 @@ public class SeedSetting implements Setting, Injectable
 	@Override
 	public boolean isRequired() 
 	{
-		return false;
+		return true;
 	}
 
 	/********************************************************************************
