@@ -6,11 +6,13 @@ import com.google.gson.annotations.Expose;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
+import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.WorldInfo;
 
-public class WorldTypeSetting implements Setting, Injectable
+public class WorldTypeSetting implements Setting, Injectable, Packageable
 {
 	/********************************************************************************
 	 * Constants
@@ -88,5 +90,21 @@ public class WorldTypeSetting implements Setting, Injectable
 		{
 			this.injectInto( target );
 		}
-	}		
+	}
+	
+	/********************************************************************************
+	 * Methods - Implement Packageable
+	 ********************************************************************************/
+	
+	@Override
+	public void writeToNBT( NBTTagCompound tagCompound ) 
+	{	
+		tagCompound.setString( "name", this.name );
+	}
+
+	@Override
+	public void readFromNBT( NBTTagCompound tagCompound ) 
+	{
+		this.name = tagCompound.getString( "name" );
+	}	
 }

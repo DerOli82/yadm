@@ -11,6 +11,7 @@ import com.google.gson.JsonSerializationContext;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingFactory;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingGroup;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
@@ -18,6 +19,7 @@ import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraft.world.storage.WorldInfo;
@@ -28,11 +30,11 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	 * Attributes
 	 ********************************************************************************/
 	
-	private String group; 
-	
 	private int id;
 	
 	private String name;
+	
+	private String group; 
 	
 	private boolean isRegistered;
 	
@@ -40,10 +42,13 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	 * Methods
 	 ********************************************************************************/
 	
+	public Dimension() {}
+	
 	public Dimension( int id, String name )
 	{
 		this.id = id;
 		this.name = name;
+		this.group = "default";
 		this.isRegistered = false;
 	}
 	
@@ -152,13 +157,44 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	@Override
 	public void writeToNBT( NBTTagCompound tagCompound ) 
 	{	
-
+		NBTTagCompound settingCompound;
+		NBTTagList list = new NBTTagList();
+		
+		tagCompound.setInteger( "id", this.id );
+		tagCompound.setString( "name", this.name );
+		
+		for( Setting setting : this.getAll().values() )
+		{
+			if( setting instanceof Packageable )
+			{
+				settingCompound = new NBTTagCompound();
+				
+				settingCompound.setString( "type", setting.getSettingType().toString() );
+				((Packageable)setting).writeToNBT( settingCompound );
+				list.appendTag( settingCompound );
+			}
+		}
+		tagCompound.setTag( "settings", list );
 	}
 
 	@Override
 	public void readFromNBT( NBTTagCompound tagCompound ) 
 	{
-
+		Setting setting;
+		NBTTagCompound settingCompound;
+		
+		this.id = tagCompound.getInteger( "id" );
+		this.name = tagCompound.getString( "name" );
+		
+		NBTTagList list =(NBTTagList)tagCompound.getTag( "settings" );
+		
+		for( int i = 0; i< list.tagCount(); i++ )
+		{
+			settingCompound = list.getCompoundTagAt( i );
+			setting = SettingFactory.createNewInstance( settingCompound.getString( "type" ) ); 
+					
+			this.add(setting );
+		}
 	}
 
 	/********************************************************************************

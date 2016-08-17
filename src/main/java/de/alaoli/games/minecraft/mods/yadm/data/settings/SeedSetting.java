@@ -7,9 +7,11 @@ import com.google.gson.annotations.Expose;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
+import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.storage.WorldInfo;
 
-public class SeedSetting implements Setting, Injectable
+public class SeedSetting implements Setting, Injectable, Packageable
 {
 	/********************************************************************************
 	 * Attributes
@@ -79,5 +81,21 @@ public class SeedSetting implements Setting, Injectable
 		{
 			this.injectInto( target );
 		}
+	}
+	
+	/********************************************************************************
+	 * Methods - Implement Packageable
+	 ********************************************************************************/
+	
+	@Override
+	public void writeToNBT( NBTTagCompound tagCompound ) 
+	{	
+		tagCompound.setLong( "value", this.value );
+	}
+
+	@Override
+	public void readFromNBT( NBTTagCompound tagCompound ) 
+	{
+		this.value = tagCompound.getLong( "value" );
 	}		
 }

@@ -2,7 +2,11 @@ package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
 import com.google.gson.annotations.Expose;
 
-public class WorldProviderSetting implements Setting
+import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+
+public class WorldProviderSetting implements Setting, Packageable
 {
 	/********************************************************************************
 	 * Constants
@@ -61,5 +65,21 @@ public class WorldProviderSetting implements Setting
 	public boolean isRequired() 
 	{
 		return true;
+	}
+	
+	/********************************************************************************
+	 * Methods - Implement Packageable
+	 ********************************************************************************/
+	
+	@Override
+	public void writeToNBT( NBTTagCompound tagCompound ) 
+	{	
+		tagCompound.setString( "name", this.name );
+	}
+
+	@Override
+	public void readFromNBT( NBTTagCompound tagCompound ) 
+	{
+		this.name = tagCompound.getString( "name" );
 	}
 }

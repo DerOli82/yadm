@@ -6,10 +6,12 @@ import com.google.gson.annotations.Expose;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
+import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.WorldInfo;
 
-public class GeneratorOptionsSetting implements Setting, Injectable
+public class GeneratorOptionsSetting implements Setting, Injectable, Packageable
 {
 	/********************************************************************************
 	 * Attributes
@@ -74,5 +76,21 @@ public class GeneratorOptionsSetting implements Setting, Injectable
 		{
 			this.injectInto( target );
 		}
+	}		
+	
+	/********************************************************************************
+	 * Methods - Implement Packageable
+	 ********************************************************************************/
+	
+	@Override
+	public void writeToNBT( NBTTagCompound tagCompound ) 
+	{	
+		tagCompound.setString( "value", this.value );
+	}
+
+	@Override
+	public void readFromNBT( NBTTagCompound tagCompound ) 
+	{
+		this.value = tagCompound.getString( "value" );
 	}		
 }
