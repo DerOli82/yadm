@@ -6,7 +6,8 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.data.DimensionTemplate;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.DimensionFieldAccessor;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.GetDimensionNameInterceptor;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.GetSeedInterceptor;
@@ -108,17 +109,17 @@ public class WorldBuilder
 	{
 		Class<? extends WorldProvider> providerClass;
 		
-		switch( dimension.getSettings().getProviderName() )
+		switch( ((WorldProviderSetting)dimension.get( SettingType.WORLDPROVIDER )).getName() )
 		{
-			case DimensionTemplate.PROVIDER_NETHER :
+			case WorldProviderSetting.NETHER :
 				providerClass = this.worldProviders.get( -1 );
 				break;
 				
-			case DimensionTemplate.PROVIDER_OVERWORLD :
+			case WorldProviderSetting.OVERWORLD :
 				providerClass = this.worldProviders.get( 0 );
 				break;
 				
-			case DimensionTemplate.PROVIDER_END :
+			case WorldProviderSetting.END :
 				providerClass = this.worldProviders.get( 1 );
 				break;				
 				
