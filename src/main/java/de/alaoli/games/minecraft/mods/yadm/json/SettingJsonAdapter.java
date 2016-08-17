@@ -12,7 +12,6 @@ import com.google.gson.JsonSerializer;
 
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingFactory;
-import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 
 public class SettingJsonAdapter implements JsonSerializer<Setting>, JsonDeserializer<Setting>  
 {

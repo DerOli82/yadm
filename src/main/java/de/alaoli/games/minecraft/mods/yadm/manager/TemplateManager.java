@@ -16,7 +16,6 @@ import com.google.gson.stream.JsonWriter;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
-import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldTypeSetting;
 import de.alaoli.games.minecraft.mods.yadm.json.SettingJsonAdapter;
 import de.alaoli.games.minecraft.mods.yadm.json.TemplateJsonAdapter;
 

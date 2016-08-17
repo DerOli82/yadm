@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 
 public class WorldProviderSetting implements Setting, Packageable
 {
