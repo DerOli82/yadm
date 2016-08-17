@@ -33,9 +33,9 @@ public class SettingJsonAdapter implements JsonSerializer<Setting>, JsonDeserial
 		if( !settingJson.has( "type" ) ) {
 			throw new JsonParseException( "Setting type required." ); 
 		}
-		Class<Setting> settingType = SettingFactory.getSettingClass( settingJson.get( "type" ).getAsString() );  
+		Class<Setting> settingType = (Class<Setting>) SettingFactory.createNewInstance( settingJson.get( "type" ).getAsString() ).getClass();  
 		settingJson.remove( "type" );
-		
+		 
 		return context.deserialize( settingJson, settingType );
 	}
 }
