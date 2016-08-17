@@ -12,8 +12,8 @@ import cpw.mods.fml.common.network.FMLOutboundHandler;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import de.alaoli.games.minecraft.mods.yadm.Log;
-import de.alaoli.games.minecraft.mods.yadm.data.DataObject;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
 import de.alaoli.games.minecraft.mods.yadm.network.SyncDimensionsMessage;
@@ -40,7 +40,7 @@ public class DimensionFMLEvent
 	    	Dimension dimension;
 	    	Set<Dimension> dimensions = new HashSet<Dimension>(); 
 	    	
-	    	for( Entry<String, DataObject> entry : YADimensionManager.instance.getAll() )
+	    	for( Entry<String, Manageable> entry : YADimensionManager.instance.getAll() )
 	    	{
 	    		dimension = (Dimension)entry.getValue();
 	    		dimensions.add( dimension );
@@ -50,10 +50,6 @@ public class DimensionFMLEvent
 					.append( dimension.getName() )
 					.append( "' with ID '" )
 					.append( dimension.getId() )
-					.append( "' and Provider '" )
-					.append( dimension.getSettings().getProviderName() )
-					.append( "' with ID '" )
-					.append( dimension.getSettings().getProviderId() )
 					.append( "'." );
 				Log.info( msg.toString() );	    		
 	    	}

@@ -5,7 +5,7 @@ import java.util.Queue;
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.data.DimensionTemplate;
+import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.util.CommandUtil;
@@ -74,7 +74,7 @@ public class CreateCommand extends Command
 			sender.addChatMessage( new ChatComponentText( "Numbers aren't allowed for dimension names" ) );
 			return;
 		}
-		DimensionTemplate template = (DimensionTemplate) TemplateManager.instance.get( templateName );
+		Template template = (Template) TemplateManager.instance.get( templateName );
 		
 		try
 		{

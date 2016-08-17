@@ -3,8 +3,8 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 import java.util.Queue;
 import java.util.Map.Entry;
 
-import de.alaoli.games.minecraft.mods.yadm.data.DataObject;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
@@ -44,7 +44,7 @@ public class ListDimensionCommand extends Command
 		
 		sender.addChatMessage( new ChatComponentText( "Registered Dimensions:" ) );
 		
-		for( Entry<String, DataObject> entry : YADimensionManager.instance.getAll() )
+		for( Entry<String, Manageable> entry : YADimensionManager.instance.getAll() )
 		{
 			dimension = (Dimension)entry.getValue();
 			msg = new StringBuilder()
