@@ -2,6 +2,8 @@ package de.alaoli.games.minecraft.mods.yadm.util;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.SpawnSetting;
 import de.alaoli.games.minecraft.mods.yadm.teleport.DimensionTeleport;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -48,23 +50,34 @@ public class TeleportUtil
 	
 	public static boolean teleport( EntityPlayer player, Dimension dimension )
 	{
-		if( ( dimension == null ) || !dimension.canTeleport() || ( player == null ) ) { return false; }
+		if( ( dimension == null ) || !dimension.isRegistered() || ( player == null ) ) { return false; }
 		
 		WorldServer target = MinecraftServer.getServer().worldServerForDimension( dimension.getId() );
 		if( target == null ) { return false; }
 		
-		Coordinate coordinate = new Coordinate(
-			target.getSpawnPoint().posX,
-			target.getSpawnPoint().posY + OFFSETY,
-			target.getSpawnPoint().posZ
-		);
+		Coordinate coordinate;
+		
+		if( dimension.hasSetting( SettingType.SPAWN ) )
+		{
+			SpawnSetting spawn = (SpawnSetting)dimension.get( SettingType.SPAWN );
+			coordinate = spawn.getCoordinate();
+		}
+		else
+		{
+			coordinate = new Coordinate(
+				target.getSpawnPoint().posX,
+				target.getSpawnPoint().posY + OFFSETY,
+				target.getSpawnPoint().posZ
+			);
+		}
+		
 		
 		return teleport( player, dimension, coordinate, target );
 	}
 	
 	public static boolean teleport( EntityPlayer player, Dimension dimension, Coordinate coordinate )
 	{
-		if( ( dimension == null ) || !dimension.canTeleport() || ( player == null ) ) { return false; }
+		if( ( dimension == null ) || !dimension.isRegistered() || ( player == null ) ) { return false; }
 		 
 		WorldServer target = DimensionManager.getWorld( dimension.getId() );
 				
@@ -75,7 +88,7 @@ public class TeleportUtil
 	
 	public static boolean teleport( EntityPlayer player, Dimension dimension, Coordinate coordinate, WorldServer target )
 	{
-		if( ( dimension == null ) || !dimension.canTeleport() || ( player == null ) || ( target == null ) ) { return false; }
+		if( ( dimension == null ) || !dimension.isRegistered() || ( player == null ) || ( target == null ) ) { return false; }
 		
 		preparePlayer( player );
 		
