@@ -1,7 +1,5 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
-import java.lang.reflect.Type;
-
 import com.google.gson.annotations.Expose;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
@@ -22,6 +20,14 @@ public class SpawnSetting implements Setting
 	 * Methods
 	 ********************************************************************************/
 
+	public SpawnSetting() {}
+	
+	public SpawnSetting( Coordinate coordinate, int mode )
+	{
+		this.coordinate = coordinate;
+		this.mode = mode;
+	}
+	
 	public Coordinate getCoordinate() 
 	{
 		return this.coordinate;
@@ -46,11 +52,5 @@ public class SpawnSetting implements Setting
 	public boolean isRequired() 
 	{
 		return false;
-	}
-
-	@Override
-	public SpawnSetting createInstance( Type type ) 
-	{
-		return new SpawnSetting();
-	}		
+	}	
 }

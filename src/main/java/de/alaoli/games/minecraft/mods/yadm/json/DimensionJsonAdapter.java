@@ -1,19 +1,18 @@
 package de.alaoli.games.minecraft.mods.yadm.json;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.data.Template;
 
 public class DimensionJsonAdapter extends AbstractJsonAdapter<Dimension>
 {
 	@Override
 	public String getName() 
 	{
-		return "dimension";
+		return "dimensions";
 	}
 
 	@Override
-	public Class<Dimension> getType() 
+	public Dimension createInstance() 
 	{
-		return Dimension.class;
+		return new Dimension();
 	}
 }

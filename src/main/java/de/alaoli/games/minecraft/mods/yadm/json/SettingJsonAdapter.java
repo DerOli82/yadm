@@ -11,6 +11,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingFactory;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 
 public class SettingJsonAdapter implements JsonSerializer<Setting>, JsonDeserializer<Setting>  
@@ -32,7 +33,7 @@ public class SettingJsonAdapter implements JsonSerializer<Setting>, JsonDeserial
 		if( !settingJson.has( "type" ) ) {
 			throw new JsonParseException( "Setting type required." ); 
 		}
-		Class<Setting> settingType = SettingType.get( settingJson.get( "type" ).getAsString() ).getClazz(); 
+		Class<Setting> settingType = SettingFactory.getSettingClass( settingJson.get( "type" ).getAsString() );  
 		settingJson.remove( "type" );
 		
 		return context.deserialize( settingJson, settingType );

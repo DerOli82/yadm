@@ -15,6 +15,4 @@ public class TemplateJsonAdapter extends AbstractJsonAdapter<Template>
 	{
 		return new Template();
 	}
-
-
 }

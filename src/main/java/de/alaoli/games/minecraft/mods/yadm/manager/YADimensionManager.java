@@ -415,7 +415,7 @@ public class YADimensionManager extends AbstractManager
 
 		try 
 		{
-			for( Entry<String, Manageable> entry : this.getAll() )
+			for( Entry<String, Set<Manageable>> entry : this.getAllGroups().entrySet() )
 			{
 				file = new StringBuilder()
 					.append( this.getSavePath() )

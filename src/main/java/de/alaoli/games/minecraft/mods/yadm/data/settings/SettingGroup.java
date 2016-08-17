@@ -52,7 +52,7 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 	
 	public Setting get( SettingType type )
 	{
-		return this.settings.get( type.toString() ); 
+		return this.settings.get( type ); 
 	}
 
 	public Setting get( String name )
@@ -63,6 +63,11 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 	public Map<SettingType, Setting> getAll()
 	{
 		return this.settings;
+	}
+	
+	public boolean hasSetting( SettingType type )
+	{
+		return this.settings.containsKey( type );
 	}
 	
 	/********************************************************************************

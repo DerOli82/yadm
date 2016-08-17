@@ -44,6 +44,7 @@ public class TemplateManager extends AbstractManager
 		template.add( new WorldTypeSetting( WorldTypeSetting.DEFAULT ) );
 		this.add( template );
 		
+		
 		template = new Template( "nether", "vanilla" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.NETHER ) );
 		template.add( new WorldTypeSetting( WorldTypeSetting.DEFAULT ) );
