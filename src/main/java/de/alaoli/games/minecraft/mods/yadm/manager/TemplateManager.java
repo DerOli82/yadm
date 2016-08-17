@@ -41,18 +41,15 @@ public class TemplateManager extends AbstractManager
 	{
 		Template template = new Template( "overworld", "vanilla" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.OVERWORLD ) );
-		template.add( new WorldTypeSetting( WorldTypeSetting.DEFAULT ) );
 		this.add( template );
 		
 		
 		template = new Template( "nether", "vanilla" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.NETHER ) );
-		template.add( new WorldTypeSetting( WorldTypeSetting.DEFAULT ) );
 		this.add( template );
 		
 		template = new Template( "end", "vanilla" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.END ) );
-		template.add( new WorldTypeSetting( WorldTypeSetting.DEFAULT ) );
 		this.add( template );
 
 		this.dirty = true;
