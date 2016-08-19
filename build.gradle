@@ -43,6 +43,9 @@ minecraft {
 
 jar {
     version = minecraft.version + "-" + project.version + "-${repo.head().abbreviatedId}"
+    manifest {
+       attributes 'FMLCorePlugin': 'de.alaoli.games.minecraft.mods.yadm.YADMLoadingPlugin', 'FMLCorePluginContainsFMLMod': 'true'
+   }
 }
 
 dependencies {
@@ -60,6 +63,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
     compile 'net.bytebuddy:byte-buddy:1.4.+'
+    compile 'com.eclipsesource.minimal-json:minimal-json:0.9.+'
 
 }
 
