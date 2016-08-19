@@ -4,15 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonValue;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
-import de.alaoli.games.minecraft.mods.yadm.json.SettingJsonAdapter;
 
 public abstract class SettingGroup implements Setting, JsonSerializable
 {
@@ -75,36 +69,30 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 	 ********************************************************************************/
 
 	@Override
-	public JsonElement serialize( JsonSerializationContext context ) 
+	public JsonValue serialize() 
 	{
-		JsonObject result = new JsonObject();
-		JsonArray arrayJson = new JsonArray();
+		JsonArray json = new JsonArray();
 		
 		for( Setting setting : this.settings.values() )
 		{
-			arrayJson.add( context.serialize( setting, SettingJsonAdapter.class ).getAsJsonObject() );
+			if( setting instanceof JsonSerializable )
+			{
+				json.add( ((JsonSerializable)setting).serialize() );
+			}
 		}
-		result.add( "settings", arrayJson );
-		
-		return result;
+		return json;
 	}
 
 	@Override
-	public void deserialize( JsonElement json, JsonDeserializationContext context )
+	public void deserialize( JsonValue json )
 	{
-		JsonObject groupJson = json.getAsJsonObject();
+		Setting setting;
 		
-		if( !groupJson.has( "settings" ) ) { 
-			throw new JsonParseException( "Settings required." ); 
-		}
-		if( !groupJson.get( "settings" ).isJsonArray() ) {
-			throw new JsonParseException( "Settings must be an array." );
-		}
-		JsonArray arrayJson = groupJson.get( "settings" ).getAsJsonArray();
-		
-		for( JsonElement settingJson : arrayJson )
+		for( JsonValue value : json.asArray() )
 		{
-			this.add( (Setting)context.deserialize( settingJson, SettingJsonAdapter.class ) );
+			setting = SettingFactory.createNewInstance( value.asObject().get( "type" ).asString() );
+			
+			((JsonSerializable)setting).deserialize( value );
 		}
 	}	
 }

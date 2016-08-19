@@ -7,15 +7,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Map.Entry;
-import java.util.Set;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 
-import de.alaoli.games.minecraft.mods.yadm.Log;
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.WriterConfig;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
+import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 
 public class TemplateManager extends AbstractManager
 {
@@ -39,7 +36,7 @@ public class TemplateManager extends AbstractManager
 	 */
 	private void createDefaultTemplates()
 	{
-		ManageableGroup vanilla = new ManageableGroup( "vanilla" );
+		ManageableGroup vanilla = new TemplateGroup( "vanilla" );
 		
 		Template template = new Template( "overworld" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.OVERWORLD ) );
@@ -57,6 +54,16 @@ public class TemplateManager extends AbstractManager
 		this.dirty = true;
 		this.save();
 	}
+
+	/********************************************************************************
+	 * Methods - Implement ManageableGroup
+	 ********************************************************************************/
+	
+	@Override
+	public Manageable create() 
+	{
+		return null;
+	}
 	
 	/********************************************************************************
 	 * Methods - Implement AbstractManager
@@ -65,15 +72,8 @@ public class TemplateManager extends AbstractManager
 	@Override
 	public void load()
 	{
-		/*
-		JsonReader reader;
-		Set<Manageable> group;
-		
-		Gson gson = new GsonBuilder()
-			.registerTypeHierarchyAdapter( SettingJsonAdapter.class, new SettingJsonAdapter() )
-			.registerTypeHierarchyAdapter( TemplateJsonAdapter.class, new TemplateJsonAdapter() )
-			.excludeFieldsWithoutExposeAnnotation()
-			.create();
+		String groupName;
+		InputStreamReader reader;
 		File folder	= new File( this.getSavePath() );
 		
 		//Create folder and default template
@@ -91,58 +91,60 @@ public class TemplateManager extends AbstractManager
 			{
 				try 
 				{
-					reader = new JsonReader( new InputStreamReader( new FileInputStream( file.toString() ), "UTF-8" ) );
+					groupName = file.getName().replace( ".json", "" );
+					reader = new InputStreamReader( new FileInputStream( file.toString() ), "UTF-8" );
+
+					//Initialize group 
+					if( !this.exists( groupName ) )
+					{
+						this.add( new TemplateGroup( groupName ) );
+					}
+					((JsonSerializable)this.get( groupName )).deserialize( Json.parse( reader ) );
 					
-					group = gson.fromJson( reader, TemplateJsonAdapter.class );
-					
-					this.addGroup( group );
 					reader.close();
 				}
 				catch ( IOException e ) 
 				{
-					Log.error( e.getMessage() );
+					e.printStackTrace();
 				}
 			}
-		}*/
+		}
 	}
-	
+
 	@Override
 	public void save() 
 	{
 		//Nothing to do
 		if( !this.dirty ) { return; }
 		
-		/*
+		Manageable data;
 		StringBuilder file;
-		JsonWriter writer;
+		OutputStreamWriter writer;
 		
-		Gson gson = (new GsonBuilder())
-			.excludeFieldsWithoutExposeAnnotation()
-			.registerTypeHierarchyAdapter( SettingJsonAdapter.class, new SettingJsonAdapter() )
-			.registerTypeHierarchyAdapter( TemplateJsonAdapter.class, new TemplateJsonAdapter() )
-			.create();
-
-		try 
-		{		
-			for( Entry<String, Set<Manageable>> entry : this.getAllGroups().entrySet() )
+		for( Entry<String, Manageable> entry : this.getAll() )
+		{
+			data = entry.getValue();
+			
+			if( data instanceof JsonSerializable )
 			{
 				file = new StringBuilder()
 					.append( this.getSavePath() )
 					.append( File.separator)
-					.append( entry.getKey() )
+					.append( data.getManageableName() )
 					.append( ".json" );
-				writer = new JsonWriter( new OutputStreamWriter( new FileOutputStream( file.toString() ), "UTF-8" ) );
-				writer.setIndent( "  " );
-
-				gson.toJson( entry.getValue(), TemplateJsonAdapter.class, writer );
-
-				writer.close();
+				
+				try 
+				{
+					writer = new OutputStreamWriter( new FileOutputStream( file.toString() ), "UTF-8" );
+					((JsonSerializable)data).serialize().writeTo( writer, WriterConfig.PRETTY_PRINT );
+					
+					writer.close();
+				}
+				catch (IOException e) 
+				{
+					e.printStackTrace();
+				}
 			}
-			this.dirty = false;
 		}
-		catch( IOException e ) 
-		{
-			Log.error( e.getMessage() );
-		}	*/
 	}
 }

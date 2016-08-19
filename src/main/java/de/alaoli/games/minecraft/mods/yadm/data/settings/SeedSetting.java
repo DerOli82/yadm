@@ -3,21 +3,21 @@ package de.alaoli.games.minecraft.mods.yadm.data.settings;
 import java.util.List;
 import java.util.Random;
 
-import com.google.gson.annotations.Expose;
-
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
+import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.storage.WorldInfo;
 
-public class SeedSetting implements Setting, Injectable, Packageable
+public class SeedSetting implements Setting, JsonSerializable, Packageable, Injectable
 {
 	/********************************************************************************
 	 * Attributes
 	 ********************************************************************************/
 	
-	@Expose
 	private Long value;
 	
 	/********************************************************************************
@@ -56,6 +56,43 @@ public class SeedSetting implements Setting, Injectable, Packageable
 	}
 
 	/********************************************************************************
+	 * Methods - Implement JsonSerializable
+	 ********************************************************************************/
+
+	@Override
+	public JsonValue serialize() 
+	{
+		JsonObject json = new JsonObject();
+
+		json.add( "type", this.getSettingType().toString() );
+		json.add( "value", this.value );
+		
+		return json;
+	}
+
+	@Override
+	public void deserialize( JsonValue json )
+	{
+		this.value = json.asObject().get( "value" ).asLong();
+	}
+	
+	/********************************************************************************
+	 * Methods - Implement Packageable
+	 ********************************************************************************/
+	
+	@Override
+	public void writeToNBT( NBTTagCompound tagCompound ) 
+	{	
+		tagCompound.setLong( "value", this.value );
+	}
+
+	@Override
+	public void readFromNBT( NBTTagCompound tagCompound ) 
+	{
+		this.value = tagCompound.getLong( "value" );
+	}
+	
+	/********************************************************************************
 	 * Methods - Implements Injectable
 	 ********************************************************************************/
 
@@ -81,21 +118,5 @@ public class SeedSetting implements Setting, Injectable, Packageable
 		{
 			this.injectInto( target );
 		}
-	}
-	
-	/********************************************************************************
-	 * Methods - Implement Packageable
-	 ********************************************************************************/
-	
-	@Override
-	public void writeToNBT( NBTTagCompound tagCompound ) 
-	{	
-		tagCompound.setLong( "value", this.value );
-	}
-
-	@Override
-	public void readFromNBT( NBTTagCompound tagCompound ) 
-	{
-		this.value = tagCompound.getLong( "value" );
 	}		
 }

@@ -3,12 +3,8 @@ package de.alaoli.games.minecraft.mods.yadm.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingFactory;
@@ -34,8 +30,6 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	
 	private String name;
 	
-	private String group; 
-	
 	private boolean isRegistered;
 	
 	/********************************************************************************
@@ -48,17 +42,8 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	{
 		this.id = id;
 		this.name = name;
-		this.group = "default";
 		this.isRegistered = false;
 	}
-	
-	public Dimension( int id, String name, String group )
-	{
-		this( id, name );
-		
-		this.group = group;
-	}
-	
 	public Dimension( NBTTagCompound tagCompound ) 
 	{
 		this.readFromNBT( tagCompound );
@@ -87,54 +72,6 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	}
 	
 	/********************************************************************************
-	 * Methods - Implement Manageable
-	 ********************************************************************************/
-
-	@Override
-	public String getManageableGroupName() 
-	{
-		return this.group;
-	}
-	
-	@Override
-	public String getManageableName() 
-	{
-		return this.name;
-	}
-	
-	/********************************************************************************
-	 * Methods - Implement JsonSerializable
-	 ********************************************************************************/
-
-	@Override
-	public JsonElement serialize( JsonSerializationContext context ) 
-	{
-		JsonObject result = super.serialize( context ).getAsJsonObject();
-		
-		result.addProperty( "id", this.id );
-		result.addProperty( "name", this.name );
-		
-		return result;
-	}
-
-	@Override
-	public void deserialize( JsonElement json, JsonDeserializationContext context )
-	{
-		JsonObject data = json.getAsJsonObject();
-
-		if( !data.has( "id" ) ) { 
-			throw new JsonParseException( "Dimension requires a id." ); 
-		}		
-		if( !data.has( "name" ) ) { 
-			throw new JsonParseException( "Dimension requires a name." ); 
-		}
-		this.id = data.get( "id" ).getAsInt();
-		this.name = data.get( "name" ).getAsString();
-		
-		super.deserialize( json, context );
-	}
-	
-	/********************************************************************************
 	 * Methods - Implement Setting
 	 ********************************************************************************/
 	
@@ -149,6 +86,41 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	{
 		return true;
 	}	
+	
+	/********************************************************************************
+	 * Methods - Implement Manageable
+	 ********************************************************************************/
+
+	@Override
+	public String getManageableName() 
+	{
+		return this.name;
+	}
+		
+	/********************************************************************************
+	 * Methods - Implement JsonSerializable
+	 ********************************************************************************/
+
+	@Override
+	public JsonValue serialize() 
+	{
+		JsonObject json = new JsonObject();
+		
+		json.add( "id", this.id );
+		json.add( "name", this.name );
+		json.add( "settings", super.serialize().asObject() );
+		
+		return json;
+	}
+
+	@Override
+	public void deserialize( JsonValue json )
+	{
+		this.id = json.asObject().get( "id" ).asInt();
+		this.name = json.asObject().get( "name" ).asString();
+		
+		super.deserialize( json.asObject().get( "settings" ).asArray() );
+	}
 
 	/********************************************************************************
 	 * Methods - Implement Packageable

@@ -1,11 +1,12 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
-import com.google.gson.annotations.Expose;
-
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
+import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class WorldProviderSetting implements Setting, Packageable
+public class WorldProviderSetting implements Setting, JsonSerializable, Packageable
 {
 	/********************************************************************************
 	 * Constants
@@ -21,7 +22,6 @@ public class WorldProviderSetting implements Setting, Packageable
 				
 	private int id;
 	
-	@Expose
 	private String name;
 
 	/********************************************************************************
@@ -65,6 +65,27 @@ public class WorldProviderSetting implements Setting, Packageable
 	{
 		return true;
 	}
+	
+	/********************************************************************************
+	 * Methods - Implement JsonSerializable
+	 ********************************************************************************/
+
+	@Override
+	public JsonValue serialize() 
+	{
+		JsonObject json = new JsonObject();
+
+		json.add( "type", this.getSettingType().toString() );
+		json.add( "name", this.name );
+
+		return json;
+	}
+
+	@Override
+	public void deserialize( JsonValue json )
+	{
+		this.name = json.asObject().get( "name" ).asString();
+	}	
 	
 	/********************************************************************************
 	 * Methods - Implement Packageable

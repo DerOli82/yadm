@@ -1,10 +1,7 @@
 package de.alaoli.games.minecraft.mods.yadm.data;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingGroup;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
@@ -16,8 +13,6 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 	 * Attributes
 	 ********************************************************************************/
 	
-	private String groupName; 
-	
 	private String name;
 
 	/********************************************************************************
@@ -26,10 +21,9 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 	
 	public Template() {}
 	
-	public Template( String name, String groupName )
+	public Template( String name )
 	{
 		this.name = name;
-		this.groupName = groupName;
 	}
 	
 	public String getName()
@@ -37,22 +31,6 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 		return this.name;
 	}
 	
-	/********************************************************************************
-	 * Methods - Implement Manageable
-	 ********************************************************************************/
-
-	@Override
-	public String getManageableGroupName() 
-	{
-		return this.groupName;
-	}
-	
-	@Override
-	public String getManageableName() 
-	{
-		return this.name;
-	}
-
 	/********************************************************************************
 	 * Methods - Implement Setting
 	 ********************************************************************************/
@@ -70,28 +48,35 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 	}
 	
 	/********************************************************************************
+	 * Methods - Implement Manageable
+	 ********************************************************************************/
+
+	@Override
+	public String getManageableName() 
+	{
+		return this.name;
+	}
+	
+	/********************************************************************************
 	 * Methods - Implement JsonSerializable
 	 ********************************************************************************/
 
 	@Override
-	public JsonElement serialize( JsonSerializationContext context ) 
+	public JsonValue serialize() 
 	{
-		JsonObject result = super.serialize( context ).getAsJsonObject();
+		JsonObject json = new JsonObject();
 		
-		result.addProperty( "name", this.name );
+		json.add( "name", this.name );
+		json.add( "settings", super.serialize().asArray() );
 		
-		return result;
+		return json;
 	}
 
 	@Override
-	public void deserialize( JsonElement json, JsonDeserializationContext context )
+	public void deserialize( JsonValue json )
 	{
-		JsonObject data = json.getAsJsonObject();
+		this.name = json.asObject().get( "name" ).asString();
 		
-		if( !data.has( "name" ) ) { 
-			throw new JsonParseException( "Template requires a name." ); 
-		}
-		this.name = data.get( "name" ).getAsString();
-		super.deserialize( json, context );
+		super.deserialize( json.asObject().get( "settings" ).asArray() );
 	}
 }

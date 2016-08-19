@@ -1,12 +1,10 @@
 package de.alaoli.games.minecraft.mods.yadm.json;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
+import com.eclipsesource.json.JsonValue;
 
 public interface JsonSerializable
 {
-	public JsonElement serialize( JsonSerializationContext context );
+	public JsonValue serialize();
 
-	public void deserialize( JsonElement json, JsonDeserializationContext context );
+	public void deserialize( JsonValue json );
 }

@@ -2,17 +2,18 @@ package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
 import java.util.List;
 
-import com.google.gson.annotations.Expose;
-
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
+import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.WorldInfo;
 
-public class WorldTypeSetting implements Setting, Injectable, Packageable
+public class WorldTypeSetting implements Setting, JsonSerializable, Packageable, Injectable 
 {
 	/********************************************************************************
 	 * Constants
@@ -24,7 +25,6 @@ public class WorldTypeSetting implements Setting, Injectable, Packageable
 	 * Attributes
 	 ********************************************************************************/
 	
-	@Expose
 	private String name;
 
 	/********************************************************************************
@@ -60,6 +60,43 @@ public class WorldTypeSetting implements Setting, Injectable, Packageable
 	}
 
 	/********************************************************************************
+	 * Methods - Implement JsonSerializable
+	 ********************************************************************************/
+
+	@Override
+	public JsonValue serialize() 
+	{
+		JsonObject json = new JsonObject();
+
+		json.add( "type", this.getSettingType().toString() );
+		json.add( "name", this.name );
+
+		return json;
+	}
+
+	@Override
+	public void deserialize( JsonValue json )
+	{
+		this.name = json.asObject().get( "name" ).asString();
+	}	
+	
+	/********************************************************************************
+	 * Methods - Implement Packageable
+	 ********************************************************************************/
+	
+	@Override
+	public void writeToNBT( NBTTagCompound tagCompound ) 
+	{	
+		tagCompound.setString( "name", this.name );
+	}
+
+	@Override
+	public void readFromNBT( NBTTagCompound tagCompound ) 
+	{
+		this.name = tagCompound.getString( "name" );
+	}
+	
+	/********************************************************************************
 	 * Methods - Implements Injectable
 	 ********************************************************************************/
 
@@ -90,21 +127,5 @@ public class WorldTypeSetting implements Setting, Injectable, Packageable
 		{
 			this.injectInto( target );
 		}
-	}
-	
-	/********************************************************************************
-	 * Methods - Implement Packageable
-	 ********************************************************************************/
-	
-	@Override
-	public void writeToNBT( NBTTagCompound tagCompound ) 
-	{	
-		tagCompound.setString( "name", this.name );
-	}
-
-	@Override
-	public void readFromNBT( NBTTagCompound tagCompound ) 
-	{
-		this.name = tagCompound.getString( "name" );
 	}	
 }

@@ -6,16 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-import org.apache.commons.io.FileUtils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.WriterConfig;
 
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.Log;
@@ -24,10 +18,10 @@ import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
+import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
 public class YADimensionManager extends AbstractManager 
@@ -178,7 +172,7 @@ public class YADimensionManager extends AbstractManager
 		//Create new group
 		if( !this.exists( group ) )
 		{
-			this.add( new ManageableGroup( group ) );
+			this.add( new DimensionGroup( group ) );
 		}
 		((ManageableGroup)this.get( group )).add( dimension );
 		
@@ -346,6 +340,16 @@ public class YADimensionManager extends AbstractManager
 		this.unregisterAll();
 		this.clear();	
 	}
+
+	/********************************************************************************
+	 * Methods - Implement ManageableGroup
+	 ********************************************************************************/
+	
+	@Override
+	public Manageable create() 
+	{
+		return null;
+	}
 	
 	/********************************************************************************
 	 * Methods - Implement AbstractManager
@@ -354,15 +358,9 @@ public class YADimensionManager extends AbstractManager
 	@Override
 	public void load() 
 	{
-		/*
-		JsonReader reader;
-		Set<Manageable> group;
 		
-		Gson gson = new GsonBuilder()
-			.registerTypeHierarchyAdapter( SettingJsonAdapter.class, new SettingJsonAdapter() )
-			.registerTypeHierarchyAdapter( DimensionJsonAdapter.class, new DimensionJsonAdapter() )
-			.excludeFieldsWithoutExposeAnnotation()
-			.create();		
+		String groupName;
+		InputStreamReader reader;
 		StringBuilder path = new StringBuilder()
 			.append( this.getSavePath() )
 			.append( File.separator )
@@ -384,26 +382,26 @@ public class YADimensionManager extends AbstractManager
 			if( ( file.isFile() ) && 
 				( file.getName().endsWith(".json") ) )
 			{
-				try 
+				try
 				{
-					reader = new JsonReader( new InputStreamReader( new FileInputStream( file.toString() ), "UTF-8" ) );
-					group = gson.fromJson( reader, DimensionJsonAdapter.class );
-
-					this.addGroup( group );
-					
-					for( Manageable dimension : group )
+					groupName = file.getName().replace( ".json", "" );
+					reader = new InputStreamReader( new FileInputStream( file.toString() ), "UTF-8" );
+	
+					//Initialize group 
+					if( !this.exists( groupName ) )
 					{
-						this.register( (Dimension)dimension );
-						this.init( (Dimension)dimension );
+						this.add( new TemplateGroup( groupName ) );
 					}
+					((JsonSerializable)this.get( groupName )).deserialize( Json.parse( reader ) );
+					
 					reader.close();
 				}
 				catch ( IOException e ) 
 				{
-					Log.error( e.getMessage() );
+					e.printStackTrace();
 				}
 			}
-		}		*/
+		}
 	}
 
 	@Override
@@ -411,19 +409,16 @@ public class YADimensionManager extends AbstractManager
 	{
 		//Nothing to do
 		if( !this.dirty ) { return; }
-		/*
-		JsonWriter writer;
-		StringBuilder file;
 		
-		Gson gson = (new GsonBuilder())
-			.excludeFieldsWithoutExposeAnnotation()
-			.registerTypeHierarchyAdapter( SettingJsonAdapter.class, new SettingJsonAdapter() )
-			.registerTypeHierarchyAdapter( DimensionJsonAdapter.class, new DimensionJsonAdapter() )
-			.create();
-
-		try 
+		Manageable data;
+		StringBuilder file;
+		OutputStreamWriter writer;
+		
+		for( Entry<String, Manageable> entry : this.getAll() )
 		{
-			for( Entry<String, Set<Manageable>> entry : this.getAllGroups().entrySet() )
+			data = entry.getValue();
+		
+			if( data instanceof JsonSerializable )
 			{
 				file = new StringBuilder()
 					.append( this.getSavePath() )
@@ -433,19 +428,20 @@ public class YADimensionManager extends AbstractManager
 					.append( YADM.MODID )
 					.append( File.separator)
 					.append( entry.getKey() )
-					.append( ".json" );				
-				writer = new JsonWriter( new OutputStreamWriter( new FileOutputStream( file.toString() ), "UTF-8" ) );
-				writer.setIndent( "  " );
+					.append( ".json" );
 				
-				gson.toJson( entry.getValue(), DimensionJsonAdapter.class, writer );
-			
-				writer.close();
+				try
+				{
+					writer = new OutputStreamWriter( new FileOutputStream( file.toString() ), "UTF-8" );
+					((JsonSerializable)data).serialize().writeTo( writer, WriterConfig.PRETTY_PRINT );
+					
+					writer.close();
+				}
+				catch( IOException e ) 
+				{
+					e.printStackTrace();
+				}
 			}
-			this.dirty = false;
-		} 
-		catch( IOException e ) 
-		{
-			Log.error( e.getMessage() );
-		}		*/	
+		}
 	}
 }
