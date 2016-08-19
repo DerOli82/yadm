@@ -16,8 +16,6 @@ import com.google.gson.stream.JsonWriter;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
-import de.alaoli.games.minecraft.mods.yadm.json.SettingJsonAdapter;
-import de.alaoli.games.minecraft.mods.yadm.json.TemplateJsonAdapter;
 
 public class TemplateManager extends AbstractManager
 {
@@ -31,37 +29,43 @@ public class TemplateManager extends AbstractManager
 	 * Methods
 	 ********************************************************************************/
 
-	private TemplateManager() {}
+	private TemplateManager() 
+	{
+		super( "templates" );
+	}
 	
 	/**
 	 * Create Overworld, Nether and The End as default templates
 	 */
 	private void createDefaultTemplates()
 	{
-		Template template = new Template( "overworld", "vanilla" );
+		ManageableGroup vanilla = new ManageableGroup( "vanilla" );
+		
+		Template template = new Template( "overworld" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.OVERWORLD ) );
-		this.add( template );
+		vanilla.add( template );
 		
-		
-		template = new Template( "nether", "vanilla" );
+		template = new Template( "nether" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.NETHER ) );
-		this.add( template );
+		vanilla.add( template );
 		
-		template = new Template( "end", "vanilla" );
+		template = new Template( "end" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.END ) );
-		this.add( template );
+		vanilla.add( template );
 
+		this.add( vanilla );
 		this.dirty = true;
 		this.save();
 	}
 	
 	/********************************************************************************
-	 * Methods - Implements AbstractManager
+	 * Methods - Implement AbstractManager
 	 ********************************************************************************/
-
+	
 	@Override
 	public void load()
 	{
+		/*
 		JsonReader reader;
 		Set<Manageable> group;
 		
@@ -99,7 +103,7 @@ public class TemplateManager extends AbstractManager
 					Log.error( e.getMessage() );
 				}
 			}
-		}
+		}*/
 	}
 	
 	@Override
@@ -108,6 +112,7 @@ public class TemplateManager extends AbstractManager
 		//Nothing to do
 		if( !this.dirty ) { return; }
 		
+		/*
 		StringBuilder file;
 		JsonWriter writer;
 		
@@ -138,6 +143,6 @@ public class TemplateManager extends AbstractManager
 		catch( IOException e ) 
 		{
 			Log.error( e.getMessage() );
-		}	
+		}	*/
 	}
 }

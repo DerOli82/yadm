@@ -24,8 +24,6 @@ import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
-import de.alaoli.games.minecraft.mods.yadm.json.DimensionJsonAdapter;
-import de.alaoli.games.minecraft.mods.yadm.json.SettingJsonAdapter;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
@@ -42,15 +40,13 @@ public class YADimensionManager extends AbstractManager
 	
 	private static int nextId = Config.Dimension.beginsWithId;
 	
-	private Map<Integer, Dimension> deletedDimensions;
-	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
 	
 	private YADimensionManager() 
 	{
-		this.deletedDimensions = new HashMap<Integer, Dimension>();
+		super( "dimensions" );
 	}
 	
 	
@@ -170,11 +166,22 @@ public class YADimensionManager extends AbstractManager
 	
 	public Dimension create( String name, Template template ) 
 	{
+		return this.create( name, template, "default" );
+	}
+
+	public Dimension create( String name, Template template, String group ) 
+	{
 		Dimension dimension = new Dimension( this.nextDimensionId(), name );
 		
 		dimension.add( template.getAll() );
-		this.add( dimension );
-
+		
+		//Create new group
+		if( !this.exists( group ) )
+		{
+			this.add( new ManageableGroup( group ) );
+		}
+		((ManageableGroup)this.get( group )).add( dimension );
+		
 		return dimension;
 	}
 	
@@ -191,6 +198,7 @@ public class YADimensionManager extends AbstractManager
 	
 	public void delete( Dimension dimension )
 	{
+		/*
 		//Delete dimension json file		
 		StringBuilder path = new StringBuilder()
 			.append( this.getSavePath() )
@@ -210,8 +218,8 @@ public class YADimensionManager extends AbstractManager
 		this.deletedDimensions.put( dimension.getId(), dimension );
 		this.remove( dimension );
 		
-		this.markDirty();
-		DimensionManager.unloadWorld( dimension.getId() );
+		this.dirty = true;
+		DimensionManager.unloadWorld( dimension.getId() );*/
 	}
 	
 	public void unregister( Dimension dimension )
@@ -296,6 +304,7 @@ public class YADimensionManager extends AbstractManager
 	
 	public void cleanup( World world )
 	{
+		/*
 		if( !this.deletedDimensions.containsKey( world.provider.dimensionId ) ) { return; }
 		
 		Dimension dimension = this.deletedDimensions.get( world.provider.dimensionId );
@@ -324,7 +333,7 @@ public class YADimensionManager extends AbstractManager
 			{
 				e.printStackTrace();
 			}
-		}	
+		}	*/
 	}
 	
 	/**
@@ -339,12 +348,13 @@ public class YADimensionManager extends AbstractManager
 	}
 	
 	/********************************************************************************
-	 * Methods - Implements/Override AbstractManager
+	 * Methods - Implement AbstractManager
 	 ********************************************************************************/
 	
 	@Override
 	public void load() 
 	{
+		/*
 		JsonReader reader;
 		Set<Manageable> group;
 		
@@ -393,17 +403,15 @@ public class YADimensionManager extends AbstractManager
 					Log.error( e.getMessage() );
 				}
 			}
-		}		
+		}		*/
 	}
 
 	@Override
 	public void save() 
 	{
 		//Nothing to do
-		if( !this.dirty )
-		{
-			return;
-		}
+		if( !this.dirty ) { return; }
+		/*
 		JsonWriter writer;
 		StringBuilder file;
 		
@@ -438,13 +446,6 @@ public class YADimensionManager extends AbstractManager
 		catch( IOException e ) 
 		{
 			Log.error( e.getMessage() );
-		}			
-	}
-	
-	@Override
-	public void clear()
-	{
-		super.clear();
-		this.deletedDimensions.clear();
+		}		*/	
 	}
 }
