@@ -1,5 +1,14 @@
 # Changelog
 
+# Version 0.4.2
+Switch from gson to minimal-json library
+Automatically download dependencies (bytebuddy & minimal-json)
+Remove WorldType from default templates (doesn't required)
+Fixes some problems in gradle.bat ( by Krakel )
+Reworked data structures
+Fixes https://github.com/DerOli82/yadm/issues/4
+Fixes https://github.com/DerOli82/yadm/issues/6
+
 # Version 0.4.1
 Fixes https://github.com/DerOli82/yadm/issues/2
 Fixes https://github.com/DerOli82/yadm/issues/3
