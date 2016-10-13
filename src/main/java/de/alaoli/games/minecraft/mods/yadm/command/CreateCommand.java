@@ -64,7 +64,7 @@ public class CreateCommand extends Command
 			sender.addChatMessage( new ChatComponentText( "Dimension '" + name + "' already exists." ) );
 			return;
 		}
-		if( !TemplateManager.instance.exists( templateName ) ) 
+		if( !TemplateManager.instance.exists( "default", templateName ) ) 
 		{
 			sender.addChatMessage( new ChatComponentText( "Template '" + templateName + "' doesn't exists." ) );
 			return;
@@ -74,7 +74,7 @@ public class CreateCommand extends Command
 			sender.addChatMessage( new ChatComponentText( "Numbers aren't allowed for dimension names" ) );
 			return;
 		}
-		Template template = (Template) TemplateManager.instance.get( templateName );
+		Template template = (Template) TemplateManager.instance.get( "default", templateName );
 		
 		try
 		{

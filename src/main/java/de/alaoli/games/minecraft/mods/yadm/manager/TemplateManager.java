@@ -36,23 +36,53 @@ public class TemplateManager extends AbstractManager
 	 */
 	private void createDefaultTemplates()
 	{
-		ManageableGroup vanilla = new TemplateGroup( "vanilla" );
+		ManageableGroup group = new TemplateGroup( "default" );
 		
 		Template template = new Template( "overworld" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.OVERWORLD ) );
-		vanilla.add( template );
+		group.add( template );
 		
 		template = new Template( "nether" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.NETHER ) );
-		vanilla.add( template );
+		group.add( template );
 		
 		template = new Template( "end" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.END ) );
-		vanilla.add( template );
+		group.add( template );
 
-		this.add( vanilla );
+		this.add( group );
 		this.dirty = true;
 		this.save();
+	}
+
+	public boolean exists( String group, String name ) 
+	{
+		Manageable manageable = this.get( group );
+		
+		if( ( manageable != null ) && 
+			( manageable instanceof ManageableGroup ) )
+		{
+			return ((ManageableGroup)manageable).exists( name );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	public Manageable get( String group, String name )
+	{
+		Manageable manageable = this.get( group );
+		
+		if( ( manageable != null ) && 
+			( manageable instanceof ManageableGroup ) )
+		{
+			return ((ManageableGroup)manageable).get( name );
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	/********************************************************************************

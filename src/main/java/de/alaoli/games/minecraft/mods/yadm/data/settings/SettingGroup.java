@@ -93,6 +93,7 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 			setting = SettingFactory.createNewInstance( value.asObject().get( "type" ).asString() );
 			
 			((JsonSerializable)setting).deserialize( value );
+			this.add(setting);
 		}
 	}	
 }

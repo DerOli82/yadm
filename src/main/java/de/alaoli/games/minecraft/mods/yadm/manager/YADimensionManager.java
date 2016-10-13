@@ -51,6 +51,10 @@ public class YADimensionManager extends AbstractManager
 		return true;
 	}
 	
+	public boolean exists( Dimension dimension )
+	{
+		return this.exists( dimension.getId() );
+	}
 	/********************************************************************************
 	 * Methods - Getter/Setter
 	 ********************************************************************************/
@@ -59,7 +63,10 @@ public class YADimensionManager extends AbstractManager
 	{
 		Dimension dimension;
 		
-		for( Entry<String, Manageable> entry : this.getAll() )
+		/**
+		 * @TODO implement groups
+		 */
+		for( Entry<String, Manageable> entry : ((ManageableGroup)this.get( "default" )).getAll() )
 		{
 			dimension = (Dimension) entry.getValue();
 			
@@ -166,6 +173,8 @@ public class YADimensionManager extends AbstractManager
 	public Dimension create( String name, Template template, String group ) 
 	{
 		Dimension dimension = new Dimension( this.nextDimensionId(), name );
+		
+		int test = template.getAll().size();
 		
 		dimension.add( template.getAll() );
 		

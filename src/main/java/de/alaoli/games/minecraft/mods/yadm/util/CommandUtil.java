@@ -80,7 +80,7 @@ public class CommandUtil
 			{
 				if( DimensionManager.isDimensionRegistered( id ) )
 				{
-					Dimension dimension = new Dimension( id, null, null );
+					Dimension dimension = new Dimension( id, null );
 					dimension.setRegistered( true );
 					
 					return dimension; 
