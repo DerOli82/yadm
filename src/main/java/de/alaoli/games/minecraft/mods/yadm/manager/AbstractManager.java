@@ -45,4 +45,22 @@ public abstract class AbstractManager extends ManageableGroup
 		this.clear();
 		this.load();
 	}
+	
+	/********************************************************************************
+	 * Methods - Override ManageableGroup
+	 ********************************************************************************/
+
+	@Override
+	public void add( Manageable data ) 
+	{
+		super.add( data );
+		this.dirty = true;
+	}
+
+	@Override
+	public void remove( Manageable data ) 
+	{
+		super.remove( data );
+		this.dirty = true;
+	}
 }
