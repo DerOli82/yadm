@@ -14,6 +14,7 @@ import cpw.mods.fml.relauncher.Side;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
+import de.alaoli.games.minecraft.mods.yadm.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
 import de.alaoli.games.minecraft.mods.yadm.network.SyncDimensionsMessage;
@@ -39,20 +40,23 @@ public class DimensionFMLEvent
 	    
 	    	Dimension dimension;
 	    	Set<Dimension> dimensions = new HashSet<Dimension>(); 
-	    	
-	    	for( Entry<String, Manageable> entry : YADimensionManager.instance.getAll() )
-	    	{
-	    		dimension = (Dimension)entry.getValue();
-	    		dimensions.add( dimension );
-	    		
-				msg = new StringBuilder()
-					.append( "- Dimension '" )
-					.append( dimension.getName() )
-					.append( "' with ID '" )
-					.append( dimension.getId() )
-					.append( "'." );
-				Log.info( msg.toString() );	    		
-	    	}
+
+			for( Entry<String, Manageable> groupEntry : YADimensionManager.instance.getAll() )
+			{	
+				for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
+				{
+		    		dimension = (Dimension) dimensionEntry.getValue();
+		    		dimensions.add( dimension );
+		    		
+					msg = new StringBuilder()
+						.append( "- Dimension '" )
+						.append( dimension.getName() )
+						.append( "' with ID '" )
+						.append( dimension.getId() )
+						.append( "'." );
+					Log.info( msg.toString() );	  
+				}
+			}
 	    	FMLEmbeddedChannel channel = MessageDispatcher.channels.get( Side.SERVER );
 	    	
 	    	channel.attr(FMLOutboundHandler.FML_MESSAGETARGET ).set( FMLOutboundHandler.OutboundTarget.DISPATCHER );

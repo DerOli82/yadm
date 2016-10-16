@@ -5,9 +5,6 @@ import java.util.Queue;
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.data.Template;
-import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
-import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.util.CommandUtil;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
 import net.minecraft.command.ICommandSender;
@@ -44,7 +41,7 @@ public class CreateCommand extends Command
 	@Override
 	public String getCommandUsage( ICommandSender sender ) 
 	{
-		return super.getCommandUsage( sender ) + " <dimensionName> <templateName>";
+		return super.getCommandUsage( sender ) + " [<templateGroup>:]<templateName> [<dimensionGroup>:]<dimensionName>";
 	}
 	
 	@Override
@@ -56,29 +53,10 @@ public class CreateCommand extends Command
 			sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
 			return;
 		}
-		String name = args.remove();
-		String templateName = args.remove();
-		
-		if( YADimensionManager.instance.exists( name ) )
-		{
-			sender.addChatMessage( new ChatComponentText( "Dimension '" + name + "' already exists." ) );
-			return;
-		}
-		if( !TemplateManager.instance.exists( "default", templateName ) ) 
-		{
-			sender.addChatMessage( new ChatComponentText( "Template '" + templateName + "' doesn't exists." ) );
-			return;
-		}
-		if( CommandUtil.isInt( name ) )
-		{
-			sender.addChatMessage( new ChatComponentText( "Numbers aren't allowed for dimension names" ) );
-			return;
-		}
-		Template template = (Template) TemplateManager.instance.get( "default", templateName );
-		
+
 		try
 		{
-			Dimension dimension = YADimensionManager.instance.create( name, template );	
+			Dimension dimension = CommandUtil.parseAndCreateDimension( sender, args );
 			
 			YADM.proxy.registerDimension( dimension );
 			

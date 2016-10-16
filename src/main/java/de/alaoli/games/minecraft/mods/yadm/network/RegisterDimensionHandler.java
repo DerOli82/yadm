@@ -5,6 +5,8 @@ import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.manager.DimensionGroup;
+import de.alaoli.games.minecraft.mods.yadm.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 
 public class RegisterDimensionHandler implements IMessageHandler<RegisterDimensionMessage, IMessage>
@@ -18,7 +20,12 @@ public class RegisterDimensionHandler implements IMessageHandler<RegisterDimensi
 		
 		if( !YADimensionManager.instance.exists( dimension ) )
 		{	 
-			YADimensionManager.instance.add( dimension );
+			//Create new group
+			if( !YADimensionManager.instance.exists( dimension.getGroup() ) )
+			{
+				YADimensionManager.instance.add( new DimensionGroup( dimension.getGroup() ) );
+			}
+			((ManageableGroup)YADimensionManager.instance.get( dimension.getGroup() )).add( dimension );
 		}			
 		YADimensionManager.instance.register( dimension );
 

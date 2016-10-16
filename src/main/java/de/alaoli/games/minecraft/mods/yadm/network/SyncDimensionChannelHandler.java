@@ -4,6 +4,8 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.FMLIndexedMessageToMessageCodec;
 import cpw.mods.fml.relauncher.Side;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.manager.DimensionGroup;
+import de.alaoli.games.minecraft.mods.yadm.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,9 +34,14 @@ public class SyncDimensionChannelHandler extends FMLIndexedMessageToMessageCodec
 			for( Dimension dimension : msg.getDimensions() )
 			{	
 				if( !YADimensionManager.instance.exists( dimension ) )
-				{
-					YADimensionManager.instance.add( dimension );
-				}	
+				{	 
+					//Create new group
+					if( !YADimensionManager.instance.exists( dimension.getGroup() ) )
+					{
+						YADimensionManager.instance.add( new DimensionGroup( dimension.getGroup() ) );
+					}
+					((ManageableGroup)YADimensionManager.instance.get( dimension.getGroup() )).add( dimension );
+				}			
 				YADimensionManager.instance.register( dimension );
 			}
 		}

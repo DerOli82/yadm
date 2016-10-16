@@ -5,6 +5,8 @@ import java.util.Queue;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.data.Template;
+import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,6 +16,10 @@ import net.minecraftforge.common.DimensionManager;
 
 public class CommandUtil 
 {
+	/********************************************************************************
+	 * Common
+	 ********************************************************************************/
+	
 	public static boolean isInt( String str )
 	{
 	    if( str == null ) { return false; }
@@ -32,6 +38,74 @@ public class CommandUtil
 	    }
 	    return true;
 	}    
+	
+	/********************************************************************************
+	 * Template
+	 ********************************************************************************/
+	
+	public static Template parseTemplate( ICommandSender sender, Queue<String> args  )
+	{
+		String group;
+		String name = args.remove();
+		
+		//Has group?
+		if( name.contains( ":" ) )
+		{
+			String[] split = name.split( ":" );
+			group = split[0];
+			name = split[1];
+		}
+		else
+		{
+			group = "default";
+		}
+
+		//Template exists?
+		if( !TemplateManager.instance.exists( group, name ) ) 
+		{
+			sender.addChatMessage( new ChatComponentText( "Template '" + group + ":" + name + "' doesn't exists." ) );
+			return null;
+		}
+		return (Template) TemplateManager.instance.get( group, name );
+	}
+	
+	/********************************************************************************
+	 * Dimension
+	 ********************************************************************************/	
+	
+	public static Dimension parseAndCreateDimension( ICommandSender sender, Queue<String> args )
+	{
+		Template template = CommandUtil.parseTemplate( sender, args );
+		
+		String group;
+		String name = args.remove();
+		
+		//Has group?
+		if( name.contains( ":" ) )
+		{
+			String[] split = name.split( ":" );
+			group = split[0];
+			name = split[1];
+		}
+		else
+		{
+			group = "default";
+		}
+		
+		if( YADimensionManager.instance.exists( group, name ) )
+		{
+			sender.addChatMessage( new ChatComponentText( "Dimension '" + group + ":" + name + "' already exists." ) );
+			return null;
+		}
+		if( CommandUtil.isInt( name ) )
+		{
+			sender.addChatMessage( new ChatComponentText( "Numbers aren't allowed for dimension names" ) );
+			return null;
+		}
+		Dimension dimension = YADimensionManager.instance.create( group, name, template );
+		
+		return dimension;
+	}
 	
 	public static  Dimension parseDimension( ICommandSender sender, Queue<String> args  )
 	{
@@ -80,7 +154,7 @@ public class CommandUtil
 			{
 				if( DimensionManager.isDimensionRegistered( id ) )
 				{
-					Dimension dimension = new Dimension( id, null );
+					Dimension dimension = new Dimension( id, null, null );
 					dimension.setRegistered( true );
 					
 					return dimension; 

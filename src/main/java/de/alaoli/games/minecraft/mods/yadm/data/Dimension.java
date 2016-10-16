@@ -28,6 +28,8 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	
 	private int id;
 	
+	private String group;
+	
 	private String name;
 	
 	private boolean isRegistered;
@@ -38,9 +40,10 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	
 	public Dimension() {}
 	
-	public Dimension( int id, String name )
+	public Dimension( int id, String group, String name )
 	{
 		this.id = id;
+		this.group = group;
 		this.name = name;
 		this.isRegistered = false;
 	}
@@ -56,6 +59,11 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		return this.id;
 	}
 
+	public String getGroup() 
+	{
+		return this.group;
+	}
+	
 	public String getName() 
 	{
 		return this.name;
@@ -107,8 +115,9 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		JsonObject json = new JsonObject();
 		
 		json.add( "id", this.id );
+		json.add( "group", this.group );
 		json.add( "name", this.name );
-		json.add( "settings", super.serialize().asObject() );
+		json.add( "settings", super.serialize().asArray() );
 		
 		return json;
 	}
@@ -117,6 +126,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	public void deserialize( JsonValue json )
 	{
 		this.id = json.asObject().get( "id" ).asInt();
+		this.group = json.asObject().get( "group" ).asString();
 		this.name = json.asObject().get( "name" ).asString();
 		
 		super.deserialize( json.asObject().get( "settings" ).asArray() );
@@ -133,6 +143,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		NBTTagList list = new NBTTagList();
 		
 		tagCompound.setInteger( "id", this.id );
+		tagCompound.setString( "group", this.group );
 		tagCompound.setString( "name", this.name );
 		
 		for( Setting setting : this.getAll().values() )
@@ -156,6 +167,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		NBTTagCompound settingCompound;
 		
 		this.id = tagCompound.getInteger( "id" );
+		this.group = tagCompound.getString( "group" );
 		this.name = tagCompound.getString( "name" );
 		
 		NBTTagList list =(NBTTagList)tagCompound.getTag( "settings" );
@@ -164,7 +176,8 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		{
 			settingCompound = list.getCompoundTagAt( i );
 			setting = SettingFactory.createNewInstance( settingCompound.getString( "type" ) ); 
-					
+			
+			((Packageable)setting).readFromNBT(settingCompound);		
 			this.add(setting );
 		}
 	}
