@@ -61,12 +61,12 @@ public class YADMLoadingPlugin implements IFMLLoadingPlugin
 		
 		StringBuilder download = new StringBuilder()
 			.append(url)
-			.append( dependency[0].replace( ".", File.separator ) )
-			.append( File.separator )
+			.append( dependency[0].replace( ".", "/" ) )
+			.append( "/" )
 			.append( dependency[1] )
-			.append( File.separator )
+			.append( "/" )
 			.append( dependency[2] )
-			.append( File.separator )
+			.append( "/" )
 			.append( filename );
 		Log.info( "Downloading '" + filename.toString() + "' from '" +download.toString() + "'.");
 		FileUtils.copyURLToFile( new URL( download.toString() ), new File( folder, filename.toString() ) );
