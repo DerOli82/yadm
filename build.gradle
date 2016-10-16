@@ -29,7 +29,7 @@ task tagRelease << {
   }
 }
 
-version = "0.5.0"
+version = "0.4.3"
 group= "de.alaoli.games.minecraft.mods.yadm" 
 archivesBaseName = "yadm"
 

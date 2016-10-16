@@ -1,5 +1,9 @@
 # Changelog
 
+# Version 0.4.3
+Fixes save problem
+Implement dimension and template grouping. Closes https://github.com/DerOli82/yadm/issues/12
+
 # Version 0.4.2
 Switch from gson to minimal-json library
 Automatically download dependencies (bytebuddy & minimal-json)
