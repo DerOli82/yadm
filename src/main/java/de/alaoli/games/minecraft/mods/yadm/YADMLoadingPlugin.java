@@ -51,6 +51,8 @@ public class YADMLoadingPlugin implements IFMLLoadingPlugin
 
 	public static void downloadDependency( String url, File folder, String[] dependency ) throws MalformedURLException, IOException
 	{
+		Log.info( "Downloading dependencies..." );
+		
 		StringBuilder filename = new StringBuilder()
 			.append( dependency[1] )
 			.append( "-" )
