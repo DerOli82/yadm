@@ -387,7 +387,7 @@ public class YADimensionManager extends AbstractManager
 		Dimension dimension;
 		InputStreamReader reader;
 		StringBuilder path = new StringBuilder()
-			.append( this.getSavePath() )
+			.append( DimensionManager.getCurrentSaveRootDirectory() )
 			.append( File.separator )
 			.append( "data" )
 			.append( File.separator )
@@ -478,7 +478,7 @@ public class YADimensionManager extends AbstractManager
 			if( data instanceof JsonSerializable )
 			{
 				file = new StringBuilder()
-						.append( this.getSavePath() )
+						.append( DimensionManager.getCurrentSaveRootDirectory() )
 						.append( File.separator )
 						.append( "data" )
 						.append( File.separator )
