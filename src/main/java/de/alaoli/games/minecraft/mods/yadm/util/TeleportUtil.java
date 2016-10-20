@@ -70,8 +70,6 @@ public class TeleportUtil
 				target.getSpawnPoint().posZ
 			);
 		}
-		
-		
 		return teleport( player, dimension, coordinate, target );
 	}
 	
@@ -79,7 +77,7 @@ public class TeleportUtil
 	{
 		if( ( dimension == null ) || !dimension.isRegistered() || ( player == null ) ) { return false; }
 		 
-		WorldServer target = DimensionManager.getWorld( dimension.getId() );
+		WorldServer target = MinecraftServer.getServer().worldServerForDimension( dimension.getId() );
 				
 		if( target == null ) { return false; }
 			
