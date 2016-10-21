@@ -2,12 +2,9 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
-
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
-import de.alaoli.games.minecraft.mods.yadm.util.CommandUtil;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -49,17 +46,16 @@ public class DeleteCommand extends Command
 	}
 	
 	@Override
-	public void processCommand( ICommandSender sender, Queue<String> args ) 
+	public void processCommand( CommandParser command ) 
 	{
-		if( args.isEmpty() )
+		//Usage
+		if( command.isEmpty() )
 		{
-			sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
+			this.sendUsage( command.getSender() );
 			return;
 		}
-		Dimension dimension = CommandUtil.parseDimension( sender, args );
-		
-		if( dimension == null ) { return; }
-		
+		Dimension dimension = command.parseDimension();
+				
 		WorldServer world = MinecraftServer.getServer().worldServerForDimension( dimension.getId() );
 		List<EntityPlayerMP> players = new ArrayList<EntityPlayerMP>(world.playerEntities);
 		
@@ -70,6 +66,6 @@ public class DeleteCommand extends Command
 		}
 		YADimensionManager.instance.delete( dimension );
 		YADM.proxy.unregisterDimension( dimension );
-		sender.addChatMessage( new ChatComponentText( "Dimension '" + dimension.getName() + "' removed." ) );
+		command.getSender().addChatMessage( new ChatComponentText( "Dimension '" + dimension.getName() + "' removed." ) );
 	}
 }

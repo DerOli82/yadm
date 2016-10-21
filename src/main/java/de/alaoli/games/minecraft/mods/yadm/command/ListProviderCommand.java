@@ -1,10 +1,8 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-import java.util.Queue;
 import java.util.Map.Entry;
 
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
-import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.WorldProvider;
 
@@ -36,10 +34,10 @@ public class ListProviderCommand extends Command
 	}
 
 	@Override
-	public void processCommand( ICommandSender sender, Queue<String> args ) 
+	public void processCommand( CommandParser command ) 
 	{
 		StringBuilder msg;
-		sender.addChatMessage( new ChatComponentText( "Choosable providers:" ) );
+		command.getSender().addChatMessage( new ChatComponentText( "Choosable providers:" ) );
 		
 		for( Entry<Integer, Class<? extends WorldProvider>> entry : WorldBuilder.instance.getWorldProviders().entrySet() )
 		{
@@ -47,17 +45,17 @@ public class ListProviderCommand extends Command
 			{
 				case -1:
 					//Nether alias
-					sender.addChatMessage( new ChatComponentText( " - 'nether'" ) );
+					command.getSender().addChatMessage( new ChatComponentText( " - 'nether'" ) );
 					break;
 					
 				case 0:
 					//Overworld alias
-					sender.addChatMessage( new ChatComponentText( " - 'overworld'" ) );
+					command.getSender().addChatMessage( new ChatComponentText( " - 'overworld'" ) );
 					break;
 					
 				case 1:
 					//End alias
-					sender.addChatMessage( new ChatComponentText( " - 'end'" ) );
+					command.getSender().addChatMessage( new ChatComponentText( " - 'end'" ) );
 					break;
 				
 				default:
@@ -68,7 +66,7 @@ public class ListProviderCommand extends Command
 							.append( " - '" )
 							.append( entry.getValue().getName() )
 							.append( "'" );
-						sender.addChatMessage( new ChatComponentText( msg.toString() ) );
+						command.getSender().addChatMessage( new ChatComponentText( msg.toString() ) );
 					}
 					break;
 			}

@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-
 import org.apache.commons.lang3.ArrayUtils;
 
 import net.minecraft.command.ICommandSender;
@@ -68,6 +66,12 @@ public abstract class CommandGroup extends Command
 		return usage;
 	}
 	
+	@Override
+	public void sendUsage( ICommandSender sender )
+	{
+		sender.addChatMessage( new ChatComponentText( this.getCommandUsageList( sender ) ) );
+	}
+	
 	/********************************************************************************
 	 * Interface - ICommand
 	 ********************************************************************************/
@@ -99,22 +103,22 @@ public abstract class CommandGroup extends Command
 	}
 	
 	@Override
-	public void processCommand( ICommandSender sender, Queue<String> args )
+	public void processCommand( CommandParser command )
 	{
-		if( args.isEmpty() )
+		if( command.isEmpty() )
 		{
-			sender.addChatMessage( new ChatComponentText( this.getCommandUsageList( sender ) ) );
+			this.sendUsage( command.getSender() );
 			return;
 		}
-		String command = args.remove();
+		String arg = command.next(); 
 		
-		if( this.commands.containsKey( command ) )
+		if( this.commands.containsKey( arg ) )
 		{
-			this.commands.get( command ).processCommand( sender, args );
+			this.commands.get( arg ).processCommand( command );
 		}
 		else
 		{
-			sender.addChatMessage( new ChatComponentText( this.getCommandUsageList( sender ) ) );
+			this.sendUsage( command.getSender() );
 		}
 	}
 }

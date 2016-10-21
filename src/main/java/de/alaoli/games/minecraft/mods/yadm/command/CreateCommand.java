@@ -1,11 +1,8 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-import java.util.Queue;
-
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.util.CommandUtil;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -45,36 +42,40 @@ public class CreateCommand extends Command
 	}
 	
 	@Override
-	public void processCommand( ICommandSender sender, Queue<String> args ) 
+	public void processCommand( CommandParser command ) 
 	{
 		//Usage
-		if( args.size() < 2 )
+		if( command.size() < 2 )
 		{
-			sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
+			this.sendUsage( command.getSender() );
 			return;
 		}
-
+		
 		try
 		{
-			Dimension dimension = CommandUtil.parseAndCreateDimension( sender, args );
-			
+			Dimension dimension = command.parseAndCreateDimension();
+
 			YADM.proxy.registerDimension( dimension );
 			
 			if( Config.Dimension.teleportOnCreate )
 			{
-				EntityPlayer player = sender.getEntityWorld().getPlayerEntityByName( sender.getCommandSenderName() );
+				EntityPlayer player = command.getSender().getEntityWorld().getPlayerEntityByName( command.getSender().getCommandSenderName() );
 
 				if( !TeleportUtil.teleport( player, dimension ) )
 				{
-					sender.addChatMessage( new ChatComponentText( "Can't teleport to dimension" ) );
+					command.getSender().addChatMessage( new ChatComponentText( "Can't teleport to dimension" ) );
 				}
 			}			
+		}
+		catch( CommandParserException e )
+		{
+			throw e;
 		}
 		catch( RuntimeException e )
 		{
 			e.printStackTrace();
-			sender.addChatMessage( new ChatComponentText( e.getMessage() ) );
-		}	
+			command.getSender().addChatMessage( new ChatComponentText( e.getMessage() ) );
+		}
 	}
 
 }

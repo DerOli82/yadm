@@ -1,13 +1,10 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.ChatComponentText;
 
 public abstract class Command implements ICommand
 {
@@ -45,8 +42,13 @@ public abstract class Command implements ICommand
 		return 4;
 	}
 
-	public abstract void processCommand( ICommandSender sender, Queue<String> args );
+	public void sendUsage( ICommandSender sender )
+	{
+		sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
+	}
 	
+	public abstract void processCommand( CommandParser command );
+		
 	/********************************************************************************
 	 * Interface - ICommand
 	 ********************************************************************************/
@@ -58,7 +60,7 @@ public abstract class Command implements ICommand
 	}
 
 	@Override
-	public boolean canCommandSenderUseCommand(ICommandSender sender )
+	public boolean canCommandSenderUseCommand( ICommandSender sender )
 	{
 		return sender.canCommandSenderUseCommand( this.getRequiredPermissionLevel(), this.getCommandName() );
 	}
@@ -101,6 +103,13 @@ public abstract class Command implements ICommand
 	@Override
 	public void processCommand( ICommandSender sender, String[] args )
 	{
-		this.processCommand( sender, new LinkedList<String>( Arrays.asList( args ) ) );
+		try
+		{
+			this.processCommand( new CommandParser( sender, args ) );
+		}
+		catch( CommandParserException e )
+		{
+			sender.addChatMessage( new ChatComponentText( e.getMessage() ) );
+		}
 	}
 }

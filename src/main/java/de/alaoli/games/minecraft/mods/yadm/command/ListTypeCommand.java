@@ -1,8 +1,6 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-import java.util.Queue;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
-import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
 public class ListTypeCommand extends Command
@@ -33,10 +31,10 @@ public class ListTypeCommand extends Command
 	}
 
 	@Override
-	public void processCommand( ICommandSender sender, Queue<String> args ) 
+	public void processCommand( CommandParser command )
 	{
 		StringBuilder msg;
-		sender.addChatMessage( new ChatComponentText( "Choosable types:" ) );
+		command.getSender().addChatMessage( new ChatComponentText( "Choosable types:" ) );
 		
 		for( String type : WorldBuilder.instance.getWorldTypes().keySet() )
 		{
@@ -44,7 +42,7 @@ public class ListTypeCommand extends Command
 				.append( " - '" )
 				.append( type )
 				.append( "'" );
-			sender.addChatMessage( new ChatComponentText( msg.toString() ) );
+			command.getSender().addChatMessage( new ChatComponentText( msg.toString() ) );
 		}
 	}
 	

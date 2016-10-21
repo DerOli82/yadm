@@ -1,9 +1,5 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-import java.util.Queue;
-
-import net.minecraft.command.ICommandSender;
-
 public class ListCommandGroup extends CommandGroup
 {
 	/********************************************************************************
@@ -36,12 +32,12 @@ public class ListCommandGroup extends CommandGroup
 	}
 	
 	@Override
-	public void processCommand( ICommandSender sender, Queue<String> args )
+	public void processCommand( CommandParser command )
 	{
-		if( args.isEmpty() )
+		if( command.isEmpty() )
 		{
-			args.add( "dimension" );
+			command.add( "dimension" );
 		}
-		super.processCommand( sender, args );
+		super.processCommand( command );
 	}	
 }

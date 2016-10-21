@@ -1,8 +1,5 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-import java.util.Queue;
-
-import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
@@ -36,15 +33,15 @@ public class InfoCommand extends Command
 	}
 
 	@Override
-	public void processCommand( ICommandSender sender, Queue<String> args ) 
+	public void processCommand( CommandParser command )
 	{
-		World world = DimensionManager.getWorld( sender.getEntityWorld().provider.dimensionId );
+		World world = DimensionManager.getWorld( command.getSender().getEntityWorld().provider.dimensionId );
 		WorldInfo worldInfo = world.getWorldInfo();
 		
-		sender.addChatMessage( new ChatComponentText( "Current dimension info:" ) );
-		sender.addChatMessage( new ChatComponentText( "Name: " + world.provider.getDimensionName() ) );
-		sender.addChatMessage( new ChatComponentText( "ID: " + world.provider.dimensionId ) );
-		sender.addChatMessage( new ChatComponentText( "Seed: " + world.getSeed() ) );
-		sender.addChatMessage( new ChatComponentText( "GenOpt: " + world.provider.field_82913_c ) );
+		command.getSender().addChatMessage( new ChatComponentText( "Current dimension info:" ) );
+		command.getSender().addChatMessage( new ChatComponentText( "Name: " + world.provider.getDimensionName() ) );
+		command.getSender().addChatMessage( new ChatComponentText( "ID: " + world.provider.dimensionId ) );
+		command.getSender().addChatMessage( new ChatComponentText( "Seed: " + world.getSeed() ) );
+		command.getSender().addChatMessage( new ChatComponentText( "GenOpt: " + world.provider.field_82913_c ) );
 	}
 }

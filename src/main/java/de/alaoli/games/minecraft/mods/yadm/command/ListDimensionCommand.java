@@ -1,14 +1,11 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-import java.util.Queue;
 import java.util.Map.Entry;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.manager.DimensionGroup;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
-import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
 public class ListDimensionCommand extends Command
@@ -39,16 +36,16 @@ public class ListDimensionCommand extends Command
 	}
 
 	@Override
-	public void processCommand( ICommandSender sender, Queue<String> args ) 
+	public void processCommand( CommandParser command )
 	{
 		StringBuilder msg;
 		Dimension dimension;
 		
-		sender.addChatMessage( new ChatComponentText( "Registered Dimensions:" ) );
+		command.getSender().addChatMessage( new ChatComponentText( "Registered Dimensions:" ) );
 		
 		for( Entry<String, Manageable> groupEntry : YADimensionManager.instance.getAll() )
 		{	
-			sender.addChatMessage( new ChatComponentText( " - " + groupEntry.getValue().getManageableName() + ":" ) );
+			command.getSender().addChatMessage( new ChatComponentText( " - " + groupEntry.getValue().getManageableName() + ":" ) );
 			
 			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
 			{
@@ -59,7 +56,7 @@ public class ListDimensionCommand extends Command
 					.append( "' with ID '" )
 					.append( dimension.getId() )
 					.append( "'" );
-				sender.addChatMessage( new ChatComponentText( msg.toString() ) );
+				command.getSender().addChatMessage( new ChatComponentText( msg.toString() ) );
 			}
 		}
 	}

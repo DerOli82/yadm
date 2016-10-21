@@ -1,10 +1,7 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-import java.util.Queue;
-
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.util.CommandUtil;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -44,38 +41,44 @@ public class TPCommand extends Command
 	}
 	
 	@Override
-	public void processCommand( ICommandSender sender, Queue<String> args ) 
+	public void processCommand( CommandParser command ) 
 	{
 		//Usage
-		if( args.isEmpty() )
+		if( command.isEmpty() )
 		{
-			sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
+			this.sendUsage( command.getSender() );
 			return;
 		}
-		Dimension dimension = CommandUtil.parseTeleportDimension( sender, args );
+		Dimension dimension = command.parseDimension( true );
+		Coordinate coordinate = null;
+		EntityPlayer player = null;
 		
-		if( dimension == null ) { return; }
-				
-		Coordinate coordinate = CommandUtil.parseCoordinate( sender, args );
-		EntityPlayer player = CommandUtil.parsePlayer( sender, args );
-		
+		try
+		{
+			coordinate = command.parseCoordinate();
+			player = command.parsePlayer();
+		}
+		catch( CommandParserException e )
+		{
+			//Ignore optional argument Exceptions
+		}
 		if( player == null )
 		{
-			player = sender.getEntityWorld().getPlayerEntityByName( sender.getCommandSenderName() );
+			player = command.getSender().getEntityWorld().getPlayerEntityByName( command.getSender().getCommandSenderName() );
 		}
 		
 		if( coordinate == null )
 		{
 			if( !TeleportUtil.teleport( player, dimension ) )
 			{
-				sender.addChatMessage( new ChatComponentText( "Can't teleport to dimension" ) );
+				command.getSender().addChatMessage( new ChatComponentText( "Can't teleport to dimension" ) );
 			}
 		}
 		else
 		{
 			if( !TeleportUtil.teleport( player, dimension, coordinate ) )
 			{
-				sender.addChatMessage( new ChatComponentText( "Can't teleport to dimension" ) );
+				command.getSender().addChatMessage( new ChatComponentText( "Can't teleport to dimension" ) );
 			}			
 		}
 		

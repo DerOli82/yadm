@@ -1,9 +1,6 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-import java.util.Queue;
-
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
-import net.minecraft.command.ICommandSender;
 
 public class ReloadCommand extends Command 
 {
@@ -33,7 +30,7 @@ public class ReloadCommand extends Command
 	}
 
 	@Override
-	public void processCommand( ICommandSender sender, Queue<String> args ) 
+	public void processCommand( CommandParser command ) 
 	{
 		TemplateManager.instance.reload();
 	}
