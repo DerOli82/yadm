@@ -2,7 +2,6 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
@@ -13,7 +12,6 @@ import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerSelector;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.DimensionManager;
 
 public class CommandParser 
@@ -249,21 +247,5 @@ public class CommandParser
 			throw new CommandParserException( "Couldn't find player." );
 		}
 		return player;
-		/*
-		List<EntityPlayer> players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
-		
-		if( players == null ) 
-		{
-			throw new CommandParserException( "Couldn't find players list." );
-		}
-		
-		for( EntityPlayer player : players )
-		{
-			if( player.getDisplayName().toLowerCase().equals( name.toLowerCase() ) )
-			{
-				return player;
-			}
-		}
-		throw new CommandParserException( "Couldn't find player." );*/
 	}
 }
