@@ -279,7 +279,6 @@ public class YADimensionManager extends AbstractManager
 				e.printStackTrace();
 			}
 		}
-		this.reload();
 	}
 	
 	public void unregister( Dimension dimension )
@@ -345,6 +344,7 @@ public class YADimensionManager extends AbstractManager
 			Log.info( msg.toString() );			
 		}
 		dimension.setRegistered( false );
+		YADM.proxy.unregisterDimension( dimension );
 	}
 
 	public void unregister()
