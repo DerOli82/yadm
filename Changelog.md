@@ -1,8 +1,14 @@
 # Changelog
 
+# Version 0.4.6
+Fix some command block issues	
+Reimplement delete function
+
 # Version 0.4.5
 Fixes Teleport with coordinates doesn't work
- 
+Implement CommandParser Class
+First (not functional) WorldBorderSetting structure
+
 # Version 0.4.4
 Update Forge to 1.7.10-10.13.4.1614-1.7.10
 Fixes save problem

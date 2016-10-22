@@ -29,7 +29,7 @@ task tagRelease << {
   }
 }
 
-version = "0.4.5"
+version = "0.4.6"
 group= "de.alaoli.games.minecraft.mods.yadm" 
 archivesBaseName = "yadm"
 
@@ -62,7 +62,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
-    compile 'net.bytebuddy:byte-buddy:1.4.+'
+    compile 'net.bytebuddy:byte-buddy:1.4.32'
     compile 'com.eclipsesource.minimal-json:minimal-json:0.9.+'
 
 }
