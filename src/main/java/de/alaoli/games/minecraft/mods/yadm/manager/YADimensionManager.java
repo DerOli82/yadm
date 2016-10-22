@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
@@ -37,6 +39,8 @@ public class YADimensionManager extends AbstractManager
 	
 	private static int nextId = Config.Dimension.beginsWithId;
 	
+	private Map<Integer, Dimension> deletedDimensions;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -47,6 +51,7 @@ public class YADimensionManager extends AbstractManager
 		
 		//Initialize default group
 		this.add( new DimensionGroup( "default" ) );
+		this.deletedDimensions = new HashMap<Integer, Dimension>();
 	}
 	
 	
@@ -237,17 +242,19 @@ public class YADimensionManager extends AbstractManager
 	
 	public void delete( Dimension dimension )
 	{
+		this.deletedDimensions.put( dimension.getId(), dimension );
+		this.remove( dimension );
+		
 		DimensionManager.unloadWorld( dimension.getId() );
 	}
 	
 	public void delete( World world )
 	{
-		if( !this.exists( world.provider.dimensionId ) ) { return; }
+		if( !this.deletedDimensions.containsKey( world.provider.dimensionId ) ) { return; }
 		
-		Dimension dimension = this.get( world.provider.dimensionId );
+		Dimension dimension = this.deletedDimensions.get( world.provider.dimensionId );
+		this.deletedDimensions.remove( world.provider.dimensionId );
 		
-		this.remove( dimension );
-
 		((WorldServer)world).flush();
 		this.unregister( dimension );
 		
