@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonValue;
+
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 
 public abstract class SettingGroup implements Setting, JsonSerializable
@@ -59,9 +61,32 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 		return this.settings;
 	}
 	
+	/**
+	 * Check if a settings is included
+	 * 
+	 * @return boolean
+	 */	
 	public boolean hasSetting( SettingType type )
 	{
 		return this.settings.containsKey( type );
+	}
+	
+	/**
+	 * Check if required settings are included
+	 * 
+	 * @return boolean
+	 */
+	public boolean hasRequiredSettings()
+	{
+		for( SettingType type : SettingType.values() )
+		{
+			if( ( type.isRequired() ) && 
+				( !this.hasSetting( type ) ) )
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	/********************************************************************************
@@ -71,6 +96,12 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 	@Override
 	public JsonValue serialize() 
 	{
+		//Only serialize if all required settings are included
+		if( !this.hasRequiredSettings() )
+		{
+			throw new DataException( "Can't serialize, missing required SettingType." );
+		}
+		
 		JsonArray json = new JsonArray();
 		
 		for( Setting setting : this.settings.values() )
@@ -94,6 +125,12 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 			
 			((JsonSerializable)setting).deserialize( value );
 			this.add(setting);
+		}
+		
+		//All required settings deserialized?
+		if( !this.hasRequiredSettings() )
+		{
+			throw new DataException( "Can't deserialize, missing required SettingType." );
 		}
 	}	
 }
