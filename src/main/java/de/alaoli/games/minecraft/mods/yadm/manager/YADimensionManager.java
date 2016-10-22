@@ -96,6 +96,20 @@ public class YADimensionManager extends AbstractManager
 		return null;
 	}
 	
+	public Dimension get( String group, String name )
+	{
+		if( this.exists( group ) )
+		{
+			ManageableGroup manageable = (ManageableGroup) this.get( group );
+			
+			if( manageable.exists( name) )
+			{
+				return (Dimension) manageable.get( name );
+			}
+		}
+		return null;
+	}
+	
 	/********************************************************************************
 	 * Methods - Manage Dimensions
 	 ********************************************************************************/
