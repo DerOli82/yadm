@@ -122,6 +122,7 @@ public class YADimensionManager extends AbstractManager
 	{
 		DimensionGroup group = (DimensionGroup) this.get(dimension.getGroup() );
 		group.remove( dimension );
+		this.dirty = true;
 	}
 	
 	/********************************************************************************
