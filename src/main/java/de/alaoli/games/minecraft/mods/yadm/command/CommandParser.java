@@ -57,14 +57,7 @@ public class CommandParser
 	
 	public String next()
 	{
-		String value = this.args.remove();
-		
-		if( value.contains( "@p" ) )
-		{
-			EntityPlayer player = PlayerSelector.matchOnePlayer( this.sender, "@p" );
-			value = value.replaceAll( "@p", player.getDisplayName() );
-		}
-		return value;
+		return this.args.remove();
 	}
 	
 	/********************************************************************************
@@ -108,6 +101,13 @@ public class CommandParser
 	public String[] parseGroupAndName( String name ) throws CommandParserException
 	{
 		String[] groupAndName;
+		
+		//Get player name
+		if( name.contains( "@p" ) )
+		{
+			EntityPlayer player = PlayerSelector.matchOnePlayer( this.sender, "@p" );
+			name = name.replaceAll( "@p", player.getDisplayName() );
+		}
 		
 		if( name.contains( ":" ) )
 		{
@@ -181,7 +181,7 @@ public class CommandParser
 		}
 		else
 		{
-			String[] groupAndName = this.parseGroupAndName();
+			String[] groupAndName = this.parseGroupAndName( value );
 			
 			if( !YADimensionManager.instance.exists( groupAndName[0], groupAndName[1] ) )
 			{
