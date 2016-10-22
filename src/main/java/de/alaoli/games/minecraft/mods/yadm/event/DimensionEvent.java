@@ -22,7 +22,7 @@ public class DimensionEvent
 		//Cleanup deleted dimensions
 		if( !event.world.isRemote ) 
 		{
-			YADimensionManager.instance.cleanup( event.world );
+			YADimensionManager.instance.delete( event.world );
 		}
 	}
 	

@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Map.Entry;
 
+import org.apache.commons.io.FileUtils;
+
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.WriterConfig;
 
@@ -22,6 +24,7 @@ import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
 public class YADimensionManager extends AbstractManager 
@@ -108,6 +111,12 @@ public class YADimensionManager extends AbstractManager
 			}
 		}
 		return null;
+	}
+	
+	public void remove( Dimension dimension )
+	{
+		DimensionGroup group = (DimensionGroup) this.get(dimension.getGroup() );
+		group.remove( dimension );
 	}
 	
 	/********************************************************************************
@@ -228,28 +237,42 @@ public class YADimensionManager extends AbstractManager
 	
 	public void delete( Dimension dimension )
 	{
-		/*
-		//Delete dimension json file		
+		DimensionManager.unloadWorld( dimension.getId() );
+	}
+	
+	public void delete( World world )
+	{
+		if( !this.exists( world.provider.dimensionId ) ) { return; }
+		
+		Dimension dimension = this.get( world.provider.dimensionId );
+		
+		this.remove( dimension );
+
+		((WorldServer)world).flush();
+		this.unregister( dimension );
+		
+		//Delete dimension folder
 		StringBuilder path = new StringBuilder()
 			.append( this.getSavePath() )
 			.append( File.separator )
-			.append( "data" )
-			.append( File.separator )
-			.append( YADM.MODID )
-			.append( File.separator)
-			.append( dimension.getName() )
-			.append( ".json" );
+			.append( "DIM" )
+			.append( dimension.getId() )
+			.append( File.separator );
 		File file = new File( path.toString() );
-	
-		if( file.exists() )
+			
+		if( ( file.exists() ) && ( file.isDirectory() ) )
 		{
-			file.delete();
+			try 
+			{
+				FileUtils.deleteDirectory( file );
+				Log.info( "Dimenson folder 'DIM" + dimension.getId() + "' deleted!" );
+			}
+			catch ( IOException e ) 
+			{
+				e.printStackTrace();
+			}
 		}
-		this.deletedDimensions.put( dimension.getId(), dimension );
-		this.remove( dimension );
-		
-		this.dirty = true;
-		DimensionManager.unloadWorld( dimension.getId() );*/
+		this.reload();
 	}
 	
 	public void unregister( Dimension dimension )
@@ -334,41 +357,7 @@ public class YADimensionManager extends AbstractManager
 			}
 		}			
 	}
-	
-	public void cleanup( World world )
-	{
-		/*
-		if( !this.deletedDimensions.containsKey( world.provider.dimensionId ) ) { return; }
-		
-		Dimension dimension = this.deletedDimensions.get( world.provider.dimensionId );
-		this.deletedDimensions.remove( dimension );
-		
-		((WorldServer)world).flush();
-		this.unregister( dimension );
-		
-		//Delete dimension folder
-		StringBuilder path = new StringBuilder()
-			.append( this.getSavePath() )
-			.append( File.separator )
-			.append( "DIM" )
-			.append( dimension.getId() )
-			.append( File.separator );
-		File file = new File( path.toString() );
-			
-		if( ( file.exists() ) && ( file.isDirectory() ) )
-		{
-			try 
-			{
-				FileUtils.deleteDirectory(file);
-				Log.info( "Dimenson folder 'DIM" + dimension.getId() + "' deleted!" );
-			}
-			catch ( IOException e ) 
-			{
-				e.printStackTrace();
-			}
-		}	*/
-	}
-	
+
 	/**
 	 * Unregister all dimensions
 	 * Teleport players from deleted dimensions to overworld spawn
@@ -441,38 +430,6 @@ public class YADimensionManager extends AbstractManager
 				}
 			}
 		}
-		/*
-		for( File file : files ) 
-		{
-			if( ( file.isFile() ) && 
-				( file.getName().endsWith(".json") ) )
-			{
-				try
-				{
-					name = file.getName().replace( ".json", "" );
-					reader = new InputStreamReader( new FileInputStream( file.toString() ), "UTF-8" );
-	
-					
-					/**
-					 * @TODO implement groups
-					 *
-		
-					if( !YADimensionManager.instance.exists( "default" ) )
-					{
-						YADimensionManager.instance.add( new DimensionGroup( "default" ) );
-					}
-					dimension = new Dimension();
-					dimension.deserialize( Json.parse( reader ) );
-					((ManageableGroup)this.get( "default" )).add( new Dimension() );
-					
-					reader.close();
-				}
-				catch ( IOException e ) 
-				{
-					e.printStackTrace();
-				}
-			}
-		}*/
 	}
 	
 	@Override
@@ -514,35 +471,5 @@ public class YADimensionManager extends AbstractManager
 				}
 			}
 		}
-		/*
-		for( Entry<String, Manageable> entry : ((ManageableGroup)this.get( "default" )).getAll() )
-		{
-			data = entry.getValue();
-		
-			if( data instanceof JsonSerializable )
-			{
-				file = new StringBuilder()
-					.append( this.getSavePath() )
-					.append( File.separator )
-					.append( "data" )
-					.append( File.separator )
-					.append( YADM.MODID )
-					.append( File.separator)
-					.append( entry.getKey() )
-					.append( ".json" );
-				
-				try
-				{
-					writer = new OutputStreamWriter( new FileOutputStream( file.toString() ), "UTF-8" );
-					((JsonSerializable)data).serialize().writeTo( writer, WriterConfig.PRETTY_PRINT );
-					
-					writer.close();
-				}
-				catch( IOException e ) 
-				{
-					e.printStackTrace();
-				}
-			}
-		}*/
 	}
 }
