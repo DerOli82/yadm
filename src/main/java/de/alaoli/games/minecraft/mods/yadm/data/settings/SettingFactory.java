@@ -26,6 +26,9 @@ public class SettingFactory
 			case SPAWN :
 				return new SpawnSetting();
 				
+			case WORLDBORDER :
+				return new WorldBorderSetting();
+				
 			default:
 				return null;
 		}
