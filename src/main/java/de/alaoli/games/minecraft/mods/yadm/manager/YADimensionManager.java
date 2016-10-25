@@ -24,10 +24,16 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldManager;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.WorldSettings;
+import net.minecraft.world.storage.ISaveHandler;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.WorldEvent;
 
 public class YADimensionManager extends AbstractManager 
 {
@@ -155,6 +161,7 @@ public class YADimensionManager extends AbstractManager
 				if( !dimension.isRegistered() )
 				{
 					this.register( dimension );
+					this.init( dimension );
 				}
 			}
 		}	
@@ -212,7 +219,35 @@ public class YADimensionManager extends AbstractManager
 	 */
 	public void init( Dimension dimension )
 	{
-		DimensionManager.initDimension( dimension.getId() );
+		//DimensionManager.initDimension( dimension.getId() );
+		
+        WorldServer overworld = DimensionManager.getWorld(0);
+        if (overworld == null)
+        {
+            throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
+        }
+        try
+        {
+            DimensionManager.getProviderType(dimension.getId());
+        }
+        catch (Exception e)
+        {
+            System.err.println("Cannot Hotload Dim: " + e.getMessage());
+            return; // If a provider hasn't been registered then we can't hotload the dim
+        }
+        MinecraftServer mcServer = overworld.func_73046_m();
+        ISaveHandler savehandler = overworld.getSaveHandler();
+        WorldSettings worldSettings = new WorldSettings(overworld.getWorldInfo());
+
+        WorldServer world = new WorldServer( mcServer, savehandler, overworld.getWorldInfo().getWorldName(), dimension.getId(), worldSettings, mcServer.theProfiler );
+        world.addWorldAccess(new WorldManager(mcServer, world));
+        MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
+        if (!mcServer.isSinglePlayer())
+        {
+            world.getWorldInfo().setGameType(mcServer.getGameType());
+        }
+
+        mcServer.func_147139_a(mcServer.func_147135_j());
 	}
 	
 	public Dimension create( String group, String name, Template template ) 
