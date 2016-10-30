@@ -10,7 +10,6 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.DimensionFieldAccessor;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.GetDimensionNameInterceptor;
-import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.GetSeedInterceptor;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.RegisterWorldChunkManagerPostInterceptor;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.RegisterWorldChunkManagerPreInterceptor;
 import net.bytebuddy.ByteBuddy;
@@ -136,10 +135,6 @@ public class WorldBuilder
 			WorldProvider.class, (WorldProvider)providerClass.newInstance(), 
 			new String[]{ "func_80007_l", "getDimensionName" } 
 		).getName();
-		String getSeedMethodName = ReflectionHelper.findMethod( 
-			WorldProvider.class, (WorldProvider)providerClass.newInstance(), 
-			new String[]{ "func_72905_C", "getSeed" } 
-		).getName();	
 		
 		Class<?> dynamicType = new ByteBuddy()
 			.with( new NamingStrategy.SuffixingRandom( "YADM" ) )
@@ -155,8 +150,6 @@ public class WorldBuilder
 			)
 			.method( ElementMatchers.named( getDimensionNameMethodName ) )
 			.intercept( MethodDelegation.to( GetDimensionNameInterceptor.class ) )
-			.method( ElementMatchers.named( getSeedMethodName ) )
-			.intercept( MethodDelegation.to( GetSeedInterceptor.class ) )
 			.make()
 			.load( getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER )
 			.getLoaded();
