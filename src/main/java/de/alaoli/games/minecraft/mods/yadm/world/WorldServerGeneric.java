@@ -11,9 +11,9 @@ public class WorldServerGeneric extends WorldServer
 {
 	Dimension dimension;
 	
-	public WorldServerGeneric( MinecraftServer mcServer, ISaveHandler saveHandler, Dimension dimension, WorldSettings settings, Profiler profile )
+	public WorldServerGeneric( MinecraftServer mcServer, ISaveHandler saveHandler, String worldName, Dimension dimension, WorldSettings settings, Profiler profile )
 	{
-		super( mcServer, saveHandler, dimension.getName(), dimension.getId(), settings, profile );
+		super( mcServer, saveHandler, worldName, dimension.getId(), settings, profile );
 
 		this.dimension = dimension;
 	}
