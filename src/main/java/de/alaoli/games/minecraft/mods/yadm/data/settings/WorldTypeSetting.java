@@ -11,6 +11,7 @@ import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.storage.WorldInfo;
 
 public class WorldTypeSetting implements Setting, JsonSerializable, Packageable, Injectable 
@@ -27,6 +28,8 @@ public class WorldTypeSetting implements Setting, JsonSerializable, Packageable,
 	
 	private String name;
 
+	private WorldType type;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -41,6 +44,15 @@ public class WorldTypeSetting implements Setting, JsonSerializable, Packageable,
 	public String getName()
 	{
 		return this.name;
+	}
+	
+	public WorldType getWorldType()
+	{
+		if( this.type == null )
+		{
+			this.type = WorldBuilder.instance.getWorldType( this.name );
+		}
+		return this.type;
 	}
 	
 	/********************************************************************************
@@ -106,7 +118,7 @@ public class WorldTypeSetting implements Setting, JsonSerializable, Packageable,
 		if( target instanceof WorldProvider )
 		{
 			WorldProvider worldProvider = (WorldProvider)target;
-			worldProvider.terrainType = WorldBuilder.instance.getWorldType( this.name );
+			worldProvider.terrainType = this.getWorldType();
 		}
 		else if( target instanceof WorldInfo )
 		{
