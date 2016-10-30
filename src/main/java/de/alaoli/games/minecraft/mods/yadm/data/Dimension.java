@@ -123,13 +123,21 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	}
 
 	@Override
-	public void deserialize( JsonValue json )
+	public void deserialize( JsonValue json ) throws DataException
 	{
-		this.id = json.asObject().get( "id" ).asInt();
-		this.group = json.asObject().get( "group" ).asString();
-		this.name = json.asObject().get( "name" ).asString();
-		
-		super.deserialize( json.asObject().get( "settings" ).asArray() );
+		try
+		{
+			this.id = json.asObject().get( "id" ).asInt();
+			this.group = json.asObject().get( "group" ).asString();
+			this.name = json.asObject().get( "name" ).asString();
+			
+			super.deserialize( json.asObject().get( "settings" ).asArray() );
+		}
+		catch( DataException e )
+		{
+			e.addSuppressed( new DataException( "Deserialization Exception in: " + this.group + ":" + this.name ));
+			throw e;
+		}
 	}
 
 	/********************************************************************************

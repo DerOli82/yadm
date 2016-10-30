@@ -6,6 +6,7 @@ import java.util.Random;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
@@ -20,22 +21,19 @@ public class SeedSetting implements Setting, JsonSerializable, Packageable, Inje
 	
 	private Long value;
 	
+	private boolean isRandom;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
 	
-	public SeedSetting() 
-	{
-		this.value = (new Random()).nextLong();
-	}
-	
-	public SeedSetting( Long seed )
-	{
-		this.value = seed;
-	}
-	
 	public Long getValue()
 	{
+		//Initialize random seed
+		if( ( this.value == null ) && ( this.isRandom ) )
+		{
+			this.value = (new Random()).nextLong();
+		}
 		return this.value;
 	}
 	
@@ -52,7 +50,7 @@ public class SeedSetting implements Setting, JsonSerializable, Packageable, Inje
 	@Override
 	public boolean isRequired() 
 	{
-		return true;
+		return false;
 	}
 
 	/********************************************************************************
@@ -71,9 +69,23 @@ public class SeedSetting implements Setting, JsonSerializable, Packageable, Inje
 	}
 
 	@Override
-	public void deserialize( JsonValue json )
+	public void deserialize( JsonValue json ) throws DataException
 	{
-		this.value = json.asObject().get( "value" ).asLong();
+		if( ( json.asObject().get( "value" ).isString() ) && 
+			(json.asObject().get( "value" ).asString().contains( "*" ) ) )
+		{
+			this.isRandom = true;
+			this.value = null;
+		}
+		else if( json.asObject().get( "value" ).isString() )
+		{
+			this.value = json.asObject().get( "value" ).asLong();
+			this.isRandom = false;
+		}
+		else
+		{
+			throw new DataException( "Invalid seed value." );
+		}
 	}
 	
 	/********************************************************************************
@@ -83,7 +95,7 @@ public class SeedSetting implements Setting, JsonSerializable, Packageable, Inje
 	@Override
 	public void writeToNBT( NBTTagCompound tagCompound ) 
 	{	
-		tagCompound.setLong( "value", this.value );
+		tagCompound.setLong( "value", this.getValue() );
 	}
 
 	@Override
@@ -105,7 +117,7 @@ public class SeedSetting implements Setting, JsonSerializable, Packageable, Inje
 			
 			ReflectionHelper.setPrivateValue( 
 				WorldInfo.class, worldInfo, 
-				this.value, 
+				this.getValue(), 
 				new String[] { "field_76100_a", "randomSeed" } 
 			);		
 		}
