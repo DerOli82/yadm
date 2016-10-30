@@ -261,7 +261,7 @@ public class YADimensionManager extends AbstractManager
         ISaveHandler savehandler = overworld.getSaveHandler();
         WorldSettings worldSettings = new WorldSettings( overworld.getWorldInfo() );
 
-        WorldServer world = new WorldServerGeneric( mcServer, savehandler, dimension, worldSettings, mcServer.theProfiler );
+        WorldServer world = new WorldServerGeneric( mcServer, savehandler, overworld.getWorldInfo().getWorldName(), dimension, worldSettings, mcServer.theProfiler );
         world.addWorldAccess( new WorldManager( mcServer, world ) );
         
         MinecraftForge.EVENT_BUS.post( new WorldEvent.Load( world ) );
