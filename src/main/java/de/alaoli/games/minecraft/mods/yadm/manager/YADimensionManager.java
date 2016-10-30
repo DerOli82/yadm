@@ -24,6 +24,7 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
+import de.alaoli.games.minecraft.mods.yadm.world.WorldServerGeneric;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldManager;
@@ -122,6 +123,27 @@ public class YADimensionManager extends AbstractManager
 			}
 		}
 		return null;
+	}
+	
+	public WorldServer getWorldServerForDimension( Dimension dimension )
+	{
+		WorldServer result = null; 
+		
+		if( this.exists( dimension ) )
+		{
+			result = DimensionManager.getWorld( dimension.getId() );
+			
+			if( result == null )
+			{
+				this.init( dimension );
+				result = DimensionManager.getWorld( dimension.getId() );
+			}
+		}
+		else
+		{
+			result = MinecraftServer.getServer().worldServerForDimension( dimension.getId() );
+		}
+		return result;
 	}
 	
 	public void remove( Dimension dimension )
@@ -237,17 +259,17 @@ public class YADimensionManager extends AbstractManager
         }
         MinecraftServer mcServer = overworld.func_73046_m();
         ISaveHandler savehandler = overworld.getSaveHandler();
-        WorldSettings worldSettings = new WorldSettings(overworld.getWorldInfo());
+        WorldSettings worldSettings = new WorldSettings( overworld.getWorldInfo() );
 
-        WorldServer world = new WorldServer( mcServer, savehandler, overworld.getWorldInfo().getWorldName(), dimension.getId(), worldSettings, mcServer.theProfiler );
-        world.addWorldAccess(new WorldManager(mcServer, world));
-        MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
+        WorldServer world = new WorldServerGeneric( mcServer, savehandler, dimension, worldSettings, mcServer.theProfiler );
+        world.addWorldAccess( new WorldManager( mcServer, world ) );
+        
+        MinecraftForge.EVENT_BUS.post( new WorldEvent.Load( world ) );
         if (!mcServer.isSinglePlayer())
         {
-            world.getWorldInfo().setGameType(mcServer.getGameType());
+            world.getWorldInfo().setGameType( mcServer.getGameType() );
         }
-
-        mcServer.func_147139_a(mcServer.func_147135_j());
+        mcServer.func_147139_a( mcServer.func_147135_j() );
 	}
 	
 	public Dimension create( String group, String name, Template template ) 

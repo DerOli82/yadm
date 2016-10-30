@@ -4,6 +4,7 @@ import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SpawnSetting;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.teleport.DimensionTeleport;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -51,7 +52,7 @@ public class TeleportUtil
 	{
 		if( ( dimension == null ) || !dimension.isRegistered() || ( player == null ) ) { return false; }
 		
-		WorldServer target = MinecraftServer.getServer().worldServerForDimension( dimension.getId() );
+		WorldServer target = YADimensionManager.instance.getWorldServerForDimension( dimension );
 		if( target == null ) { return false; }
 		
 		Coordinate coordinate;
@@ -76,7 +77,7 @@ public class TeleportUtil
 	{
 		if( ( dimension == null ) || !dimension.isRegistered() || ( player == null ) ) { return false; }
 		 
-		WorldServer target = MinecraftServer.getServer().worldServerForDimension( dimension.getId() );
+		WorldServer target = YADimensionManager.instance.getWorldServerForDimension( dimension );
 				
 		if( target == null ) { return false; }
 			
