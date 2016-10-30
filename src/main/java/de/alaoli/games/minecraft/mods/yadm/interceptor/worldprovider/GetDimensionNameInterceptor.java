@@ -13,6 +13,6 @@ public class GetDimensionNameInterceptor extends WorldProviderInterceptor
 	{
 		Dimension dimension = getDimension( (DimensionFieldAccessor)thiz, thiz.dimensionId );
 
-		return dimension.getName();
+		return dimension.getGroup() + ":" + dimension.getName();
 	}
 }
