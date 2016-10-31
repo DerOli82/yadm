@@ -2,6 +2,7 @@ package de.alaoli.games.minecraft.mods.yadm.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
@@ -14,6 +15,7 @@ import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.WorldProvider;
@@ -31,6 +33,8 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	private String group;
 	
 	private String name;
+	
+	private UUID owner;
 	
 	private boolean isRegistered;
 	
@@ -69,6 +73,21 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		return this.name;
 	}
 
+	public UUID getOwner()
+	{
+		return this.owner;
+	}
+	
+	public void setOwner( EntityPlayer owner )
+	{
+		this.setOwner( owner.getUniqueID() );
+	}
+	
+	public void setOwner( UUID owner )
+	{
+		this.owner = owner;
+	}
+	
 	public void setRegistered( boolean isRegistered )
 	{
 		this.isRegistered = isRegistered;
@@ -79,6 +98,10 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		return this.isRegistered;
 	}
 	
+	public boolean hasOwner()
+	{
+		return this.owner != null;
+	}
 	/********************************************************************************
 	 * Methods - Implement Setting
 	 ********************************************************************************/
@@ -117,6 +140,10 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		json.add( "id", this.id );
 		json.add( "group", this.group );
 		json.add( "name", this.name );
+		if( this.owner != null )
+		{
+			json.add( "owner", this.owner.toString() );
+		}
 		json.add( "settings", super.serialize().asArray() );
 		
 		return json;
@@ -130,6 +157,10 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 			this.id = json.asObject().get( "id" ).asInt();
 			this.group = json.asObject().get( "group" ).asString();
 			this.name = json.asObject().get( "name" ).asString();
+			if( json.asObject().get( "owner" ).isString() )
+			{
+				this.owner = UUID.fromString( json.asObject().get( "name" ).asString() );
+			}
 			
 			super.deserialize( json.asObject().get( "settings" ).asArray() );
 		}

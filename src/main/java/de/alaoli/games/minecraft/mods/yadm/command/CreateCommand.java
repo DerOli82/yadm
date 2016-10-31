@@ -38,7 +38,7 @@ public class CreateCommand extends Command
 	@Override
 	public String getCommandUsage( ICommandSender sender ) 
 	{
-		return super.getCommandUsage( sender ) + " [<templateGroup>:]<templateName> [<dimensionGroup>:]<dimensionName>";
+		return super.getCommandUsage( sender ) + " [<templateGroup>:]<templateName> [<dimensionGroup>:]<dimensionName> [<owner>]";
 	}
 	
 	@Override

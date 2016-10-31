@@ -1,5 +1,7 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
+import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
@@ -23,7 +25,7 @@ public class InfoCommand extends Command
 	@Override
 	public int getRequiredPermissionLevel() 
 	{
-		return 0;
+		return -1;
 	}
 	
 	@Override
@@ -35,10 +37,27 @@ public class InfoCommand extends Command
 	@Override
 	public void processCommand( CommandParser command )
 	{
-		World world = DimensionManager.getWorld( command.getSender().getEntityWorld().provider.dimensionId );
-		WorldInfo worldInfo = world.getWorldInfo();
+		World world;
+		int dimensionId = command.getSender().getEntityWorld().provider.dimensionId;
 		
 		command.getSender().addChatMessage( new ChatComponentText( "Current dimension info:" ) );
+		
+		if( YADimensionManager.instance.exists( dimensionId ) )
+		{
+			Dimension dimension = YADimensionManager.instance.get( dimensionId ); 
+			world = YADimensionManager.instance.getWorldServerForDimension( dimension );
+			
+			if( dimension.hasOwner() )
+			{
+				command.getSender().addChatMessage( new ChatComponentText( "Owner: " + dimension.getOwner().toString() ) );
+			}
+		}
+		else
+		{
+			world = DimensionManager.getWorld( dimensionId );
+		}
+		WorldInfo worldInfo = world.getWorldInfo();
+		
 		command.getSender().addChatMessage( new ChatComponentText( "Name: " + world.provider.getDimensionName() ) );
 		command.getSender().addChatMessage( new ChatComponentText( "ID: " + world.provider.dimensionId ) );
 		command.getSender().addChatMessage( new ChatComponentText( "Seed: " + world.getSeed() ) );

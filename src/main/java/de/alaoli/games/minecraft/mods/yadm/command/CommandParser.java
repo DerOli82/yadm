@@ -3,6 +3,7 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.UUID;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
@@ -199,6 +200,7 @@ public class CommandParser
 	
 	public Dimension parseAndCreateDimension() throws CommandParserException
 	{
+		EntityPlayer owner = null;
 		Template template = this.parseTemplate();
 		String[] groupAndName = this.parseGroupAndName();
 
@@ -211,6 +213,15 @@ public class CommandParser
 		if( dimension == null )
 		{
 			throw new CommandParserException( "Couldn't create Dimension '" + groupAndName[0] + ":" + groupAndName[1] + "'." );
+		}
+		
+		try
+		{
+			dimension.setOwner( this.parseOwner() );
+		}
+		catch( CommandParserException e )
+		{
+			//Ignore optinal
 		}
 		return dimension;
 	}
@@ -247,5 +258,27 @@ public class CommandParser
 			throw new CommandParserException( "Couldn't find player." );
 		}
 		return player;
+	}
+	
+	public UUID parseOwner() throws CommandParserException
+	{
+		EntityPlayer player;
+		
+		try
+		{
+			player = this.parsePlayer();
+		}
+		catch( CommandParserException e )
+		{
+			if( this.sender instanceof EntityPlayer )
+			{
+				player = (EntityPlayer) this.sender;
+			}
+			else
+			{
+				throw new CommandParserException( "Couldn't find owner." );
+			}
+		}
+		return player.getUniqueID();
 	}
 }
