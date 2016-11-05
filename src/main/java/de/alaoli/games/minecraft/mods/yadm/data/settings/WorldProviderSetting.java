@@ -2,6 +2,8 @@ package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import net.minecraft.nbt.NBTTagCompound;
@@ -82,9 +84,16 @@ public class WorldProviderSetting implements Setting, JsonSerializable, Packagea
 	}
 
 	@Override
-	public void deserialize( JsonValue json )
+	public void deserialize( JsonValue json ) throws DataException
 	{
-		this.name = json.asObject().get( "name" ).asString();
+		if( !json.isObject() ) { throw new DataException( "WorldProviderSetting isn't a JsonObject." ); }
+		
+		JsonObject obj = json.asObject();				
+		
+		if( obj.get( "name" ) == null ) { throw new DataException( "WorldProviderSetting 'name' is missing." ); }
+		if( !obj.get( "name" ).isString() ) { throw new DataException( "WorldProviderSetting 'name' isn't a string." ); }
+		
+		this.name = obj.get( "name" ).asString();
 	}	
 	
 	/********************************************************************************

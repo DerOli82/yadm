@@ -28,12 +28,24 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	 * Attributes
 	 ********************************************************************************/
 	
+	/**
+	 * Required
+	 */
 	private int id;
 	
+	/**
+	 * Required
+	 */
 	private String group;
 	
+	/**
+	 * Required
+	 */
 	private String name;
 	
+	/**
+	 * Optional
+	 */
 	private UUID owner;
 	
 	private boolean isRegistered;
@@ -133,7 +145,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	 ********************************************************************************/
 
 	@Override
-	public JsonValue serialize() 
+	public JsonValue serialize() throws DataException
 	{
 		JsonObject json = new JsonObject();
 		
@@ -154,20 +166,33 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	{
 		try
 		{
-			this.id = json.asObject().get( "id" ).asInt();
-			this.group = json.asObject().get( "group" ).asString();
-			this.name = json.asObject().get( "name" ).asString();
-			if( json.asObject().get( "owner" ).isString() )
-			{
-				this.owner = UUID.fromString( json.asObject().get( "name" ).asString() );
-			}
+			if( !json.isObject() ) { throw new DataException( "Dimension isn't a JsonObject." ); }
 			
-			super.deserialize( json.asObject().get( "settings" ).asArray() );
+			JsonObject obj = json.asObject();
+			
+			if( obj.get( "id" ) == null ) { throw new DataException( "Dimension 'id' is missing." ); }
+			if( !obj.get( "id" ).isNumber() ) { throw new DataException( "Dimension 'id' isn't a number." ); }
+			
+			if( obj.get( "group" ) == null ) { throw new DataException( "Dimension 'group' is missing." ); }
+			if( !obj.get( "group" ).isString() ) { throw new DataException( "Dimension 'group' isn't a string." ); }
+			
+			if( obj.get( "name" ) == null ) { throw new DataException( "Dimension 'name' is missing." ); }
+			if( !obj.get( "name" ).isString() ) { throw new DataException( "Dimension 'name' isn't a string." ); }
+			
+			this.id = obj.get( "id" ).asInt();
+			this.group = obj.get( "group" ).asString();
+			this.name = obj.get( "name" ).asString();
+			
+			if( ( json.asObject().get("owner") != null ) &&
+				( json.asObject().get( "owner" ).isString() ) )
+			{
+				this.owner = UUID.fromString( json.asObject().get( "owner" ).asString() );
+			}
+			super.deserialize( json );
 		}
 		catch( DataException e )
 		{
-			e.addSuppressed( new DataException( "Deserialization Exception in: " + this.group + ":" + this.name ));
-			throw e;
+			throw new DataException( "Deserialization Exception in: " + this.group + ":" + this.name, e );
 		}
 	}
 

@@ -5,6 +5,7 @@ import java.util.List;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
@@ -63,7 +64,14 @@ public class GeneratorOptionsSetting implements Setting, JsonSerializable, Packa
 	@Override
 	public void deserialize( JsonValue json )
 	{
-		this.value = json.asObject().get( "value" ).asString();
+		if( !json.isObject() ) { throw new DataException( "GeneratorOptionsSetting isn't a JsonObject." ); }
+		
+		JsonObject obj = json.asObject();
+		
+		if( obj.get( "value" ) == null ) { throw new DataException( "GeneratorOptionsSetting 'value' is missing." ); }
+		if( !obj.get( "value" ).isString() ) { throw new DataException( "GeneratorOptionsSetting 'value' isn't a string." ); }
+		
+		this.value = obj.get( "value" ).asString();
 	}
 	
 	/********************************************************************************

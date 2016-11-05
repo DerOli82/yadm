@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
@@ -16,6 +17,9 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 	 * Attributes
 	 ********************************************************************************/
 	
+	/**
+	 * Required
+	 */
 	private Map<SettingType, Setting> settings = new HashMap<SettingType, Setting>();
 	
 	/********************************************************************************
@@ -117,20 +121,33 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 	@Override
 	public void deserialize( JsonValue json )
 	{
+		if( !json.isObject() ) { throw new DataException( "SettingGroup isn't a JsonObject." ); }
+		
+		JsonObject obj = json.asObject();
+		
+		if( obj.get( "settings" ) == null ) { throw new DataException( "SettingGroup 'settings' are missing." ); }
+		if( !obj.get( "settings" ).isArray() ) { throw new DataException( "SettingGroup 'settings' isn't an array." ); }
+				
 		Setting setting;
+		JsonObject settingObj;
+		JsonArray settingArray = obj.get( "settings" ).asArray();
 		
-		for( JsonValue value : json.asArray() )
+		for( JsonValue settingValue : settingArray )
 		{
-			setting = SettingFactory.createNewInstance( value.asObject().get( "type" ).asString() );
+			if( !settingValue.isObject() ) { throw new DataException( "SettingGroup 'setting' isn't a JsonObject." ); }
 			
-			((JsonSerializable)setting).deserialize( value );
-			this.add(setting);
+			settingObj = settingValue.asObject();
+			
+			if( settingObj.get( "type" ) == null ) { throw new DataException( "Setting 'type' is missing." ); }
+			if( !settingObj.get( "type" ).isString() ) { throw new DataException( "Setting 'type' isn't a string." ); }
+				
+			setting = SettingFactory.createNewInstance( settingObj.get( "type" ).asString() );
+			
+			if( setting == null ) { throw new DataException( "SettingType is unknown." ); }
+			
+			((JsonSerializable)setting).deserialize( settingValue );
+			this.add( setting );
 		}
-		
-		//All required settings deserialized?
-		if( !this.hasRequiredSettings() )
-		{
-			throw new DataException( "Can't deserialize, missing required SettingType." );
-		}
+		if( !this.hasRequiredSettings() ) { throw new DataException( "SettingGroup required settings are missing." ); }
 	}	
 }

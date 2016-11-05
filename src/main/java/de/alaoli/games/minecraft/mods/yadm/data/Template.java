@@ -15,18 +15,26 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 	
 	private String name;
 
+	private String group;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
 	
 	public Template() {}
 	
-	public Template( String name )
+	public Template( String group, String name )
 	{
+		this.group = group;
 		this.name = name;
 	}
 	
-	public String getName()
+	public String getGroup() 
+	{
+		return this.group;
+	}
+	
+	public String getName() 
 	{
 		return this.name;
 	}
@@ -62,7 +70,7 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 	 ********************************************************************************/
 
 	@Override
-	public JsonValue serialize() 
+	public JsonValue serialize() throws DataException
 	{
 		JsonObject json = new JsonObject();
 		
@@ -73,10 +81,25 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 	}
 
 	@Override
-	public void deserialize( JsonValue json )
+	public void deserialize( JsonValue json ) throws DataException
 	{
-		this.name = json.asObject().get( "name" ).asString();
+		try
+		{
+			if( !json.isObject() ) { throw new DataException( "Dimension isn't a JsonObject." ); }
+			
+			JsonObject obj = json.asObject();
+			
+			if( obj.get( "name" ) == null ) { throw new DataException( "Dimension 'name' is missing." ); }
+			if( !obj.get( "name" ).isString() ) { throw new DataException( "Dimension 'name' isn't a string." ); }
+			
+			this.name = obj.get( "name" ).asString();
 		
-		super.deserialize( json.asObject().get( "settings" ).asArray() );
+			super.deserialize( json );
+			
+		}
+		catch( DataException e )
+		{
+			throw new DataException( "Deserialization Exception in: " + this.group + ":" + this.name, e );
+		}			
 	}
 }

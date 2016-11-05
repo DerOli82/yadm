@@ -5,6 +5,7 @@ import java.util.List;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
@@ -89,7 +90,14 @@ public class WorldTypeSetting implements Setting, JsonSerializable, Packageable,
 	@Override
 	public void deserialize( JsonValue json )
 	{
-		this.name = json.asObject().get( "name" ).asString();
+		if( !json.isObject() ) { throw new DataException( "WorldTypeSetting isn't a JsonObject." ); }
+		
+		JsonObject obj = json.asObject();				
+		
+		if( obj.get( "name" ) == null ) { throw new DataException( "WorldTypeSetting 'name' is missing." ); }
+		if( !obj.get( "name" ).isString() ) { throw new DataException( "WorldTypeSetting 'name' isn't a string." ); }
+		
+		this.name = obj.get( "name" ).asString();
 	}	
 	
 	/********************************************************************************

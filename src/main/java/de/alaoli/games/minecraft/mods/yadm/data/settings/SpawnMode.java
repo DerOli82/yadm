@@ -1,12 +1,12 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
-public enum TeleportMode 
+public enum SpawnMode 
 {
-	PLATFORM( "platform" );
+	TOPDOWN( "topdown" );
 	
 	private String name;
 	
-	private TeleportMode( String name )
+	private SpawnMode( String name )
 	{
 		this.name = name;
 	}
@@ -17,9 +17,14 @@ public enum TeleportMode
 		return this.name;
 	}
 
-	public static TeleportMode get( String name )
+	public static boolean hasMode( String name )
 	{
-		for( TeleportMode mode : TeleportMode.values() )
+		return get( name ) != null;
+	}
+	
+	public static SpawnMode get( String name )
+	{
+		for( SpawnMode mode : SpawnMode.values() )
 		{
 			if( mode.toString().equals( name ) )
 			{

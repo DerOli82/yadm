@@ -71,20 +71,26 @@ public class SeedSetting implements Setting, JsonSerializable, Packageable, Inje
 	@Override
 	public void deserialize( JsonValue json ) throws DataException
 	{
-		if( ( json.asObject().get( "value" ).isString() ) && 
-			(json.asObject().get( "value" ).asString().contains( "*" ) ) )
+		if( !json.isObject() ) { throw new DataException( "SeedSetting isn't a JsonObject." ); }
+		
+		JsonObject obj = json.asObject();		
+		
+		if( obj.get( "value" ) == null ) { throw new DataException( "SeedSetting 'value' is missing." ); }
+		
+		if( ( obj.get( "value" ).isString() ) && 
+			( obj.get( "value" ).asString().contains( "*" ) ) )
 		{
 			this.isRandom = true;
 			this.value = null;
 		}
-		else if( json.asObject().get( "value" ).isString() )
+		else if( obj.get( "value" ).isString() )
 		{
 			this.value = json.asObject().get( "value" ).asLong();
 			this.isRandom = false;
 		}
 		else
 		{
-			throw new DataException( "Invalid seed value." );
+			throw new DataException( "SeedSetting 'value' is invalid." );
 		}
 	}
 	

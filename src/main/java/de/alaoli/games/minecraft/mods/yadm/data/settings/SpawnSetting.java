@@ -3,6 +3,7 @@ package de.alaoli.games.minecraft.mods.yadm.data.settings;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 
 public class SpawnSetting implements Setting, JsonSerializable
@@ -13,7 +14,7 @@ public class SpawnSetting implements Setting, JsonSerializable
 	
 	private Coordinate coordinate;
 	
-	private TeleportMode mode;
+	private SpawnMode mode;
 	
 	/********************************************************************************
 	 * Methods
@@ -21,7 +22,7 @@ public class SpawnSetting implements Setting, JsonSerializable
 
 	public SpawnSetting() {}
 	
-	public SpawnSetting( Coordinate coordinate, TeleportMode mode )
+	public SpawnSetting( Coordinate coordinate, SpawnMode mode )
 	{
 		this.coordinate = coordinate;
 		this.mode = mode;
@@ -32,7 +33,7 @@ public class SpawnSetting implements Setting, JsonSerializable
 		return this.coordinate;
 	}
 
-	public TeleportMode getMode() 
+	public SpawnMode getMode() 
 	{
 		return this.mode;
 	}
@@ -74,11 +75,35 @@ public class SpawnSetting implements Setting, JsonSerializable
 	@Override
 	public void deserialize( JsonValue json )
 	{
+		if( !json.isObject() ) { throw new DataException( "SpawnSetting isn't a JsonObject." ); }
+		
+		JsonObject obj = json.asObject();		
+		
+		if( obj.get( "x" ) == null ) { throw new DataException( "SpawnSetting 'x' coordinate is missing." ); }
+		if( !obj.get( "x" ).isNumber() ) { throw new DataException( "SpawnSetting 'x' coordinate isn't a number." ); }
+		if( obj.get( "y" ) == null ) { throw new DataException( "SpawnSetting 'y' coordinate is missing." ); }
+		if( !obj.get( "y" ).isNumber() ) { throw new DataException( "SpawnSetting 'y' coordinate isn't a number." ); }
+		if( obj.get( "z" ) == null ) { throw new DataException( "SpawnSetting 'z' coordinate is missing." ); }
+		if( !obj.get( "z" ).isNumber() ) { throw new DataException( "SpawnSetting 'z' coordinate isn't a number." ); }
+		
 		this.coordinate = new Coordinate(
-			json.asObject().get( "x" ).asInt(),
-			json.asObject().get( "y" ).asInt(),
-			json.asObject().get( "z" ).asInt()
+			obj.get( "x" ).asInt(),
+			obj.get( "y" ).asInt(),
+			obj.get( "z" ).asInt()
 		);
-		this.mode = TeleportMode.get( json.asObject().get( "mode" ).asString() );
+		
+		if( obj.get( "mode" ) != null )
+		{
+			if( !obj.get( "mode" ).isString() ) { throw new DataException( "SpawnSetting 'mode' coordinate isn't a string." ); }
+			
+			this.mode = SpawnMode.get( json.asObject().get( "mode" ).asString() );
+			
+			if( this.mode == null ) { throw new DataException( "SpawnSetting 'mode' is invalid." ); }
+		}
+		else
+		{
+			//Default
+			this.mode = SpawnMode.TOPDOWN;
+		}
 	}	
 }
