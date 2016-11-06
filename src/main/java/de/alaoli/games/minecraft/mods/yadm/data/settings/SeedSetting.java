@@ -33,8 +33,14 @@ public class SeedSetting implements Setting, JsonSerializable, Packageable, Inje
 		if( ( this.value == null ) && ( this.isRandom ) )
 		{
 			this.value = (new Random()).nextLong();
+			this.isRandom = false;
 		}
 		return this.value;
+	}
+	
+	public boolean isRandom()
+	{
+		return this.isRandom;
 	}
 	
 	/********************************************************************************

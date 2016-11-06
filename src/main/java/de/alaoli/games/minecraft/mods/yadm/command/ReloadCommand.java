@@ -32,7 +32,7 @@ public class ReloadCommand extends Command
 	@Override
 	public void processCommand( CommandParser command ) 
 	{
-		TemplateManager.instance.reload();
+		TemplateManager.INSTANCE.load();
 	}
 
 }

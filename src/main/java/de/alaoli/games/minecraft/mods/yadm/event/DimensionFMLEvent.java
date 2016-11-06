@@ -28,7 +28,7 @@ public class DimensionFMLEvent
     {
     	Log.info( "Client connected..." );
 
-    	if( !YADimensionManager.instance.isEmpty() )
+    	if( !YADimensionManager.INSTANCE.isEmpty() )
     	{
 	    	EntityPlayerMP player = ((NetHandlerPlayServer) event.handler).playerEntity;
 	    	
@@ -41,7 +41,7 @@ public class DimensionFMLEvent
 	    	Dimension dimension;
 	    	Set<Dimension> dimensions = new HashSet<Dimension>(); 
 
-			for( Entry<String, Manageable> groupEntry : YADimensionManager.instance.getAll() )
+			for( Entry<String, Manageable> groupEntry : YADimensionManager.INSTANCE.getAll() )
 			{	
 				for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
 				{
@@ -50,7 +50,9 @@ public class DimensionFMLEvent
 		    		
 					msg = new StringBuilder()
 						.append( "- Dimension '" )
-						.append( dimension.getName() )
+						.append( dimension.getManageableGroupName() )
+						.append( ":" )
+						.append( dimension.getManageableName() )
 						.append( "' with ID '" )
 						.append( dimension.getId() )
 						.append( "'." );

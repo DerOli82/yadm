@@ -43,16 +43,16 @@ public class ListDimensionCommand extends Command
 		
 		command.getSender().addChatMessage( new ChatComponentText( "Registered Dimensions:" ) );
 		
-		for( Entry<String, Manageable> groupEntry : YADimensionManager.instance.getAll() )
+		for( Entry<String, Manageable> groupEntry : YADimensionManager.INSTANCE.getAll() )
 		{	
-			command.getSender().addChatMessage( new ChatComponentText( " - " + groupEntry.getValue().getManageableName() + ":" ) );
+			command.getSender().addChatMessage( new ChatComponentText( " - " + groupEntry.getValue().getManageableGroupName() + ":" ) );
 			
 			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
 			{
 				dimension = (Dimension)dimensionEntry.getValue();
 				msg = new StringBuilder()
 					.append( "    - '" )
-					.append( dimension.getName() )
+					.append( dimension.getManageableName() )
 					.append( "' with ID '" )
 					.append( dimension.getId() )
 					.append( "'" );

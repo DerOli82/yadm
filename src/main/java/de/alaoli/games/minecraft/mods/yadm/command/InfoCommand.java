@@ -42,10 +42,10 @@ public class InfoCommand extends Command
 		
 		command.getSender().addChatMessage( new ChatComponentText( "Current dimension info:" ) );
 		
-		if( YADimensionManager.instance.exists( dimensionId ) )
+		if( YADimensionManager.INSTANCE.exists( dimensionId ) )
 		{
-			Dimension dimension = YADimensionManager.instance.get( dimensionId ); 
-			world = YADimensionManager.instance.getWorldServerForDimension( dimension );
+			Dimension dimension = YADimensionManager.INSTANCE.get( dimensionId ); 
+			world = YADimensionManager.INSTANCE.getWorldServerForDimension( dimension );
 			
 			if( dimension.hasOwner() )
 			{

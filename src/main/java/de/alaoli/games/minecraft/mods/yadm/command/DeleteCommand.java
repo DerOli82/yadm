@@ -64,8 +64,8 @@ public class DeleteCommand extends Command
 		{
 			TeleportUtil.emergencyTeleport( player );
 		}
-		YADimensionManager.instance.delete( dimension );
+		YADimensionManager.INSTANCE.delete( dimension );
 		YADM.proxy.unregisterDimension( dimension );
-		command.getSender().addChatMessage( new ChatComponentText( "Dimension '" + dimension.getName() + "' removed." ) );
+		command.getSender().addChatMessage( new ChatComponentText( "Dimension '" + dimension.getManageableGroupName() + ":" + dimension.getManageableName() + "' removed." ) );
 	}
 }

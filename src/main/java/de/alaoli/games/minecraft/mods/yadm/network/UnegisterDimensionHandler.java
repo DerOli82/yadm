@@ -16,11 +16,11 @@ public class UnegisterDimensionHandler implements IMessageHandler<UnregisterDime
 		
 		int dimensionId = message.getDimensionId();
 		
-		if( YADimensionManager.instance.exists( dimensionId ) )
+		if( YADimensionManager.INSTANCE.exists( dimensionId ) )
 		{
-			Dimension dimension = YADimensionManager.instance.get( dimensionId );	
-			YADimensionManager.instance.unregister( dimension );
-			YADimensionManager.instance.remove( dimension );
+			Dimension dimension = YADimensionManager.INSTANCE.get( dimensionId );	
+			YADimensionManager.INSTANCE.unregister( dimension );
+			YADimensionManager.INSTANCE.remove( dimension );
 		}
 		return null;
 	}

@@ -22,7 +22,7 @@ import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraft.world.storage.WorldInfo;
 
-public class Dimension extends SettingGroup implements Manageable, JsonSerializable, Packageable, Injectable
+public class Dimension extends SettingGroup implements Manageable, JsonSerializable, Packageable, Injectable 
 {
 	/********************************************************************************
 	 * Attributes
@@ -75,16 +75,6 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		return this.id;
 	}
 
-	public String getGroup() 
-	{
-		return this.group;
-	}
-	
-	public String getName() 
-	{
-		return this.name;
-	}
-
 	public UUID getOwner()
 	{
 		return this.owner;
@@ -134,6 +124,24 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	 * Methods - Implement Manageable
 	 ********************************************************************************/
 
+	@Override
+	public void setManageableGroupName( String name ) 
+	{
+		this.group = name;
+	}
+	
+	@Override
+	public String getManageableGroupName() 
+	{
+		return this.group;
+	}
+	
+	@Override
+	public void setManageableName( String name ) 
+	{
+		this.name = name;
+	}
+	
 	@Override
 	public String getManageableName() 
 	{

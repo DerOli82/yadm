@@ -141,11 +141,11 @@ public class CommandParser
 		String[] groupAndName = this.parseGroupAndName();
 
 		//Template exists?
-		if( !TemplateManager.instance.exists( groupAndName[0], groupAndName[1] ) ) 
+		if( !TemplateManager.INSTANCE.exists( groupAndName[0], groupAndName[1] ) ) 
 		{
 			throw new CommandParserException( "Template '" + groupAndName[0] + ":" + groupAndName[1] + "' doesn't exists." );
 		}
-		return (Template) TemplateManager.instance.get( groupAndName[0], groupAndName[1] );
+		return (Template) TemplateManager.INSTANCE.get( groupAndName[0], groupAndName[1] );
 	}
 	
 	public Dimension parseDimension() throws CommandParserException
@@ -162,9 +162,9 @@ public class CommandParser
 		{
 			int id = Integer.valueOf( value );
 			
-			if( YADimensionManager.instance.exists( id ) )
+			if( YADimensionManager.INSTANCE.exists( id ) )
 			{
-				dimension = YADimensionManager.instance.get( id );
+				dimension = YADimensionManager.INSTANCE.get( id );
 			}
 			else
 			{
@@ -184,11 +184,11 @@ public class CommandParser
 		{
 			String[] groupAndName = this.parseGroupAndName( value );
 			
-			if( !YADimensionManager.instance.exists( groupAndName[0], groupAndName[1] ) )
+			if( !YADimensionManager.INSTANCE.exists( groupAndName[0], groupAndName[1] ) )
 			{
 				throw new CommandParserException( "Dimension '" + groupAndName[0] + ":" + groupAndName[1] + "' doesn't exists." );
 			}
-			dimension = YADimensionManager.instance.get( groupAndName[0], groupAndName[1] );
+			dimension = YADimensionManager.INSTANCE.get( groupAndName[0], groupAndName[1] );
 		}
 		
 		if( dimension == null )
@@ -204,11 +204,11 @@ public class CommandParser
 		Template template = this.parseTemplate();
 		String[] groupAndName = this.parseGroupAndName();
 
-		if( YADimensionManager.instance.exists( groupAndName[0], groupAndName[1] ) )
+		if( YADimensionManager.INSTANCE.exists( groupAndName[0], groupAndName[1] ) )
 		{
 			throw new CommandParserException( "Dimension '" + groupAndName[0] + ":" + groupAndName[1] + "' already exists." );
 		}
-		Dimension dimension = YADimensionManager.instance.create( groupAndName[0], groupAndName[1], template );
+		Dimension dimension = YADimensionManager.INSTANCE.create( groupAndName[0], groupAndName[1], template );
 		
 		if( dimension == null )
 		{

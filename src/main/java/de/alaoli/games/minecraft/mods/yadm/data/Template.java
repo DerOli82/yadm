@@ -29,16 +29,6 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 		this.name = name;
 	}
 	
-	public String getGroup() 
-	{
-		return this.group;
-	}
-	
-	public String getName() 
-	{
-		return this.name;
-	}
-	
 	/********************************************************************************
 	 * Methods - Implement Setting
 	 ********************************************************************************/
@@ -59,6 +49,24 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 	 * Methods - Implement Manageable
 	 ********************************************************************************/
 
+	@Override
+	public void setManageableGroupName( String name ) 
+	{
+		this.group = name;
+	}
+	
+	@Override
+	public String getManageableGroupName() 
+	{
+		return this.group;
+	}
+	
+	@Override
+	public void setManageableName( String name ) 
+	{
+		this.name = name;
+	}
+	
 	@Override
 	public String getManageableName() 
 	{

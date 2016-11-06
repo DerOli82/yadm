@@ -9,6 +9,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 
 public abstract class ManageableGroup implements Manageable, JsonSerializable
@@ -67,29 +68,50 @@ public abstract class ManageableGroup implements Manageable, JsonSerializable
 	{
 		return this.data.entrySet();
 	}
-	
+
 	/********************************************************************************
 	 * Methods - Implement Manageable
 	 ********************************************************************************/
 
 	@Override
+	public void setManageableGroupName( String name ) 
+	{
+		this.setManageableName( name );
+	}
+	
+	@Override
+	public String getManageableGroupName() 
+	{
+		return this.getManageableName();
+	}
+	
+	@Override
+	public void setManageableName( String name ) 
+	{
+		this.name = name;
+	}
+	
+	@Override
 	public String getManageableName() 
 	{
 		return this.name;
-	}
+	}	
 	
 	/********************************************************************************
 	 * Methods - Implement JsonSerializable
 	 ********************************************************************************/
 
 	@Override
-	public JsonValue serialize() 
+	public JsonValue serialize() throws DataException
 	{
+		Manageable data;
 		JsonObject json = new JsonObject();
 		JsonArray array = new JsonArray();
 		
-		for( Manageable data : this.data.values() )
+		for( Entry<String, Manageable> entry : this.getAll() )
 		{
+			data = entry.getValue();
+
 			if( data instanceof JsonSerializable )
 			{
 				array.add( ((JsonSerializable)data).serialize() );
@@ -101,20 +123,26 @@ public abstract class ManageableGroup implements Manageable, JsonSerializable
 	}
 
 	@Override
-	public void deserialize( JsonValue json )
+	public void deserialize( JsonValue json ) throws DataException
 	{
+		if( !json.isObject() ) { throw new DataException( "ManageableGroup isn't a JsonObject." ); }
+		
+		JsonObject obj = json.asObject();
+		
+		if( obj.get( this.getManageableGroupName() ) == null ) { throw new DataException( "ManageableGroup is missing." ); }
+		if( !obj.get( this.getManageableGroupName() ).isArray() ) { throw new DataException( "ManageableGroup isn't an array." ); }
+		
 		Manageable data;
-		JsonArray array = json.asObject().get( this.getManageableName() ).asArray();
+		JsonArray array = obj.get( this.getManageableName() ).asArray();
 		
 		for( JsonValue value : array )
 		{
 			data = this.create();
 			
-			if( data != null )
-			{
-				((JsonSerializable)data).deserialize( value );
-				this.add( data );
-			}
+			data.setManageableGroupName( this.getManageableGroupName() );
+			((JsonSerializable)data).deserialize( value );
+			
+			this.add( data );
 		}
-	}	
+	}		
 }

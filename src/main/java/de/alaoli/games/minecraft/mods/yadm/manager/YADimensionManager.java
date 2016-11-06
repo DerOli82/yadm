@@ -1,28 +1,22 @@
 package de.alaoli.games.minecraft.mods.yadm.manager;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.WriterConfig;
-
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.SeedSetting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldServerGeneric;
 import net.minecraft.server.MinecraftServer;
@@ -36,16 +30,19 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 
-public class YADimensionManager extends AbstractManager 
+public class YADimensionManager extends ManageableGroup implements JsonFileAdapter 
 {
 	/********************************************************************************
 	 * Attributes
 	 ********************************************************************************/
 	
-	public static final YADimensionManager instance = new YADimensionManager();
+	public static final YADimensionManager INSTANCE = new YADimensionManager();
 	
 	private static int nextId = Config.Dimension.beginsWithId;
 	
+	private boolean dirty;
+	
+	private Map<Integer, Dimension> dimensionIdMapping;
 	private Map<Integer, Dimension> deletedDimensions;
 	
 	/********************************************************************************
@@ -54,31 +51,55 @@ public class YADimensionManager extends AbstractManager
 	
 	private YADimensionManager() 
 	{
-		super( "dimensions" );
+		super( null );
 		
-		//Initialize default group
-		this.add( new DimensionGroup( "default" ) );
+		this.dimensionIdMapping = new HashMap<Integer, Dimension>();
 		this.deletedDimensions = new HashMap<Integer, Dimension>();
 	}
 	
+	public void add( Dimension dimension )
+	{
+		if( !this.exists( dimension.getManageableGroupName() ) )
+		{
+			this.add( new DimensionGroup( dimension.getManageableGroupName(), this.getSavePath() ) );
+		}
+		ManageableGroup group = (ManageableGroup)this.get( dimension.getManageableGroupName() );
+		
+		group.add( dimension );
+		this.dimensionIdMapping.put( dimension.getId(), dimension );
+	}
+	
+	public void remove( Dimension dimension )
+	{
+		if( this.exists( dimension.getManageableGroupName() ) )
+		{
+			ManageableGroup group = (ManageableGroup)this.get( dimension.getManageableGroupName() );
+			
+			group.remove( dimension );
+			this.dimensionIdMapping.remove( dimension.getId() );
+			
+			if( group.isEmpty() )
+			{
+				this.remove( group );
+			}
+		}
+	}
 	
 	public boolean exists( int id )
 	{
-		if( this.get( id ) == null ) { return false; }
-		
-		return true;
+		return this.dimensionIdMapping.containsKey( id );
 	}
 	
 	public boolean exists( Dimension dimension )
 	{
-		return this.exists( dimension.getGroup(), dimension.getName() );
+		return this.exists( dimension.getManageableGroupName(), dimension.getManageableGroupName() );
 	}
 	
 	public boolean exists( String group, String name )
 	{
 		if( this.exists( group ) )
 		{
-			ManageableGroup manageable = (ManageableGroup) this.get( group );
+			ManageableGroup manageable = (ManageableGroup)this.get( group );
 			
 			if( manageable.exists( name) )
 			{
@@ -87,28 +108,10 @@ public class YADimensionManager extends AbstractManager
 		}
 		return false;
 	}
-	
-	/********************************************************************************
-	 * Methods - Getter/Setter
-	 ********************************************************************************/
 
 	public Dimension get( int id )
 	{
-		Dimension dimension;
-		
-		for( Entry<String, Manageable> groupEntry : this.getAll() )
-		{	
-			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
-			{
-				dimension = (Dimension) dimensionEntry.getValue();
-		
-				if( dimension.getId() == id )
-				{
-					return dimension;
-				}
-			}
-		}
-		return null;
+		return this.dimensionIdMapping.get( id );
 	}
 	
 	public Dimension get( String group, String name )
@@ -146,20 +149,18 @@ public class YADimensionManager extends AbstractManager
 		return result;
 	}
 	
-	public void remove( Dimension dimension )
-	{
-		DimensionGroup group = (DimensionGroup) this.get(dimension.getGroup() );
-		group.remove( dimension );
-		this.dirty = true;
-	}
-	
+
 	/********************************************************************************
 	 * Methods - Manage Dimensions
 	 ********************************************************************************/
 	
-	public int nextDimensionId()
+	/**
+	 * Returns next free dimension id
+	 * 
+	 * @return
+	 */
+	public static int nextDimensionId()
 	{
-		//Check for next ID
 		while( DimensionManager.isDimensionRegistered( nextId ) )
 		{
 			nextId++;
@@ -172,21 +173,14 @@ public class YADimensionManager extends AbstractManager
 	 */
 	public void register()
 	{
-		Dimension dimension;
-		
-		for( Entry<String, Manageable> groupEntry : this.getAll() )
-		{	
-			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
+		for( Dimension dimension : this.dimensionIdMapping.values() )
+		{
+			if( !dimension.isRegistered() )
 			{
-				dimension = (Dimension) dimensionEntry.getValue();
-			
-				if( !dimension.isRegistered() )
-				{
-					this.register( dimension );
-					this.init( dimension );
-				}
-			}
-		}	
+				this.register( dimension );
+				this.init( dimension );
+			}			
+		}
 	}
 	
 	/**
@@ -218,7 +212,9 @@ public class YADimensionManager extends AbstractManager
 			
 			StringBuilder msg = new StringBuilder()
 				.append( "Register Dimension '" )
-				.append( dimension.getName() )
+				.append( dimension.getManageableGroupName() )
+				.append( ":" )
+				.append( dimension.getManageableName() )
 				.append( "' with ID '" )
 				.append( dimension.getId() )
 				.append( "' and Provider '" )
@@ -274,30 +270,21 @@ public class YADimensionManager extends AbstractManager
 	
 	public Dimension create( String group, String name, Template template ) 
 	{
-		Dimension dimension = new Dimension( this.nextDimensionId(), group, name );
+		Dimension dimension = new Dimension( nextDimensionId(), group, name );
+		
 		dimension.add( template.getAll() );
+		this.add( dimension );
+		this.setDirty( true );
 		
-		//Create new group
-		if( !this.exists( group ) )
+		//Initialize random seed
+		if( ( dimension.hasSetting( SettingType.SEED ) ) &&
+			( ((SeedSetting)dimension.get( SettingType.SEED )).isRandom() ) )
 		{
-			this.add( new DimensionGroup( group ) );
+			((SeedSetting)dimension.get( SettingType.SEED )).getValue();
 		}
-		((ManageableGroup)this.get( group )).add( dimension );
-		
 		return dimension;
 	}
-	
-	public void backup( Dimension dimension )
-	{
-		//TODO
-		Log.info("Backup feature not implemented yet!");
-	}
-	
-	public void delete( String name )
-	{
-		this.delete( (Dimension)this.get(name) );
-	}
-	
+
 	public void delete( Dimension dimension )
 	{
 		this.deletedDimensions.put( dimension.getId(), dimension );
@@ -306,6 +293,11 @@ public class YADimensionManager extends AbstractManager
 		DimensionManager.unloadWorld( dimension.getId() );
 	}
 	
+	/**
+	 * Delete dimension folder
+	 * 
+	 * @param world
+	 */
 	public void delete( World world )
 	{
 		if( !this.deletedDimensions.containsKey( world.provider.dimensionId ) ) { return; }
@@ -330,6 +322,8 @@ public class YADimensionManager extends AbstractManager
 			try 
 			{
 				FileUtils.deleteDirectory( file );
+				this.setDirty( true );
+				
 				Log.info( "Dimenson folder 'DIM" + dimension.getId() + "' deleted!" );
 			}
 			catch ( IOException e ) 
@@ -337,6 +331,24 @@ public class YADimensionManager extends AbstractManager
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void unregister()
+	{
+		Dimension dimension;
+		
+		for( Entry<String, Manageable> groupEntry : this.getAll() )
+		{	
+			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
+			{
+				dimension = (Dimension) dimensionEntry.getValue();
+			
+				if( dimension.isRegistered() )
+				{
+					this.unregister( dimension );
+				}
+			}
+		}			
 	}
 	
 	public void unregister( Dimension dimension )
@@ -350,7 +362,9 @@ public class YADimensionManager extends AbstractManager
 			{
 				msg = new StringBuilder()
 					.append( "Unregister Dimension '" )
-					.append( dimension.getName() )
+					.append( dimension.getManageableGroupName() )
+					.append( ":" )
+					.append( dimension.getManageableName() )
 					.append( "' with ID '" )
 					.append( dimension.getId() )
 					.append( "'." );
@@ -362,7 +376,9 @@ public class YADimensionManager extends AbstractManager
 			{
 				msg = new StringBuilder()
 					.append( "Couldn't unregister Dimension '" )
-					.append( dimension.getName() )
+					.append( dimension.getManageableGroupName() )
+					.append( ":" )
+					.append( dimension.getManageableName() )
 					.append( "' with ID '" )
 					.append( dimension.getId() )
 					.append( "'.");
@@ -395,7 +411,9 @@ public class YADimensionManager extends AbstractManager
 		{
 			msg = new StringBuilder()
 				.append( "Dimension '" )
-				.append( dimension.getName() )
+				.append( dimension.getManageableGroupName() )
+				.append( ":" )
+				.append( dimension.getManageableName() )
 				.append( "' with ID '" )
 				.append( dimension.getId() )
 				.append( "' already unregistered.");
@@ -403,24 +421,6 @@ public class YADimensionManager extends AbstractManager
 		}
 		dimension.setRegistered( false );
 		YADM.proxy.unregisterDimension( dimension );
-	}
-
-	public void unregister()
-	{
-		Dimension dimension;
-		
-		for( Entry<String, Manageable> groupEntry : this.getAll() )
-		{	
-			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
-			{
-				dimension = (Dimension) dimensionEntry.getValue();
-			
-				if( dimension.isRegistered() )
-				{
-					this.unregister( dimension );
-				}
-			}
-		}			
 	}
 
 	/**
@@ -436,105 +436,104 @@ public class YADimensionManager extends AbstractManager
 
 	/********************************************************************************
 	 * Methods - Implement ManageableGroup
-	 ********************************************************************************/
-	
+	 ********************************************************************************/	
+
 	@Override
 	public Manageable create() 
 	{
 		return null;
-	}
-	
+	}	
+
 	/********************************************************************************
-	 * Methods - Implement AbstractManager
+	 * Methods - Implement JsonFileAdapter
 	 ********************************************************************************/
-
-	@Override
-	public void load() 
-	{
-		String groupName;
-		Dimension dimension;
-		InputStreamReader reader;
-		StringBuilder path = new StringBuilder()
-			.append( DimensionManager.getCurrentSaveRootDirectory() )
-			.append( File.separator )
-			.append( "data" )
-			.append( File.separator )
-			.append( YADM.MODID )
-			.append( File.separator );
-		File folder	= new File( path.toString() );
-		
-		//Create folder
-		if( !folder.exists() )
-		{
-			folder.mkdir();
-		}
-		File[] files = folder.listFiles();
-
-		for( File file : files ) 
-		{
-			if( ( file.isFile() ) && 
-				( file.getName().endsWith(".json") ) )
-			{
-				try 
-				{
-					groupName = file.getName().replace( ".json", "" );
-					reader = new InputStreamReader( new FileInputStream( file.toString() ), "UTF-8" );
-
-					//Initialize group 
-					if( !this.exists( groupName ) )
-					{
-						this.add( new DimensionGroup( groupName ) );
-					}
-					((JsonSerializable)this.get( groupName )).deserialize( Json.parse( reader ) );
-					
-					reader.close();
-				}
-				catch ( IOException e ) 
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-	}
 	
 	@Override
-	public void save() 
+	public void setSavePath( String savePath ) {}
+
+	@Override
+	public String getSavePath() 
 	{
-		//Nothing to do
-		if( !this.dirty ) { return; }
+		return DimensionManager.getCurrentSaveRootDirectory() + File.separator + "data" + File.separator + YADM.MODID;
+	}
+
+	@Override
+	public void setDirty( boolean flag )
+	{
+		this.dirty = flag;
+	}
+
+	@Override
+	public boolean isDirty() 
+	{
+		if( this.dirty ) { return true; }
 		
 		Manageable data;
-		StringBuilder file;
-		OutputStreamWriter writer;
 		
 		for( Entry<String, Manageable> entry : this.getAll() )
 		{
 			data = entry.getValue();
 			
-			if( data instanceof JsonSerializable )
+			if( data instanceof JsonFileAdapter )
 			{
-				file = new StringBuilder()
-						.append( DimensionManager.getCurrentSaveRootDirectory() )
-						.append( File.separator )
-						.append( "data" )
-						.append( File.separator )
-						.append( YADM.MODID )
-						.append( File.separator)
-						.append( entry.getKey() )
-						.append( ".json" );
-				
-				try 
-				{
-					writer = new OutputStreamWriter( new FileOutputStream( file.toString() ), "UTF-8" );
-					((JsonSerializable)data).serialize().writeTo( writer, WriterConfig.PRETTY_PRINT );
-					
-					writer.close();
-				}
-				catch (IOException e) 
-				{
-					e.printStackTrace();
-				}
+				if( ((JsonFileAdapter)data).isDirty() ) { return true; }
 			}
 		}
+		return false;
 	}
+
+	@Override
+	public void save() 
+	{
+		if( !this.dirty ) { return; }
+		
+		Manageable data;
+		
+		for( Entry<String, Manageable> entry : this.getAll() )
+		{
+			data = entry.getValue();
+			
+			if( data instanceof JsonFileAdapter )
+			{
+				((JsonFileAdapter)data).save();
+			}		
+		}		
+	}
+
+	@Override
+	public void load() 
+	{
+		File folder	= new File( this.getSavePath() );
+		
+		if( !folder.exists() ) { folder.mkdir(); }
+		
+		Manageable data;
+		String groupName;
+		File[] files = folder.listFiles();
+		
+		for( File file : files ) 
+		{
+			if( ( file.isFile() ) && 
+				( file.getName().endsWith(".json") ) )
+			{
+				groupName = file.getName().replace( ".json", "" );
+				
+				//Initialize group 
+				if( this.exists( groupName ) )
+				{
+					data = this.get( groupName );
+				}
+				else
+				{
+					data = new DimensionGroup( groupName, this.getSavePath() ); 
+					this.add( data );
+				}
+				
+				if( data instanceof JsonFileAdapter )
+				{
+					((JsonFileAdapter)data).load();
+				}
+			}
+		}		
+	}	
 }

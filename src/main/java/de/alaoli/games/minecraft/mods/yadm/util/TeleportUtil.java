@@ -52,7 +52,7 @@ public class TeleportUtil
 	{
 		if( ( dimension == null ) || !dimension.isRegistered() || ( player == null ) ) { return false; }
 		
-		WorldServer target = YADimensionManager.instance.getWorldServerForDimension( dimension );
+		WorldServer target = YADimensionManager.INSTANCE.getWorldServerForDimension( dimension );
 		if( target == null ) { return false; }
 		
 		Coordinate coordinate;
@@ -77,7 +77,7 @@ public class TeleportUtil
 	{
 		if( ( dimension == null ) || !dimension.isRegistered() || ( player == null ) ) { return false; }
 		 
-		WorldServer target = YADimensionManager.instance.getWorldServerForDimension( dimension );
+		WorldServer target = YADimensionManager.INSTANCE.getWorldServerForDimension( dimension );
 				
 		if( target == null ) { return false; }
 			

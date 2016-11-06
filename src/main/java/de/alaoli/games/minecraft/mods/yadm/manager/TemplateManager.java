@@ -1,34 +1,31 @@
 package de.alaoli.games.minecraft.mods.yadm.manager;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.Map.Entry;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.WriterConfig;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 
-public class TemplateManager extends AbstractManager
+public class TemplateManager extends ManageableGroup implements JsonFileAdapter
 {
 	/********************************************************************************
 	 * Attribute
 	 ********************************************************************************/
 	
-	public static final TemplateManager instance = new TemplateManager();
+	public static final TemplateManager INSTANCE = new TemplateManager();
+	
+	private String savePath;
+	private boolean dirty;
 	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
 
 	private TemplateManager() 
-	{
-		super( "templates" );
+	{	
+		super( null );
+		this.dirty = false;
 	}
 	
 	/**
@@ -36,22 +33,22 @@ public class TemplateManager extends AbstractManager
 	 */
 	private void createDefaultTemplates()
 	{
-		ManageableGroup group = new TemplateGroup( "default" );
+		ManageableGroup group = new TemplateGroup( "default", this.savePath );
 		
-		Template template = new Template( "overworld" );
+		Template template = new Template( "default", "overworld" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.OVERWORLD ) );
 		group.add( template );
 		
-		template = new Template( "nether" );
+		template = new Template( "default", "nether" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.NETHER ) );
 		group.add( template );
 		
-		template = new Template( "end" );
+		template = new Template( "default", "end" );
 		template.add( new WorldProviderSetting( WorldProviderSetting.END ) );
 		group.add( template );
 
 		this.add( group );
-		this.dirty = true;
+		this.setDirty( true );
 		this.save();
 	}
 
@@ -84,11 +81,11 @@ public class TemplateManager extends AbstractManager
 			return null;
 		}
 	}
-
+	
 	/********************************************************************************
 	 * Methods - Implement ManageableGroup
-	 ********************************************************************************/
-	
+	 ********************************************************************************/	
+
 	@Override
 	public Manageable create() 
 	{
@@ -96,14 +93,73 @@ public class TemplateManager extends AbstractManager
 	}
 	
 	/********************************************************************************
-	 * Methods - Implement AbstractManager
+	 * Methods - Implement JsonFileAdapter
 	 ********************************************************************************/
 	
 	@Override
-	public void load()
+	public void setSavePath( String savePath )
 	{
-		String groupName;
-		InputStreamReader reader;
+		this.savePath = savePath;
+	}
+
+	@Override
+	public String getSavePath() 
+	{
+		return this.savePath;
+	}
+
+	@Override
+	public void setDirty( boolean flag )
+	{
+		this.dirty = flag;
+	}
+
+	@Override
+	public boolean isDirty() 
+	{
+		if( this.dirty ) { return true; }
+		
+		Manageable data;
+		
+		for( Entry<String, Manageable> entry : this.getAll() )
+		{
+			data = entry.getValue();
+			
+			if( data instanceof JsonFileAdapter )
+			{
+				if( ((JsonFileAdapter)data).isDirty() ) { return true; }
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void save() 
+	{
+		if( !this.isDirty() ) { return; }
+		
+		Manageable data;
+		
+		for( Entry<String, Manageable> entry : this.getAll() )
+		{
+			data = entry.getValue();
+			
+			if( data instanceof JsonFileAdapter )
+			{
+				((JsonFileAdapter)data).save();
+			}		
+		}
+	}
+
+	@Override
+	public void load() 
+	{
+		//Reload
+		if( this.isDirty() )
+		{
+			this.save();
+			this.clear();
+		}
 		File folder	= new File( this.getSavePath() );
 		
 		//Create folder and default template
@@ -112,6 +168,8 @@ public class TemplateManager extends AbstractManager
 			folder.mkdir();
 			this.createDefaultTemplates();
 		}
+		Manageable data;
+		String groupName;
 		File[] files = folder.listFiles();
 		
 		for( File file : files ) 
@@ -119,60 +177,22 @@ public class TemplateManager extends AbstractManager
 			if( ( file.isFile() ) && 
 				( file.getName().endsWith(".json") ) )
 			{
-				try 
-				{
-					groupName = file.getName().replace( ".json", "" );
-					reader = new InputStreamReader( new FileInputStream( file.toString() ), "UTF-8" );
-
-					//Initialize group 
-					if( !this.exists( groupName ) )
-					{
-						this.add( new TemplateGroup( groupName ) );
-					}
-					((JsonSerializable)this.get( groupName )).deserialize( Json.parse( reader ) );
-					
-					reader.close();
-				}
-				catch ( IOException e ) 
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	@Override
-	public void save() 
-	{
-		//Nothing to do
-		if( !this.dirty ) { return; }
-		
-		Manageable data;
-		StringBuilder file;
-		OutputStreamWriter writer;
-		
-		for( Entry<String, Manageable> entry : this.getAll() )
-		{
-			data = entry.getValue();
-			
-			if( data instanceof JsonSerializable )
-			{
-				file = new StringBuilder()
-					.append( this.getSavePath() )
-					.append( File.separator)
-					.append( data.getManageableName() )
-					.append( ".json" );
+				groupName = file.getName().replace( ".json", "" );
 				
-				try 
+				//Initialize group 
+				if( this.exists( groupName ) )
 				{
-					writer = new OutputStreamWriter( new FileOutputStream( file.toString() ), "UTF-8" );
-					((JsonSerializable)data).serialize().writeTo( writer, WriterConfig.PRETTY_PRINT );
-					
-					writer.close();
+					data = this.get( groupName );
 				}
-				catch (IOException e) 
+				else
 				{
-					e.printStackTrace();
+					data = new TemplateGroup( groupName, this.getSavePath() ); 
+					this.add( data );
+				}
+				
+				if( data instanceof JsonFileAdapter )
+				{
+					((JsonFileAdapter)data).load();
 				}
 			}
 		}

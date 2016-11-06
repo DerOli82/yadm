@@ -10,7 +10,7 @@ public abstract class WorldProviderInterceptor
 	{
 		if( worldProvider.getDimensionYADM() == null )
 		{
-			Dimension dimension = YADimensionManager.instance.get( dimId );
+			Dimension dimension = YADimensionManager.INSTANCE.get( dimId );
 			
 			worldProvider.setDimensionYADM( dimension );
 		}

@@ -36,8 +36,8 @@ public class CommonProxy
 		path.append( "-templates" );
 		path.append( File.separator );
 		
-		TemplateManager.instance.setSavePath( path.toString() );
-		TemplateManager.instance.load();
+		TemplateManager.INSTANCE.setSavePath( path.toString() );
+		TemplateManager.INSTANCE.load();
 		
 		MessageDispatcher.register();
 	}
@@ -50,19 +50,16 @@ public class CommonProxy
 	
 	public void serverStarting( FMLServerStartingEvent event )
 	{
-		YADimensionManager.instance.setSavePath( 
-			event.getServer().getEntityWorld().getSaveHandler().getWorldDirectory().getAbsolutePath() 
-		);
-		YADimensionManager.instance.load();
-		YADimensionManager.instance.register();
+		YADimensionManager.INSTANCE.load();
+		YADimensionManager.INSTANCE.register();
 		
 		event.registerServerCommand( new YADMCommandGroup() );
 	}
 
 	public void serverStopped( FMLServerStoppedEvent event ) 
 	{
-		YADimensionManager.instance.save();
-		YADimensionManager.instance.cleanup();
+		YADimensionManager.INSTANCE.save();
+		YADimensionManager.INSTANCE.cleanup();
 	}
 	
 	/********************************************************************************
@@ -71,8 +68,8 @@ public class CommonProxy
 	
 	public void registerDimension( Dimension dimension )
 	{
-		YADimensionManager.instance.register( dimension );
-		YADimensionManager.instance.init( dimension );
+		YADimensionManager.INSTANCE.register( dimension );
+		YADimensionManager.INSTANCE.init( dimension );
 	}
 	
 	public void unregisterDimension( Dimension dimension )

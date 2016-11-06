@@ -62,7 +62,15 @@ public abstract class Command implements ICommand
 	@Override
 	public boolean canCommandSenderUseCommand( ICommandSender sender )
 	{
-		return sender.canCommandSenderUseCommand( this.getRequiredPermissionLevel(), this.getCommandName() );
+		if( this.getRequiredPermissionLevel() >= 0 )
+		{
+			return sender.canCommandSenderUseCommand( this.getRequiredPermissionLevel(), this.getCommandName() );
+		}
+		else
+		{
+			return true;
+		}
+		
 	}
 	
 	@Override
