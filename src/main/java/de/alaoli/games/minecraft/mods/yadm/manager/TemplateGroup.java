@@ -82,7 +82,7 @@ public class TemplateGroup extends ManageableGroup implements JsonFileAdapter
 	}
 
 	@Override
-	public void save() 
+	public void save() throws IOException, DataException
 	{
 		Manageable data;
 		String fileName = this.getSavePath() + File.separator + this.getManageableGroupName() + ".json";
@@ -102,7 +102,7 @@ public class TemplateGroup extends ManageableGroup implements JsonFileAdapter
 	}
 
 	@Override
-	public void load() 
+	public void load() throws IOException, DataException 
 	{
 		Manageable data;
 		String fileName = this.getSavePath() + File.separator + this.getManageableGroupName() + ".json";		

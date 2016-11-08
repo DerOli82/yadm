@@ -1,5 +1,7 @@
 package de.alaoli.games.minecraft.mods.yadm;
 
+import java.io.IOException;
+
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
@@ -7,6 +9,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.proxy.CommonProxy;
 
 
@@ -48,13 +51,13 @@ public class YADM
     }
     
     @EventHandler
-    public void serverStarting( FMLServerStartingEvent event )
+    public void serverStarting( FMLServerStartingEvent event ) throws IOException, DataException
     {
     	YADM.proxy.serverStarting( event );
     }
     
     @EventHandler
-    public void serverStopped(FMLServerStoppedEvent event)
+    public void serverStopped(FMLServerStoppedEvent event) throws IOException, DataException
     {
     	YADM.proxy.serverStopped( event );
     }    

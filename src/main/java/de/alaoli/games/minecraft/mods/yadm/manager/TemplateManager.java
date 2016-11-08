@@ -1,8 +1,10 @@
 package de.alaoli.games.minecraft.mods.yadm.manager;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map.Entry;
 
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
@@ -49,7 +51,15 @@ public class TemplateManager extends ManageableGroup implements JsonFileAdapter
 
 		this.add( group );
 		this.setDirty( true );
-		this.save();
+		
+		try 
+		{
+			this.save();
+		}
+		catch ( DataException | IOException e )
+		{
+			e.printStackTrace();
+		}
 	}
 
 	public boolean exists( String group, String name ) 
@@ -134,7 +144,7 @@ public class TemplateManager extends ManageableGroup implements JsonFileAdapter
 	}
 
 	@Override
-	public void save() 
+	public void save() throws IOException, DataException
 	{
 		if( !this.isDirty() ) { return; }
 		
@@ -152,7 +162,7 @@ public class TemplateManager extends ManageableGroup implements JsonFileAdapter
 	}
 
 	@Override
-	public void load() 
+	public void load() throws IOException, DataException
 	{
 		//Reload
 		if( this.isDirty() )

@@ -1,6 +1,8 @@
 package de.alaoli.games.minecraft.mods.yadm.proxy;
 
 import java.io.File;
+import java.io.IOException;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -9,6 +11,7 @@ import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.command.YADMCommandGroup;
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.event.DimensionEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.DimensionFMLEvent;
@@ -37,7 +40,15 @@ public class CommonProxy
 		path.append( File.separator );
 		
 		TemplateManager.INSTANCE.setSavePath( path.toString() );
-		TemplateManager.INSTANCE.load();
+		try 
+		{
+			TemplateManager.INSTANCE.load();
+			
+		} catch ( DataException | IOException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		MessageDispatcher.register();
 	}
@@ -48,7 +59,7 @@ public class CommonProxy
 		MinecraftForge.EVENT_BUS.register( new DimensionEvent() );
 	}
 	
-	public void serverStarting( FMLServerStartingEvent event )
+	public void serverStarting( FMLServerStartingEvent event ) throws DataException, IOException
 	{
 		YADimensionManager.INSTANCE.load();
 		YADimensionManager.INSTANCE.register();
@@ -56,7 +67,7 @@ public class CommonProxy
 		event.registerServerCommand( new YADMCommandGroup() );
 	}
 
-	public void serverStopped( FMLServerStoppedEvent event ) 
+	public void serverStopped( FMLServerStoppedEvent event ) throws DataException, IOException 
 	{
 		YADimensionManager.INSTANCE.save();
 		YADimensionManager.INSTANCE.cleanup();

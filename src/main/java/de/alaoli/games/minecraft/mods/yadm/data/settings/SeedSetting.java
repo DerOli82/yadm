@@ -89,7 +89,7 @@ public class SeedSetting implements Setting, JsonSerializable, Packageable, Inje
 			this.isRandom = true;
 			this.value = null;
 		}
-		else if( obj.get( "value" ).isString() )
+		else if( obj.get( "value" ).isNumber() )
 		{
 			this.value = json.asObject().get( "value" ).asLong();
 			this.isRandom = false;

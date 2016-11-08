@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SeedSetting;
@@ -42,7 +43,7 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	
 	private boolean dirty;
 	
-	private Map<Integer, Dimension> dimensionIdMapping;
+	//private Map<Integer, Dimension> dimensionIdMapping;
 	private Map<Integer, Dimension> deletedDimensions;
 	
 	/********************************************************************************
@@ -53,7 +54,7 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	{
 		super( null );
 		
-		this.dimensionIdMapping = new HashMap<Integer, Dimension>();
+//		this.dimensionIdMapping = new HashMap<Integer, Dimension>();
 		this.deletedDimensions = new HashMap<Integer, Dimension>();
 	}
 	
@@ -66,7 +67,7 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 		ManageableGroup group = (ManageableGroup)this.get( dimension.getManageableGroupName() );
 		
 		group.add( dimension );
-		this.dimensionIdMapping.put( dimension.getId(), dimension );
+	//	this.dimensionIdMapping.put( dimension.getId(), dimension );
 	}
 	
 	public void remove( Dimension dimension )
@@ -76,7 +77,7 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 			ManageableGroup group = (ManageableGroup)this.get( dimension.getManageableGroupName() );
 			
 			group.remove( dimension );
-			this.dimensionIdMapping.remove( dimension.getId() );
+		//	this.dimensionIdMapping.remove( dimension.getId() );
 			
 			if( group.isEmpty() )
 			{
@@ -87,31 +88,47 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	
 	public boolean exists( int id )
 	{
-		return this.dimensionIdMapping.containsKey( id );
+		if( this.get( id ) == null ) { return false; }
+		
+		return true;
+		//return this.dimensionIdMapping.containsKey( id );
 	}
 	
 	public boolean exists( Dimension dimension )
 	{
-		return this.exists( dimension.getManageableGroupName(), dimension.getManageableGroupName() );
+		return this.exists( dimension.getManageableGroupName(), dimension.getManageableName() );
+		
+		//return this.exists( dimension.getId() );
 	}
 	
 	public boolean exists( String group, String name )
 	{
 		if( this.exists( group ) )
 		{
-			ManageableGroup manageable = (ManageableGroup)this.get( group );
-			
-			if( manageable.exists( name) )
-			{
-				return true;
-			}
+			return ((ManageableGroup)this.get( group )).exists( name );
 		}
 		return false;
 	}
 
 	public Dimension get( int id )
 	{
-		return this.dimensionIdMapping.get( id );
+		Dimension dimension;
+				
+		for( Entry<String, Manageable> groupEntry : this.getAll() )		
+		{			
+			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )		
+			{		
+				dimension = (Dimension) dimensionEntry.getValue();		
+				
+				if( dimension.getId() == id )		
+				{		
+					return dimension;		
+				}		
+			}		
+		}		
+		return null;
+		
+		//return this.dimensionIdMapping.get( id );
 	}
 	
 	public Dimension get( String group, String name )
@@ -173,6 +190,22 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	 */
 	public void register()
 	{
+		Dimension dimension;
+		
+ 		for( Entry<String, Manageable> groupEntry : this.getAll() )	
+ 		{			
+ 			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )		
+  			{	
+ 				dimension = (Dimension) dimensionEntry.getValue();	
+ 					 
+ 				if( !dimension.isRegistered() )					
+ 				{	
+ 					this.register( dimension );		
+ 					this.init( dimension );		
+ 				}		
+ 			}		
+ 		}			
+		/*
 		for( Dimension dimension : this.dimensionIdMapping.values() )
 		{
 			if( !dimension.isRegistered() )
@@ -180,7 +213,7 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 				this.register( dimension );
 				this.init( dimension );
 			}			
-		}
+		}*/
 	}
 	
 	/**
@@ -483,7 +516,7 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	}
 
 	@Override
-	public void save() 
+	public void save() throws IOException, DataException
 	{
 		if( !this.dirty ) { return; }
 		
@@ -501,7 +534,7 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	}
 
 	@Override
-	public void load() 
+	public void load() throws IOException, DataException
 	{
 		File folder	= new File( this.getSavePath() );
 		

@@ -1,5 +1,8 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
+import java.io.IOException;
+
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 
 public class ReloadCommand extends Command 
@@ -32,7 +35,12 @@ public class ReloadCommand extends Command
 	@Override
 	public void processCommand( CommandParser command ) 
 	{
-		TemplateManager.INSTANCE.load();
+		try {
+			TemplateManager.INSTANCE.load();
+		} catch (DataException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

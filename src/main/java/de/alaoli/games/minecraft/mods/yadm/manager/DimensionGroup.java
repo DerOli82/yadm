@@ -82,7 +82,7 @@ public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 	}
 
 	@Override
-	public void save() 
+	public void save() throws IOException, DataException
 	{
 		Manageable data;
 		String fileName = this.getSavePath() + File.separator + this.getManageableGroupName() + ".json";
@@ -102,22 +102,15 @@ public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 	}
 
 	@Override
-	public void load() 
+	public void load() throws IOException, DataException
 	{
 		Manageable data;
 		String fileName = this.getSavePath() + File.separator + this.getManageableGroupName() + ".json";		
 		
-		try
-		{
-			InputStreamReader reader = new InputStreamReader( new FileInputStream( fileName ), "UTF-8" );
-			
-			this.deserialize( Json.parse( reader ) );
-			
-			reader.close();
-		} 
-		catch ( IOException | DataException e )
-		{
-			e.printStackTrace();
-		}
+		InputStreamReader reader = new InputStreamReader( new FileInputStream( fileName ), "UTF-8" );
+		
+		this.deserialize( Json.parse( reader ) );
+		
+		reader.close();
 	}
 }
