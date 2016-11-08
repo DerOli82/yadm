@@ -1,5 +1,7 @@
-package de.alaoli.games.minecraft.mods.yadm.command;
+package de.alaoli.games.minecraft.mods.yadm.command.list;
 
+import de.alaoli.games.minecraft.mods.yadm.command.Command;
+import de.alaoli.games.minecraft.mods.yadm.command.CommandParser;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.util.ChatComponentText;
 

@@ -1,7 +1,9 @@
-package de.alaoli.games.minecraft.mods.yadm.command;
+package de.alaoli.games.minecraft.mods.yadm.command.list;
 
 import java.util.Map.Entry;
 
+import de.alaoli.games.minecraft.mods.yadm.command.Command;
+import de.alaoli.games.minecraft.mods.yadm.command.CommandParser;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.manager.ManageableGroup;

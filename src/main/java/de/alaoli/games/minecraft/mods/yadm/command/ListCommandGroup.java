@@ -1,5 +1,9 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
+import de.alaoli.games.minecraft.mods.yadm.command.list.ListDimensionCommand;
+import de.alaoli.games.minecraft.mods.yadm.command.list.ListProviderCommand;
+import de.alaoli.games.minecraft.mods.yadm.command.list.ListTypeCommand;
+
 public class ListCommandGroup extends CommandGroup
 {
 	/********************************************************************************
