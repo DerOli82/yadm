@@ -1,11 +1,16 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+
 public enum BorderSide 
 {
 	NORTH( "north" ),
 	EAST( "east" ),
 	SOUTH( "south" ),
-	WEST( "west" );
+	WEST( "west" ),
+	ALL( "all" ),
+	INSIDE( "inside" ),
+	OUTSIDE( "outside" );
 	
 	private String name;
 	
@@ -29,6 +34,6 @@ public enum BorderSide
 				return side;
 			}
 		}
-		return null;
+		throw new DataException( "Unknown BorderSide." );
 	}	
 }

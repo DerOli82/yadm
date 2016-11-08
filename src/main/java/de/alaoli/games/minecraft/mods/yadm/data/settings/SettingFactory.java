@@ -1,5 +1,9 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder.KnockbackSetting;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder.MessageSetting;
+
 public class SettingFactory 
 {
 	public static Setting createNewInstance( String name )
@@ -11,7 +15,7 @@ public class SettingFactory
 	{
 		switch( type )
 		{
-			case WORLDPROVIDER :
+			case WORLDPROVIDER : 
 				return new WorldProviderSetting();
 						
 			case WORLDTYPE :
@@ -29,8 +33,14 @@ public class SettingFactory
 			case WORLDBORDER :
 				return new WorldBorderSetting();
 				
+			case WORLDBORDER_MESSAGE :
+				return new MessageSetting();
+				
+			case WORLDBORDER_KNOCKBACK :
+				return new KnockbackSetting();
+				
 			default:
-				return null;
+				throw new DataException( "Unknown setting type." );
 		}
 	}
 }

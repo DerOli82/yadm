@@ -1,7 +1,10 @@
 package de.alaoli.games.minecraft.mods.yadm.event;
 
+import java.io.IOException;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import de.alaoli.games.minecraft.mods.yadm.data.ChunkCoordinate;
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
@@ -17,7 +20,12 @@ public class DimensionEvent
 	@SubscribeEvent
 	public void onWorldSave( WorldEvent.Save event )
 	{
-		YADimensionManager.INSTANCE.save();
+		try {
+			YADimensionManager.INSTANCE.save();
+		} catch (DataException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	@SubscribeEvent
@@ -44,42 +52,7 @@ public class DimensionEvent
 			{
 				WorldBorderSetting border = (WorldBorderSetting)dimension.get( SettingType.WORLDBORDER );
 				
-				player.addChatComponentMessage( new ChatComponentText( "x:" + event.newChunkX + " z:" + event.newChunkZ) );
-				BorderSide side = border.intersectBorder(
-					new ChunkCoordinate( event.oldChunkX, event.oldChunkZ ), 
-					new ChunkCoordinate( event.newChunkX, event.newChunkZ )
-				);
-				
-				if( side != null )
-				{
-					switch( side )
-					{
-						case NORTH:
-							player.addChatComponentMessage( new ChatComponentText( "You reached the north border." ) );
-						
-							break;
-							
-						case EAST:
-							player.addChatComponentMessage( new ChatComponentText( "You reached the east border." ) );
-							
-							break;
-							
-
-						case SOUTH:
-							player.addChatComponentMessage( new ChatComponentText( "You reached the south border." ) );
-							
-							break;
-
-						case WEST:
-							player.addChatComponentMessage( new ChatComponentText( "You reached the west border." ) );
-							
-							break;
-							
-						default:
-							break;
-					}					
-					
-				}
+				border.performAction( new WorldBorderEvent( event, dimension ) );
 			}
 		}
 	}

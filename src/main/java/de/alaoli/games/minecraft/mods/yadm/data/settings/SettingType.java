@@ -1,5 +1,7 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+
 public enum SettingType 
 {
 	WORLDPROVIDER( "worldProvider", true ),
@@ -7,7 +9,9 @@ public enum SettingType
 	SEED( "seed" ),
 	GENERATOROPTIONS( "generatorOptions" ),
 	SPAWN( "spawn" ),
-	WORLDBORDER( "border" );
+	WORLDBORDER( "border" ),
+	WORLDBORDER_MESSAGE( "border:message" ),
+	WORLDBORDER_KNOCKBACK( "border:knockback" );
 	
 	private String name;
 	
@@ -45,6 +49,6 @@ public enum SettingType
 				return type;
 			}
 		}
-		return null;
+		throw new DataException( "Unknown SettingType." );
 	}
 }
