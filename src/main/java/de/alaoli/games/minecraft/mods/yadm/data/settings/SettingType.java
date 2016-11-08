@@ -9,6 +9,7 @@ public enum SettingType
 	SEED( "seed" ),
 	GENERATOROPTIONS( "generatorOptions" ),
 	SPAWN( "spawn" ),
+	WHITELIST( "whitelist" ),
 	WORLDBORDER( "border" ),
 	WORLDBORDER_MESSAGE( "border:message" ),
 	WORLDBORDER_KNOCKBACK( "border:knockback" );

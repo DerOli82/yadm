@@ -48,6 +48,11 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	 */
 	private UUID owner;
 	
+	/**
+	 * Optional
+	 */	
+	private String ownerName;
+	
 	private boolean isRegistered;
 	
 	/********************************************************************************
@@ -80,14 +85,15 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		return this.owner;
 	}
 	
-	public void setOwner( EntityPlayer owner )
+	public String getOwnerName()
 	{
-		this.setOwner( owner.getUniqueID() );
+		return this.ownerName;
 	}
 	
-	public void setOwner( UUID owner )
+	public void setOwner( EntityPlayer owner )
 	{
-		this.owner = owner;
+		this.owner = owner.getUniqueID();
+		this.ownerName = owner.getDisplayName();
 	}
 	
 	public void setRegistered( boolean isRegistered )
@@ -163,6 +169,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		if( this.owner != null )
 		{
 			json.add( "owner", this.owner.toString() );
+			json.add( "ownerName", this.ownerName );
 		}
 		json.add( "settings", super.serialize().asArray() );
 		
@@ -191,10 +198,11 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 			this.group = obj.get( "group" ).asString();
 			this.name = obj.get( "name" ).asString();
 			
-			if( ( json.asObject().get("owner") != null ) &&
-				( json.asObject().get( "owner" ).isString() ) )
+			if( ( obj.get("owner") != null ) &&
+				( obj.get( "owner" ).isString() ) )
 			{
-				this.owner = UUID.fromString( json.asObject().get( "owner" ).asString() );
+				this.owner = UUID.fromString( obj.get( "owner" ).asString() );
+				this.ownerName = obj.get( "ownerName" ).asString();
 			}
 			super.deserialize( json );
 		}

@@ -30,6 +30,9 @@ public class SettingFactory
 			case SPAWN :
 				return new SpawnSetting();
 				
+			case WHITELIST :
+				return new WhitelistSetting();
+				
 			case WORLDBORDER :
 				return new WorldBorderSetting();
 				
