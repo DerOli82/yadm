@@ -1,6 +1,5 @@
 package de.alaoli.games.minecraft.mods.yadm.event;
 
-import cpw.mods.fml.common.eventhandler.Event;
 import de.alaoli.games.minecraft.mods.yadm.data.ChunkCoordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;

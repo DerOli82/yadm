@@ -11,7 +11,6 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import de.alaoli.games.minecraft.mods.yadm.data.ChunkCoordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
-import de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder.KnockbackSetting;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderAction;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
