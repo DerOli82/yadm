@@ -6,6 +6,7 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SpawnSetting;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.teleport.DimensionTeleport;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -14,7 +15,7 @@ import net.minecraft.world.WorldServer;
 
 public class TeleportUtil 
 {
-	private static final int OFFSETY = 3;
+	private static final int OFFSETY = 4;
 	
 	private static void preparePlayer( EntityPlayer player )
 	{
@@ -26,6 +27,25 @@ public class TeleportUtil
 		{
 			player.setSneaking( false );
 		}
+	}
+	
+	private static Coordinate safeSpawn( EntityPlayer player, Dimension dimension, Coordinate coordinate, WorldServer target )
+	{
+		Block block;
+		int y = 255;
+		
+		while( y > 0 )
+		{
+			block = target.getBlock( coordinate.x, y, coordinate.z );
+			
+			if( ( block != null ) &&
+				( !block.isAir(target, coordinate.x, y, coordinate.z ) ) )
+			{
+				return new Coordinate( coordinate.x, y + OFFSETY, coordinate.z );
+			}
+			y--;
+		}
+		return coordinate;
 	}
 	
 	public static void emergencyTeleport( EntityPlayer player )
@@ -87,6 +107,8 @@ public class TeleportUtil
 	public static boolean teleport( EntityPlayer player, Dimension dimension, Coordinate coordinate, WorldServer target )
 	{
 		if( ( dimension == null ) || !dimension.isRegistered() || ( player == null ) || ( target == null ) ) { return false; }
+		
+		coordinate = safeSpawn( player, dimension, coordinate, target );
 		
 		preparePlayer( player );
 		
