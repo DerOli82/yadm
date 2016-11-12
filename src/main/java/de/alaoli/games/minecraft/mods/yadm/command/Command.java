@@ -2,8 +2,12 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
 public abstract class Command implements ICommand
@@ -62,15 +66,27 @@ public abstract class Command implements ICommand
 	@Override
 	public boolean canCommandSenderUseCommand( ICommandSender sender )
 	{
-		if( this.getRequiredPermissionLevel() >= 0 )
-		{
-			return sender.canCommandSenderUseCommand( this.getRequiredPermissionLevel(), this.getCommandName() );
-		}
-		else
-		{
-			return true;
-		}
+		if ( this.getRequiredPermissionLevel() < 0 ) { return true; }
 		
+		if( this instanceof OwnerCommand )
+		{
+			//Check dimension owner
+			if( sender instanceof EntityPlayer )
+			{
+				EntityPlayer player = (EntityPlayer) sender;
+				
+				if( YADimensionManager.INSTANCE.exists( player.dimension ) ) 
+				{
+					Dimension dimension = YADimensionManager.INSTANCE.get( player.dimension );
+					
+					if( dimension.isOwner( player) )
+					{
+						return true;
+					}
+				}
+			}	
+		}
+		return sender.canCommandSenderUseCommand( this.getRequiredPermissionLevel(), this.getCommandName() );		
 	}
 	
 	@Override
