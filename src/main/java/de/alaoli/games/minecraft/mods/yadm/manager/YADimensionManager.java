@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.StringJoiner;
 
 import org.apache.commons.io.FileUtils;
 
@@ -487,7 +488,12 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	@Override
 	public String getSavePath() 
 	{
-		return DimensionManager.getCurrentSaveRootDirectory() + File.separator + "data" + File.separator + YADM.MODID;
+		StringJoiner joiner = new StringJoiner( File.separator )
+			.add( DimensionManager.getCurrentSaveRootDirectory().toString() )
+			.add( "data" )
+			.add( YADM.MODID )
+			.add( "dimensions" );
+		return joiner.toString();
 	}
 
 	@Override
@@ -538,7 +544,8 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	{
 		File folder	= new File( this.getSavePath() );
 		
-		if( !folder.exists() ) { folder.mkdir(); }
+		if( !folder.exists() ) { FileUtils.forceMkdir( folder ); }
+		
 		
 		Manageable data;
 		String groupName;
