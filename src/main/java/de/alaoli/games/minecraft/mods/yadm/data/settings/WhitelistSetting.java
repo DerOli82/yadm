@@ -1,7 +1,6 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -12,8 +11,8 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
-import net.minecraft.entity.player.EntityPlayer;
 
 public class WhitelistSetting implements Setting, JsonSerializable
 {
@@ -21,7 +20,7 @@ public class WhitelistSetting implements Setting, JsonSerializable
 	 * Attribute
 	 ********************************************************************************/
 	
-	private Map<UUID, String> users;
+	private Map<UUID, Player> users;
 	
 	/********************************************************************************
 	 * Methods 
@@ -29,22 +28,27 @@ public class WhitelistSetting implements Setting, JsonSerializable
 	
 	public WhitelistSetting()
 	{
-		this.users = new HashMap<UUID, String>();
+		this.users = new HashMap<UUID, Player>();
 	}
 	
-	public void add( EntityPlayer player )
+	public void add( Player player )
 	{
-		this.users.put( player.getUniqueID(), player.getDisplayName() );
+		this.users.put( player.getId(), player );
 	}
 	
-	public void remove( EntityPlayer player )
+	public void remove( Player player )
 	{
-		this.users.remove( player.getUniqueID() );
+		this.users.remove( player.getId() );
 	}
 	
-	public boolean exists( EntityPlayer player )
+	public boolean exists( Player player )
 	{
-		return this.users.containsKey( player.getUniqueID() );
+		return this.users.containsKey( player.getId() );
+	}
+	
+	public Set<Entry<UUID,Player>> getUsers()
+	{
+		return this.users.entrySet();
 	}
 	
 	/********************************************************************************
@@ -74,14 +78,9 @@ public class WhitelistSetting implements Setting, JsonSerializable
 		JsonObject json = new JsonObject();
 		JsonArray array = new JsonArray();
 		
-		for( Entry<UUID, String> entry : this.users.entrySet() )
+		for( Entry<UUID, Player> entry : this.users.entrySet() )
 		{
-			user = new JsonObject();
-			
-			user.add( "uuid", entry.getKey().toString() );
-			user.add( "name", entry.getValue() );
-			
-			array.add( user );
+			array.add( entry.getValue().serialize() );
 		}
 		json.add( "type", this.getSettingType().toString() );
 		json.add( "users", array );
@@ -101,22 +100,16 @@ public class WhitelistSetting implements Setting, JsonSerializable
 		if( obj.get( "users" ) == null ) { throw new DataException( "WhitelistSetting 'users' is missing." ); }
 		if( !obj.get( "users" ).isArray() ) { throw new DataException( "WhitelistSetting 'users' isn't an array." ); }
 		
-		JsonObject valueObj;
+		Player player;
 		JsonArray users = obj.get( "users" ).asArray();
 		
 		for( JsonValue value : users )
 		{
-			if( !value.isObject() ) { throw new DataException( "WhitelistSetting 'users' value isn't a JsonObject." ); }
+			player = new Player();
 			
-			valueObj = value.asObject();
+			player.deserialize( value );
 			
-			if( valueObj.get( "uuid" ) == null ) { throw new DataException( "WhitelistSetting 'users' value 'uuid' is missing." ); }
-			if( !valueObj.get( "uuid" ).isString() ) { throw new DataException( "WhitelistSetting 'users' value 'uuid' isn't a string." ); }
-			
-			if( valueObj.get( "name" ) == null ) { throw new DataException( "WhitelistSetting 'users' value 'name' is missing." ); }
-			if( !valueObj.get( "name" ).isString() ) { throw new DataException( "WhitelistSetting 'users' value 'name' isn't a string." ); }
-			
-			this.users.put( UUID.fromString( valueObj.get( "uuid" ).asString() ), valueObj.get( "name" ).asString() );
+			this.add( player );
 		}
 	}	
 }
