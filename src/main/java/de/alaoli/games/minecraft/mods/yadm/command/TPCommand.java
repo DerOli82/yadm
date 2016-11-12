@@ -23,12 +23,6 @@ public class TPCommand extends Command
 	 ********************************************************************************/
 	
 	@Override
-	public int getRequiredPermissionLevel() 
-	{
-		return 2;
-	}
-		
-	@Override
 	public String getCommandName() 
 	{
 		return "tp";
@@ -41,12 +35,12 @@ public class TPCommand extends Command
 	}
 	
 	@Override
-	public void processCommand( CommandParser command ) 
+	public void processCommand( Arguments command ) 
 	{
 		//Usage
 		if( command.isEmpty() )
 		{
-			this.sendUsage( command.getSender() );
+			this.sendUsage( command.sender );
 			return;
 		}
 		Dimension dimension = command.parseDimension( true );
@@ -58,14 +52,15 @@ public class TPCommand extends Command
 			coordinate = command.parseCoordinate();
 			player = command.getEntityPlayer( command.parsePlayer() );
 		}
-		catch( CommandParserException e )
+		catch( CommandException e )
 		{
 			//Ignore optional argument Exceptions
 		}
 		
-		if( player == null )
+		if( ( player == null ) && 
+			( command.senderIsEntityPlayer ) ) 
 		{
-			player = command.getSenderAsEntityPlayer();
+			player = (EntityPlayer)command.sender;
 		}
 		
 		if( coordinate == null )

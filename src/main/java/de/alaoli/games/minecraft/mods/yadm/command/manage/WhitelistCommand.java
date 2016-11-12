@@ -4,8 +4,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import de.alaoli.games.minecraft.mods.yadm.command.Command;
-import de.alaoli.games.minecraft.mods.yadm.command.CommandParser;
-import de.alaoli.games.minecraft.mods.yadm.command.OwnerCommand;
+import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
@@ -15,7 +14,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
-public class WhitelistCommand extends Command implements OwnerCommand
+public class WhitelistCommand extends Command
 {
 	/********************************************************************************
 	 * Methods
@@ -31,12 +30,6 @@ public class WhitelistCommand extends Command implements OwnerCommand
 	 ********************************************************************************/
 
 	@Override
-	public int getRequiredPermissionLevel() 
-	{
-		return 1;
-	}
-	
-	@Override
 	public String getCommandName() 
 	{
 		return "whitelist";
@@ -47,13 +40,13 @@ public class WhitelistCommand extends Command implements OwnerCommand
 	{
 		return super.getCommandUsage( sender ) + " add|remove <player> or list";
 	}
-	
+
 	@Override
-	public void processCommand( CommandParser command )
-	{
+	public void processCommand( Arguments command )
+	{		
 		String action = command.next();
 		
-		EntityPlayer owner = command.getSenderAsEntityPlayer();
+		EntityPlayer owner = (EntityPlayer)command.sender;
 		
 		if( !YADimensionManager.INSTANCE.exists( owner.dimension ) ) { return; }
 		
@@ -78,11 +71,11 @@ public class WhitelistCommand extends Command implements OwnerCommand
 				
 			case "list" :
 			default :
-				command.getSender().addChatMessage( new ChatComponentText( "Whitelist:" ) );
+				command.sender.addChatMessage( new ChatComponentText( "Whitelist:" ) );
 				
 				for( Entry<UUID, Player> entry : setting.getUsers() )
 				{
-					command.getSender().addChatMessage( new ChatComponentText( "    - '" + entry.getValue().toString() ) );
+					command.sender.addChatMessage( new ChatComponentText( "    - '" + entry.getValue().toString() ) );
 				}
 				break;
 		}

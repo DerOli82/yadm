@@ -23,24 +23,19 @@ public class InfoCommand extends Command
 	 ********************************************************************************/
 	
 	@Override
-	public int getRequiredPermissionLevel() 
-	{
-		return -1;
-	}
-	
-	@Override
 	public String getCommandName() 
 	{
 		return "info";
 	}
 
 	@Override
-	public void processCommand( CommandParser command )
+	public void processCommand( Arguments command )
 	{
 		World world;
-		int dimensionId = command.getSender().getEntityWorld().provider.dimensionId;
 		
-		command.getSender().addChatMessage( new ChatComponentText( "Current dimension info:" ) );
+		int dimensionId = command.sender.getEntityWorld().provider.dimensionId;
+		
+		command.sender.addChatMessage( new ChatComponentText( "Current dimension info:" ) );
 		
 		if( YADimensionManager.INSTANCE.exists( dimensionId ) )
 		{
@@ -49,7 +44,7 @@ public class InfoCommand extends Command
 			
 			if( dimension.hasOwner() )
 			{	
-				command.getSender().addChatMessage( new ChatComponentText( "Owner: " + dimension.getOwner().toString() ) );
+				command.sender.addChatMessage( new ChatComponentText( "Owner: " + dimension.getOwner().toString() ) );
 			}
 		}
 		else
@@ -58,11 +53,9 @@ public class InfoCommand extends Command
 		}
 		WorldInfo worldInfo = world.getWorldInfo();
 		
-		
-		
-		command.getSender().addChatMessage( new ChatComponentText( "Name: " + world.provider.getDimensionName() ) );
-		command.getSender().addChatMessage( new ChatComponentText( "ID: " + world.provider.dimensionId ) );
-		command.getSender().addChatMessage( new ChatComponentText( "Seed: " + world.getSeed() ) );
-		command.getSender().addChatMessage( new ChatComponentText( "GenOpt: " + world.provider.field_82913_c ) );
+		command.sender.addChatMessage( new ChatComponentText( "Name: " + world.provider.getDimensionName() ) );
+		command.sender.addChatMessage( new ChatComponentText( "ID: " + world.provider.dimensionId ) );
+		command.sender.addChatMessage( new ChatComponentText( "Seed: " + world.getSeed() ) );
+		command.sender.addChatMessage( new ChatComponentText( "GenOpt: " + world.provider.field_82913_c ) );
 	}
 }

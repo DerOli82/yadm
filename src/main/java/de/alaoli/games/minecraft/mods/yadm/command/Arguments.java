@@ -16,28 +16,23 @@ import net.minecraft.command.PlayerSelector;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.DimensionManager;
 
-public class CommandParser 
+public class Arguments 
 {
-	final private static String DEFAULT_GROUPNAME = "default";
-	
 	private Queue<String> args;
-	private ICommandSender sender;
 	
-	public CommandParser( ICommandSender sender, String[] args )
+	final public ICommandSender sender; 
+	final public boolean senderIsEntityPlayer; 
+	final public boolean senderIsOP;
+	
+	public Arguments( ICommandSender sender, String[] args )
 	{
-		this.sender = sender;
+		this.sender = sender;	
+		this.senderIsEntityPlayer = sender instanceof EntityPlayer;
+		this.senderIsOP = sender.canCommandSenderUseCommand( 2, "yadm" );
+		
 		this.args = new LinkedList<String>( Arrays.asList( args ) );
 	}
 
-	/**********************************************************************
-	 * Method - Sender 
-	 **********************************************************************/
-	
-	public ICommandSender getSender()
-	{
-		return this.sender;
-	}
-	
 	/**********************************************************************
 	 * Method - Arguments 
 	 **********************************************************************/
@@ -85,22 +80,31 @@ public class CommandParser
 	    return true;
 	}    
 		
+	public EntityPlayer getEntityPlayer( Player player )
+	{
+		EntityPlayer result = PlayerSelector.matchOnePlayer( this.sender, player.getManageableName() );
+		
+		if( result == null ) new CommandException( "Couldn't find player entity." );
+		
+		return result;
+	}
+	
 	/**********************************************************************
 	 * Method - Parser
 	 **********************************************************************/
 	
-	public String[] parseGroupAndName() throws CommandParserException
+	public String[] parseGroupAndName() throws CommandException
 	{
 		if( this.isEmpty() )
 		{
-			throw new CommandParserException( "Missing [<group>]:<name> argument." );
+			throw new CommandException( "Missing [<group>]:<name> argument." );
 		}
 		String name = this.next();
 		
 		return this.parseGroupAndName( name );
 	}
 	
-	public String[] parseGroupAndName( String name ) throws CommandParserException
+	public String[] parseGroupAndName( String name ) throws CommandException
 	{
 		String[] groupAndName;
 		
@@ -119,42 +123,42 @@ public class CommandParser
 		{
 			groupAndName = new String[2];
 			
-			groupAndName[0] = DEFAULT_GROUPNAME;
+			groupAndName[0] = "default";
 			groupAndName[1] = name;
 		}
 		//Values set?
 		if( ( groupAndName[0] == null  ) || 
 			( groupAndName[1] == null ) )
 		{
-			throw new CommandParserException( "Invalid [<group>]:<name> argument." );
+			throw new CommandException( "Invalid [<group>]:<name> argument." );
 		}
 		//Int not allowed
 		if( ( isInt( groupAndName[0] ) ) || 
 			( isInt( groupAndName[1] ) ) )
 		{
-			throw new CommandParserException( "Invalid [<group>]:<name> argument. Numbers aren't allowed as group or name" );
+			throw new CommandException( "Invalid [<group>]:<name> argument. Numbers aren't allowed as group or name" );
 		}
 		return groupAndName;
 	}
 	
-	public Template parseTemplate()throws CommandParserException
+	public Template parseTemplate() throws CommandException
 	{	
 		String[] groupAndName = this.parseGroupAndName();
 
 		//Template exists?
 		if( !TemplateManager.INSTANCE.exists( groupAndName[0], groupAndName[1] ) ) 
 		{
-			throw new CommandParserException( "Template '" + groupAndName[0] + ":" + groupAndName[1] + "' doesn't exists." );
+			throw new CommandException( "Template '" + groupAndName[0] + ":" + groupAndName[1] + "' doesn't exists." );
 		}
 		return (Template) TemplateManager.INSTANCE.get( groupAndName[0], groupAndName[1] );
 	}
 	
-	public Dimension parseDimension() throws CommandParserException
+	public Dimension parseDimension() throws CommandException
 	{
 		return this.parseDimension( false );
 	}
 	
-	public Dimension parseDimension( boolean includeVanillaDimensions ) throws CommandParserException
+	public Dimension parseDimension( boolean includeVanillaDimensions ) throws CommandException
 	{
 		Dimension dimension;
 		String value = this.next();
@@ -177,7 +181,7 @@ public class CommandParser
 				}
 				else
 				{
-					throw new CommandParserException( "Dimension '" + id + "' doesn't exists." );
+					throw new CommandException( "Dimension '" + id + "' doesn't exists." );
 				}
 			}
 		}
@@ -187,19 +191,19 @@ public class CommandParser
 			
 			if( !YADimensionManager.INSTANCE.exists( groupAndName[0], groupAndName[1] ) )
 			{
-				throw new CommandParserException( "Dimension '" + groupAndName[0] + ":" + groupAndName[1] + "' doesn't exists." );
+				throw new CommandException( "Dimension '" + groupAndName[0] + ":" + groupAndName[1] + "' doesn't exists." );
 			}
 			dimension = YADimensionManager.INSTANCE.get( groupAndName[0], groupAndName[1] );
 		}
 		
 		if( dimension == null )
 		{
-			throw new CommandParserException( "Couldn't find Dimension '" + value + "'." );
+			throw new CommandException( "Couldn't find Dimension '" + value + "'." );
 		}
 		return dimension;		
 	}
 	
-	public Dimension parseAndCreateDimension() throws CommandParserException
+	public Dimension parseAndCreateDimension() throws CommandException
 	{
 		Player owner = null;
 		Template template = this.parseTemplate();
@@ -207,39 +211,39 @@ public class CommandParser
 
 		if( YADimensionManager.INSTANCE.exists( groupAndName[0], groupAndName[1] ) )
 		{
-			throw new CommandParserException( "Dimension '" + groupAndName[0] + ":" + groupAndName[1] + "' already exists." );
+			throw new CommandException( "Dimension '" + groupAndName[0] + ":" + groupAndName[1] + "' already exists." );
 		}
 		Dimension dimension = YADimensionManager.INSTANCE.create( groupAndName[0], groupAndName[1], template );
 		
 		if( dimension == null )
 		{
-			throw new CommandParserException( "Couldn't create Dimension '" + groupAndName[0] + ":" + groupAndName[1] + "'." );
+			throw new CommandException( "Couldn't create Dimension '" + groupAndName[0] + ":" + groupAndName[1] + "'." );
 		}
 		
 		try
 		{
 			 owner = this.parsePlayer();
 		}
-		catch( CommandParserException e )
+		catch( CommandException e )
 		{
 			//Ignore because optional
 		}
 		
 		if( ( owner == null ) && 
-			( this.senderIsEntityPlayer() ) )
+			( this.senderIsEntityPlayer ) )
 		{
-			owner = (Player) PlayerManager.INSTANCE.get( this.getSenderAsEntityPlayer().getUniqueID() );
+			owner = (Player) PlayerManager.INSTANCE.get( ((EntityPlayer)this.sender).getUniqueID() );
 		}
 		dimension.setOwner( owner );
 		
 		return dimension;
 	}
 	
-	public Coordinate parseCoordinate() throws CommandParserException
+	public Coordinate parseCoordinate() throws CommandException
 	{
 		if( this.size() < 3 )
 		{
-			throw new CommandParserException( "Missing coordinate argument." );
+			throw new CommandException( "Missing coordinate argument." );
 		}
 		String x = this.next();
 		String y = this.next();
@@ -247,42 +251,21 @@ public class CommandParser
 		
 		if( ( !isInt( x ) ) || ( !isInt( y ) ) || ( !isInt( z ) ) )
 		{
-			throw new CommandParserException( "Invalid coordinate argument." );
+			throw new CommandException( "Invalid coordinate argument." );
 		}
 		return new Coordinate( Integer.valueOf( x ),Integer.valueOf( y ),Integer.valueOf( z ) );
 	}
 	
-	public Player parsePlayer() throws CommandParserException
+	public Player parsePlayer() throws CommandException
 	{
 		if( this.isEmpty() )
 		{
-			throw new CommandParserException( "Missing <player> argument." );
+			throw new CommandException( "Missing <player> argument." );
 		}
 		String name = this.next();
 		
-		if( !PlayerManager.INSTANCE.exists( name ) ) { throw new CommandParserException( "Couldn't find player." ); }
+		if( !PlayerManager.INSTANCE.exists( name ) ) { throw new CommandException( "Couldn't find player." ); }
 		
 		return (Player)PlayerManager.INSTANCE.get( name );
-	}
-
-	public boolean senderIsEntityPlayer()
-	{
-		return sender instanceof EntityPlayer;
-	}
-	
-	public EntityPlayer getSenderAsEntityPlayer()
-	{
-		if( !this.senderIsEntityPlayer() ) throw new CommandException( "Command sender isn't a player." );
-		
-		return (EntityPlayer)this.sender;
-	}
-	
-	public EntityPlayer getEntityPlayer( Player player )
-	{
-		EntityPlayer result = PlayerSelector.matchOnePlayer( this.sender, player.getManageableName() );
-		
-		if( result == null ) new CommandParserException( "Couldn't find player entity." );
-		
-		return result;
 	}
 }

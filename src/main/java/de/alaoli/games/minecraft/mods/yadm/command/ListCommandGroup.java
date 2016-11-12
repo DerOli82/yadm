@@ -24,20 +24,16 @@ public class ListCommandGroup extends CommandGroup
 	 ********************************************************************************/
 	
 	@Override
-	public int getRequiredPermissionLevel() 
-	{
-		return 1;
-	}
-	
-	@Override
 	public String getCommandName()
 	{
 		return "list";
 	}
 	
 	@Override
-	public void processCommand( CommandParser command )
+	public void processCommand( Arguments command )
 	{
+		super.processCommand( command );
+		
 		if( command.isEmpty() )
 		{
 			command.add( "dimension" );

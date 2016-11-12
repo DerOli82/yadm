@@ -5,6 +5,7 @@ import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
 public class CreateCommand extends Command
@@ -23,12 +24,6 @@ public class CreateCommand extends Command
 	 ********************************************************************************/
 	
 	@Override
-	public int getRequiredPermissionLevel() 
-	{
-		return 2;
-	}
-	
-	@Override
 	public String getCommandName() 
 	{
 		return "create";
@@ -41,12 +36,12 @@ public class CreateCommand extends Command
 	}
 	
 	@Override
-	public void processCommand( CommandParser command ) 
+	public void processCommand( Arguments command ) 
 	{
 		//Usage
 		if( command.size() < 2 )
 		{
-			this.sendUsage( command.getSender() );
+			this.sendUsage( command.sender );
 			return;
 		}
 		
@@ -57,22 +52,22 @@ public class CreateCommand extends Command
 			YADM.proxy.registerDimension( dimension );
 			
 			if( ( Config.Dimension.teleportOnCreate ) && 
-				( command.senderIsEntityPlayer() ) )
+				( command.senderIsEntityPlayer ) )
 			{
-				if( !TeleportUtil.teleport( command.getSenderAsEntityPlayer(), dimension ) )
+				if( !TeleportUtil.teleport( (EntityPlayer)command.sender, dimension ) )
 				{
-					command.getSender().addChatMessage( new ChatComponentText( "Can't teleport to dimension" ) );
+					command.sender.addChatMessage( new ChatComponentText( "Can't teleport to dimension" ) );
 				}
 			}			
 		}
-		catch( CommandParserException e )
+		catch( CommandException e )
 		{
 			throw e;
 		}
 		catch( RuntimeException e )
 		{
 			e.printStackTrace();
-			command.getSender().addChatMessage( new ChatComponentText( e.getMessage() ) );
+			command.sender.addChatMessage( new ChatComponentText( e.getMessage() ) );
 		}
 	}
 

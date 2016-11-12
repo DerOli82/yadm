@@ -3,7 +3,7 @@ package de.alaoli.games.minecraft.mods.yadm.command.list;
 import java.util.Map.Entry;
 
 import de.alaoli.games.minecraft.mods.yadm.command.Command;
-import de.alaoli.games.minecraft.mods.yadm.command.CommandParser;
+import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.manager.ManageableGroup;
@@ -26,28 +26,22 @@ public class ListDimensionCommand extends Command
 	 ********************************************************************************/
 	
 	@Override
-	public int getRequiredPermissionLevel() 
-	{
-		return 1;
-	}
-	
-	@Override
 	public String getCommandName() 
 	{
 		return "dimension";
 	}
 
 	@Override
-	public void processCommand( CommandParser command )
+	public void processCommand( Arguments command )
 	{
 		StringBuilder msg;
 		Dimension dimension;
 		
-		command.getSender().addChatMessage( new ChatComponentText( "Registered Dimensions:" ) );
+		command.sender.addChatMessage( new ChatComponentText( "Registered Dimensions:" ) );
 		
 		for( Entry<String, Manageable> groupEntry : YADimensionManager.INSTANCE.getAll() )
 		{	
-			command.getSender().addChatMessage( new ChatComponentText( " - " + groupEntry.getValue().getManageableGroupName() + ":" ) );
+			command.sender.addChatMessage( new ChatComponentText( " - " + groupEntry.getValue().getManageableGroupName() + ":" ) );
 			
 			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
 			{
@@ -58,7 +52,7 @@ public class ListDimensionCommand extends Command
 					.append( "' with ID '" )
 					.append( dimension.getId() )
 					.append( "'" );
-				command.getSender().addChatMessage( new ChatComponentText( msg.toString() ) );
+				command.sender.addChatMessage( new ChatComponentText( msg.toString() ) );
 			}
 		}
 	}

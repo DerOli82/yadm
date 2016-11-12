@@ -3,11 +3,8 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
 public abstract class Command implements ICommand
@@ -40,19 +37,14 @@ public abstract class Command implements ICommand
 	{
 		return this.parent;
 	}
-	
-	public int getRequiredPermissionLevel() 
-	{
-		return 4;
-	}
 
 	public void sendUsage( ICommandSender sender )
 	{
 		sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
 	}
 	
-	public abstract void processCommand( CommandParser command );
-		
+	public abstract void processCommand( Arguments args );
+	
 	/********************************************************************************
 	 * Interface - ICommand
 	 ********************************************************************************/
@@ -66,27 +58,7 @@ public abstract class Command implements ICommand
 	@Override
 	public boolean canCommandSenderUseCommand( ICommandSender sender )
 	{
-		if ( this.getRequiredPermissionLevel() < 0 ) { return true; }
-		
-		if( this instanceof OwnerCommand )
-		{
-			//Check dimension owner
-			if( sender instanceof EntityPlayer )
-			{
-				EntityPlayer player = (EntityPlayer) sender;
-				
-				if( YADimensionManager.INSTANCE.exists( player.dimension ) ) 
-				{
-					Dimension dimension = YADimensionManager.INSTANCE.get( player.dimension );
-					
-					if( dimension.isOwner( player) )
-					{
-						return true;
-					}
-				}
-			}	
-		}
-		return sender.canCommandSenderUseCommand( this.getRequiredPermissionLevel(), this.getCommandName() );		
+		return true;		
 	}
 	
 	@Override
@@ -111,8 +83,10 @@ public abstract class Command implements ICommand
 	public List getCommandAliases() 
 	{
 		List<String> list = new ArrayList<String>();
+		
 		list.add( this.getCommandName() );
-		return null;
+		
+		return list;
 	}	
 	
 	@Override
@@ -129,9 +103,9 @@ public abstract class Command implements ICommand
 	{
 		try
 		{
-			this.processCommand( new CommandParser( sender, args ) );
+			this.processCommand( new Arguments( sender, args ) );
 		}
-		catch( CommandParserException e )
+		catch( CommandException e )
 		{
 			sender.addChatMessage( new ChatComponentText( e.getMessage() ) );
 		}

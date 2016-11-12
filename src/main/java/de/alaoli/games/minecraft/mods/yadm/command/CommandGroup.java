@@ -103,11 +103,11 @@ public abstract class CommandGroup extends Command
 	}
 	
 	@Override
-	public void processCommand( CommandParser command )
+	public void processCommand( Arguments command )
 	{
 		if( command.isEmpty() )
 		{
-			this.sendUsage( command.getSender() );
+			this.sendUsage( command.sender );
 			return;
 		}
 		String arg = command.next(); 
@@ -118,7 +118,7 @@ public abstract class CommandGroup extends Command
 		}
 		else
 		{
-			this.sendUsage( command.getSender() );
+			this.sendUsage( command.sender );
 		}
 	}
 }

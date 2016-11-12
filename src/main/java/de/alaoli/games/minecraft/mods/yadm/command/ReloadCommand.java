@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
+import net.minecraft.util.ChatComponentText;
 
 public class ReloadCommand extends Command 
 {
@@ -21,25 +22,25 @@ public class ReloadCommand extends Command
 	 ********************************************************************************/
 	
 	@Override
-	public int getRequiredPermissionLevel() 
-	{
-		return 2;
-	}
-	
-	@Override
 	public String getCommandName() 
 	{
 		return "reload";
 	}
 
 	@Override
-	public void processCommand( CommandParser command ) 
+	public void processCommand( Arguments command ) 
 	{
-		try {
+		try 
+		{
 			TemplateManager.INSTANCE.load();
-		} catch (DataException | IOException e) {
-			// TODO Auto-generated catch block
+			
+			command.sender.addChatMessage( new ChatComponentText( "Templates reloaded." ) );
+		}
+		catch ( DataException | IOException e )
+		{
 			e.printStackTrace();
+			
+			throw new CommandException( "Can't reload templates." );
 		}
 	}
 

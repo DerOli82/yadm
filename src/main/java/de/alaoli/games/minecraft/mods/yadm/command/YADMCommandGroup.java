@@ -24,13 +24,7 @@ public class YADMCommandGroup extends CommandGroup
 	/********************************************************************************
 	 * Override - ICommand, Command
 	 ********************************************************************************/
-	
-	@Override
-	public int getRequiredPermissionLevel() 
-	{
-		return -1;
-	}
-	
+
 	@Override
 	public String getCommandName() 
 	{

@@ -28,12 +28,6 @@ public class DeleteCommand extends Command
 	 ********************************************************************************/
 	
 	@Override
-	public int getRequiredPermissionLevel() 
-	{
-		return 2;
-	}	
-	
-	@Override
 	public String getCommandName() 
 	{
 		return "delete";
@@ -46,12 +40,12 @@ public class DeleteCommand extends Command
 	}
 	
 	@Override
-	public void processCommand( CommandParser command ) 
+	public void processCommand( Arguments command ) 
 	{
 		//Usage
 		if( command.isEmpty() )
 		{
-			this.sendUsage( command.getSender() );
+			this.sendUsage( command.sender );
 			return;
 		}
 		Dimension dimension = command.parseDimension();
@@ -66,6 +60,6 @@ public class DeleteCommand extends Command
 		}
 		YADimensionManager.INSTANCE.delete( dimension );
 		YADM.proxy.unregisterDimension( dimension );
-		command.getSender().addChatMessage( new ChatComponentText( "Dimension '" + dimension.getManageableGroupName() + ":" + dimension.getManageableName() + "' removed." ) );
+		command.sender.addChatMessage( new ChatComponentText( "Dimension '" + dimension.getManageableGroupName() + ":" + dimension.getManageableName() + "' removed." ) );
 	}
 }
