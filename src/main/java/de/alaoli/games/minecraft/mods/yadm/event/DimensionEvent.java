@@ -7,6 +7,7 @@ import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldBorderSetting;
+import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.EntityEvent.EnteringChunk;
@@ -17,10 +18,13 @@ public class DimensionEvent
 	@SubscribeEvent
 	public void onWorldSave( WorldEvent.Save event )
 	{
-		try {
+		try 
+		{
+			PlayerManager.INSTANCE.save();
 			YADimensionManager.INSTANCE.save();
-		} catch (DataException | IOException e) {
-			// TODO Auto-generated catch block
+		}
+		catch ( DataException | IOException e )
+		{
 			e.printStackTrace();
 		}
 	}

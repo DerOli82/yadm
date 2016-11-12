@@ -13,8 +13,10 @@ import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.manager.ManageableGroup;
+import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
 import de.alaoli.games.minecraft.mods.yadm.network.SyncDimensionsMessage;
@@ -26,12 +28,20 @@ public class DimensionFMLEvent
     @SubscribeEvent( priority = EventPriority.HIGHEST )
     public void onClientConnected( FMLNetworkEvent.ServerConnectionFromClientEvent event )
     {
+    	EntityPlayerMP player = ((NetHandlerPlayServer) event.handler).playerEntity;
+    	
     	Log.info( "Client connected..." );
-
+    	
+    	//Register unknown players
+    	if( !PlayerManager.INSTANCE.exists( player ) )
+    	{
+    		PlayerManager.INSTANCE.add( new Player( player ) );
+    		PlayerManager.INSTANCE.setDirty( true );
+    	}
+    	
+    	//Sync dimensions
     	if( !YADimensionManager.INSTANCE.isEmpty() )
     	{
-	    	EntityPlayerMP player = ((NetHandlerPlayServer) event.handler).playerEntity;
-	    	
 	    	StringBuilder msg = new StringBuilder()
     			.append( "... sync Dimensions to Player '" )
 	    		.append( player.getUniqueID() )

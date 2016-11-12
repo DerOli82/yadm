@@ -2,8 +2,6 @@ package de.alaoli.games.minecraft.mods.yadm.data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -46,12 +44,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	/**
 	 * Optional
 	 */
-	private UUID owner;
-	
-	/**
-	 * Optional
-	 */	
-	private String ownerName;
+	private Player owner;
 	
 	private boolean isRegistered;
 	
@@ -80,20 +73,14 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		return this.id;
 	}
 
-	public UUID getOwner()
+	public Player getOwner()
 	{
 		return this.owner;
 	}
 	
-	public String getOwnerName()
+	public void setOwner( Player owner )
 	{
-		return this.ownerName;
-	}
-	
-	public void setOwner( EntityPlayer owner )
-	{
-		this.owner = owner.getUniqueID();
-		this.ownerName = owner.getDisplayName();
+		this.owner = owner;
 	}
 	
 	public void setRegistered( boolean isRegistered )
@@ -110,6 +97,21 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	{
 		return this.owner != null;
 	}
+	
+	public boolean isOwner( Player player )
+	{
+		if( !this.hasOwner() ) { return false; }
+		
+		return this.owner.equals( player );
+	}
+
+	public boolean isOwner( EntityPlayer player )
+	{
+		if( !this.hasOwner() ) { return false; }
+		
+		return this.owner.equals( new Player( player ) );
+	}
+	
 	/********************************************************************************
 	 * Methods - Implement Setting
 	 ********************************************************************************/
@@ -166,10 +168,10 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		json.add( "id", this.id );
 		json.add( "group", this.group );
 		json.add( "name", this.name );
+		
 		if( this.owner != null )
 		{
-			json.add( "owner", this.owner.toString() );
-			json.add( "ownerName", this.ownerName );
+			json.add( "owner", this.owner.serialize() );
 		}
 		json.add( "settings", super.serialize().asArray() );
 		
@@ -198,11 +200,12 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 			this.group = obj.get( "group" ).asString();
 			this.name = obj.get( "name" ).asString();
 			
+			//Optional
 			if( ( obj.get("owner") != null ) &&
-				( obj.get( "owner" ).isString() ) )
+				( obj.get( "owner" ).isObject() ) )
 			{
-				this.owner = UUID.fromString( obj.get( "owner" ).asString() );
-				this.ownerName = obj.get( "ownerName" ).asString();
+				this.owner = new Player();
+				this.owner.deserialize( obj.get( "owner").asObject() );
 			}
 			super.deserialize( json );
 		}
