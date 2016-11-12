@@ -13,6 +13,7 @@ public class YADMCommandGroup extends CommandGroup
 		super( null );
 		
 		this.add( new ListCommandGroup( this ) );
+		this.add( new ManageCommandGroup( this ) );
 		this.add( new ReloadCommand( this ) );
 		this.add( new CreateCommand( this ) );
 		this.add( new DeleteCommand( this ) );

@@ -1,0 +1,90 @@
+package de.alaoli.games.minecraft.mods.yadm.command.manage;
+
+import java.util.Map.Entry;
+import java.util.UUID;
+
+import de.alaoli.games.minecraft.mods.yadm.command.Command;
+import de.alaoli.games.minecraft.mods.yadm.command.CommandParser;
+import de.alaoli.games.minecraft.mods.yadm.command.OwnerCommand;
+import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.data.Player;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.WhitelistSetting;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ChatComponentText;
+
+public class WhitelistCommand extends Command implements OwnerCommand
+{
+	/********************************************************************************
+	 * Methods
+	 ********************************************************************************/
+	
+	public WhitelistCommand( Command parent ) 
+	{
+		super( parent );
+	}
+
+	/********************************************************************************
+	 * Override - ICommand, Command
+	 ********************************************************************************/
+
+	@Override
+	public int getRequiredPermissionLevel() 
+	{
+		return 1;
+	}
+	
+	@Override
+	public String getCommandName() 
+	{
+		return "whitelist";
+	}
+
+	@Override
+	public String getCommandUsage( ICommandSender sender ) 
+	{
+		return super.getCommandUsage( sender ) + " add|remove <player> or list";
+	}
+	
+	@Override
+	public void processCommand( CommandParser command )
+	{
+		String action = command.next();
+		
+		EntityPlayer owner = command.getSenderAsEntityPlayer();
+		
+		if( !YADimensionManager.INSTANCE.exists( owner.dimension ) ) { return; }
+		
+		Dimension dimension = YADimensionManager.INSTANCE.get( owner.dimension );
+		
+		if( !dimension.hasSetting( SettingType.WHITELIST ) )
+		{
+			dimension.add( new WhitelistSetting() );
+		}
+		WhitelistSetting setting = (WhitelistSetting)dimension.get( SettingType.WHITELIST );
+		Player player = command.parsePlayer();
+		
+		switch( action )
+		{
+			case "add":
+				setting.add( player );
+				break;
+				
+			case "remove":
+				setting.remove( player );
+				break;
+				
+			case "list" :
+			default :
+				command.getSender().addChatMessage( new ChatComponentText( "Whitelist:" ) );
+				
+				for( Entry<UUID, Player> entry : setting.getUsers() )
+				{
+					command.getSender().addChatMessage( new ChatComponentText( "    - '" + entry.getValue().toString() ) );
+				}
+				break;
+		}
+	}
+}
