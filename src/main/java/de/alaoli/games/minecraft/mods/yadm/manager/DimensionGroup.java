@@ -6,12 +6,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.StringJoiner;
+
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.WriterConfig;
 
+import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
+import net.minecraftforge.common.DimensionManager;
 
 public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 {
@@ -19,8 +23,6 @@ public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 	 * Attribute
 	 ********************************************************************************/
 
-	private String savePath;
-	
 	private boolean dirty;
 
 	/********************************************************************************
@@ -30,13 +32,6 @@ public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 	public DimensionGroup( String name )
 	{
 		super( name );
-		this.dirty = false;
-	}
-
-	public DimensionGroup( String name, String savePath )
-	{
-		super( name );
-		this.savePath = savePath;
 		this.dirty = false;
 	}
 		
@@ -58,15 +53,17 @@ public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 	 ********************************************************************************/
 	
 	@Override
-	public void setSavePath( String savePath )
-	{
-		this.savePath = savePath;
-	}
+	public void setSavePath( String savePath ) {}
 
 	@Override
 	public String getSavePath() 
 	{
-		return this.savePath;
+		StringJoiner joiner = new StringJoiner( File.separator )
+			.add( DimensionManager.getCurrentSaveRootDirectory().toString() )
+			.add( "data" )
+			.add( YADM.MODID )
+			.add( "dimensions" );
+		return joiner.toString();
 	}
 
 	@Override

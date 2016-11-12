@@ -63,7 +63,7 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	{
 		if( !this.exists( dimension.getManageableGroupName() ) )
 		{
-			this.add( new DimensionGroup( dimension.getManageableGroupName(), this.getSavePath() ) );
+			this.add( new DimensionGroup( dimension.getManageableGroupName() ) );
 		}
 		ManageableGroup group = (ManageableGroup)this.get( dimension.getManageableGroupName() );
 		
@@ -565,7 +565,7 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 				}
 				else
 				{
-					data = new DimensionGroup( groupName, this.getSavePath() ); 
+					data = new DimensionGroup( groupName ); 
 					this.add( data );
 				}
 				
