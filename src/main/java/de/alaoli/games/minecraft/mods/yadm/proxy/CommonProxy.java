@@ -15,6 +15,7 @@ import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.event.DimensionEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.DimensionFMLEvent;
+import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
@@ -61,6 +62,7 @@ public class CommonProxy
 	
 	public void serverStarting( FMLServerStartingEvent event ) throws DataException, IOException
 	{
+		PlayerManager.INSTANCE.load();
 		YADimensionManager.INSTANCE.load();
 		YADimensionManager.INSTANCE.register();
 		
@@ -69,6 +71,8 @@ public class CommonProxy
 
 	public void serverStopped( FMLServerStoppedEvent event ) throws DataException, IOException 
 	{
+		PlayerManager.INSTANCE.save();
+		PlayerManager.INSTANCE.cleanup();
 		YADimensionManager.INSTANCE.save();
 		YADimensionManager.INSTANCE.cleanup();
 	}

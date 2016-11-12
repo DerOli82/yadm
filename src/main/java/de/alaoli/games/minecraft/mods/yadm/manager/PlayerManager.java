@@ -63,6 +63,11 @@ public class PlayerManager extends ManageableGroup implements JsonFileAdapter
 		return null;
 	}
 	
+	public void cleanup()
+	{
+		this.clear();
+	}
+	
 	/********************************************************************************
 	 * Methods - Implement ManageableGroup
 	 ********************************************************************************/	
