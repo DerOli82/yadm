@@ -68,6 +68,13 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	
 	}
 	
+	
+	@Override
+	public String toString() 
+	{
+		return this.group + ":" + this.name;
+	}
+
 	public int getId() 
 	{
 		return this.id;
