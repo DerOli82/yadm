@@ -3,9 +3,9 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChatComponentText;
 
 public class TPCommand extends Command
 {
@@ -56,29 +56,30 @@ public class TPCommand extends Command
 		try
 		{
 			coordinate = command.parseCoordinate();
-			player = command.parsePlayer();
+			player = command.getEntityPlayer( command.parsePlayer() );
 		}
 		catch( CommandParserException e )
 		{
 			//Ignore optional argument Exceptions
 		}
+		
 		if( player == null )
 		{
-			player = command.getSender().getEntityWorld().getPlayerEntityByName( command.getSender().getCommandSenderName() );
+			player = command.getSenderAsEntityPlayer();
 		}
 		
 		if( coordinate == null )
 		{
 			if( !TeleportUtil.teleport( player, dimension ) )
 			{
-				command.getSender().addChatMessage( new ChatComponentText( "Can't teleport to dimension" ) );
+				throw new CommandException( "Can't teleport to dimension" );
 			}
 		}
 		else
 		{
 			if( !TeleportUtil.teleport( player, dimension, coordinate ) )
 			{
-				command.getSender().addChatMessage( new ChatComponentText( "Can't teleport to dimension" ) );
+				throw new CommandException( "Can't teleport to dimension" );
 			}			
 		}
 		

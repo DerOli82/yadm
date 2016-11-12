@@ -48,7 +48,7 @@ public class InfoCommand extends Command
 			world = YADimensionManager.INSTANCE.getWorldServerForDimension( dimension );
 			
 			if( dimension.hasOwner() )
-			{
+			{	
 				command.getSender().addChatMessage( new ChatComponentText( "Owner: " + dimension.getOwner().toString() ) );
 			}
 		}
@@ -57,6 +57,8 @@ public class InfoCommand extends Command
 			world = DimensionManager.getWorld( dimensionId );
 		}
 		WorldInfo worldInfo = world.getWorldInfo();
+		
+		
 		
 		command.getSender().addChatMessage( new ChatComponentText( "Name: " + world.provider.getDimensionName() ) );
 		command.getSender().addChatMessage( new ChatComponentText( "ID: " + world.provider.dimensionId ) );

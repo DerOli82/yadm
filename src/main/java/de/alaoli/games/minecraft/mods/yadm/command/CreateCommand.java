@@ -5,7 +5,6 @@ import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
 public class CreateCommand extends Command
@@ -57,11 +56,10 @@ public class CreateCommand extends Command
 
 			YADM.proxy.registerDimension( dimension );
 			
-			if( Config.Dimension.teleportOnCreate )
+			if( ( Config.Dimension.teleportOnCreate ) && 
+				( command.senderIsEntityPlayer() ) )
 			{
-				EntityPlayer player = command.getSender().getEntityWorld().getPlayerEntityByName( command.getSender().getCommandSenderName() );
-
-				if( !TeleportUtil.teleport( player, dimension ) )
+				if( !TeleportUtil.teleport( command.getSenderAsEntityPlayer(), dimension ) )
 				{
 					command.getSender().addChatMessage( new ChatComponentText( "Can't teleport to dimension" ) );
 				}

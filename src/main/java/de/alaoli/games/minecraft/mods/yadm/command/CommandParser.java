@@ -3,13 +3,14 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.UUID;
-
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
+import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerSelector;
 import net.minecraft.entity.player.EntityPlayer;
@@ -200,7 +201,7 @@ public class CommandParser
 	
 	public Dimension parseAndCreateDimension() throws CommandParserException
 	{
-		EntityPlayer owner = null;
+		Player owner = null;
 		Template template = this.parseTemplate();
 		String[] groupAndName = this.parseGroupAndName();
 
@@ -217,12 +218,20 @@ public class CommandParser
 		
 		try
 		{
-			dimension.setOwner( this.parseOwner() );
+			 owner = this.parsePlayer();
 		}
 		catch( CommandParserException e )
 		{
-			//Ignore optinal
+			//Ignore because optional
 		}
+		
+		if( ( owner == null ) && 
+			( this.senderIsEntityPlayer() ) )
+		{
+			owner = (Player) PlayerManager.INSTANCE.get( this.getSenderAsEntityPlayer().getUniqueID() );
+		}
+		dimension.setOwner( owner );
+		
 		return dimension;
 	}
 	
@@ -243,42 +252,37 @@ public class CommandParser
 		return new Coordinate( Integer.valueOf( x ),Integer.valueOf( y ),Integer.valueOf( z ) );
 	}
 	
-	public EntityPlayer parsePlayer() throws CommandParserException
+	public Player parsePlayer() throws CommandParserException
 	{
 		if( this.isEmpty() )
 		{
-			throw new CommandParserException( "Missing player argument." );
+			throw new CommandParserException( "Missing <player> argument." );
 		}
 		String name = this.next();
 		
-		EntityPlayer player = PlayerSelector.matchOnePlayer( this.sender, name );
+		if( !PlayerManager.INSTANCE.exists( name ) ) { throw new CommandParserException( "Couldn't find player." ); }
 		
-		if( player == null )
-		{
-			throw new CommandParserException( "Couldn't find player." );
-		}
-		return player;
+		return (Player)PlayerManager.INSTANCE.get( name );
+	}
+
+	public boolean senderIsEntityPlayer()
+	{
+		return sender instanceof EntityPlayer;
 	}
 	
-	public UUID parseOwner() throws CommandParserException
+	public EntityPlayer getSenderAsEntityPlayer()
 	{
-		EntityPlayer player;
+		if( !this.senderIsEntityPlayer() ) throw new CommandException( "Command sender isn't a player." );
 		
-		try
-		{
-			player = this.parsePlayer();
-		}
-		catch( CommandParserException e )
-		{
-			if( this.sender instanceof EntityPlayer )
-			{
-				player = (EntityPlayer) this.sender;
-			}
-			else
-			{
-				throw new CommandParserException( "Couldn't find owner." );
-			}
-		}
-		return player.getUniqueID();
+		return (EntityPlayer)this.sender;
+	}
+	
+	public EntityPlayer getEntityPlayer( Player player )
+	{
+		EntityPlayer result = PlayerSelector.matchOnePlayer( this.sender, player.getManageableName() );
+		
+		if( result == null ) new CommandParserException( "Couldn't find player entity." );
+		
+		return result;
 	}
 }
