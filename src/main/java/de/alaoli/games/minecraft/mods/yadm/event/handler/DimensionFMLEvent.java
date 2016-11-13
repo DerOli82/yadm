@@ -1,4 +1,4 @@
-package de.alaoli.games.minecraft.mods.yadm.event;
+package de.alaoli.games.minecraft.mods.yadm.event.handler;
 
 import java.util.HashSet;
 import java.util.Set;
