@@ -10,7 +10,6 @@ import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldBorderSetting;
-import de.alaoli.games.minecraft.mods.yadm.event.KnockbackEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
@@ -21,25 +20,6 @@ import net.minecraftforge.event.world.WorldEvent;
 
 public class DimensionEvent 
 {
-	@SubscribeEvent
-	public void onKnockback( KnockbackEvent event )
-	{
-		Log.info( "knockback event");
-		
-		EntityPlayer player = (EntityPlayer)event.entity;
-		
-		Vector2d centerPlayer = new Vector2d( 
-			event.borderEvent.chunkEvent.newChunkX - event.borderEvent.setting.getPointCenter().x,
-			event.borderEvent.chunkEvent.newChunkZ - event.borderEvent.setting.getPointCenter().z
-		);
-		centerPlayer.scale( -1 / centerPlayer.length());
-		
-		player.motionX = centerPlayer.x * 1;
-		player.motionY = 0.4D;
-		player.motionZ = centerPlayer.y * 1;
-		
-	}
-	
 	@SubscribeEvent
 	public void onWorldSave( WorldEvent.Save event )
 	{
