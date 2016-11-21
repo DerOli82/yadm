@@ -264,8 +264,15 @@ public class Arguments
 		}
 		String name = this.next();
 		
-		if( !PlayerManager.INSTANCE.exists( name ) ) { throw new CommandException( "Couldn't find player." ); }
-		
-		return (Player)PlayerManager.INSTANCE.get( name );
+		if( name.contains( "@p" ) )
+		{
+			return new Player( null, "@p" );
+		}
+		else
+		{
+			if( !PlayerManager.INSTANCE.exists( name ) ) { throw new CommandException( "Couldn't find player." ); }
+			
+			return (Player)PlayerManager.INSTANCE.get( name );
+		}
 	}
 }

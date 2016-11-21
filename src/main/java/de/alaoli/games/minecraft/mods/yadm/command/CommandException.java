@@ -6,4 +6,9 @@ public class CommandException extends RuntimeException
 	{
 		super( message );
 	}
+	
+	public CommandException( String message, Exception e )
+	{
+		super( message, e );
+	}	
 }

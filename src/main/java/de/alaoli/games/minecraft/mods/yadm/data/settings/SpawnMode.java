@@ -2,6 +2,7 @@ package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
 public enum SpawnMode 
 {
+	EXACT( "exact"),
 	TOPDOWN( "topdown" );
 	
 	private String name;

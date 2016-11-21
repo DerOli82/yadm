@@ -2,6 +2,8 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.teleport.TeleportException;
+import de.alaoli.games.minecraft.mods.yadm.teleport.TeleportSettings;
 import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -63,20 +65,13 @@ public class TPCommand extends Command
 			player = (EntityPlayer)command.sender;
 		}
 		
-		if( coordinate == null )
+		try
 		{
-			if( !TeleportUtil.teleport( player, dimension ) )
-			{
-				throw new CommandException( "Can't teleport to dimension" );
-			}
+			TeleportUtil.teleport( new TeleportSettings( dimension, player, coordinate ));
 		}
-		else
+		catch( TeleportException e )
 		{
-			if( !TeleportUtil.teleport( player, dimension, coordinate ) )
-			{
-				throw new CommandException( "Can't teleport to dimension" );
-			}			
+			throw new CommandException( e.getMessage(), e );
 		}
-		
 	}
 }
