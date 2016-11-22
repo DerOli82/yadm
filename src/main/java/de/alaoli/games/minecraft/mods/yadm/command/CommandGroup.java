@@ -103,22 +103,22 @@ public abstract class CommandGroup extends Command
 	}
 	
 	@Override
-	public void processCommand( Arguments command )
+	public void processCommand( Arguments args )
 	{
-		if( command.isEmpty() )
+		if( args.isEmpty() )
 		{
-			this.sendUsage( command.sender );
+			this.sendUsage( args.sender );
 			return;
 		}
-		String arg = command.next(); 
+		String arg = args.next(); 
 		
 		if( this.commands.containsKey( arg ) )
 		{
-			this.commands.get( arg ).processCommand( command );
+			this.commands.get( arg ).processCommand( args );
 		}
 		else
 		{
-			this.sendUsage( command.sender );
+			this.sendUsage( args.sender );
 		}
 	}
 }

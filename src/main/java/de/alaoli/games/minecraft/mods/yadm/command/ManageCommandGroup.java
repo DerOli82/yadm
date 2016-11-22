@@ -21,9 +21,26 @@ public class ManageCommandGroup extends CommandGroup
 	 * Override - ICommand, Command
 	 ********************************************************************************/
 	
+
+	
 	@Override
 	public String getCommandName()
 	{
 		return "manage";
+	}
+
+	@Override
+	public Permission requiredPermission()
+	{
+		return Permission.OWNER;
+	}
+	
+	@Override
+	public void processCommand(Arguments args) 
+	{
+		//Check permission
+		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
+		
+		super.processCommand( args );
 	}
 }

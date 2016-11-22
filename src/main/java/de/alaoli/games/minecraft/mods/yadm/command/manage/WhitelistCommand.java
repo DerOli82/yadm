@@ -4,6 +4,8 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import de.alaoli.games.minecraft.mods.yadm.command.Command;
+import de.alaoli.games.minecraft.mods.yadm.command.CommandException;
+import de.alaoli.games.minecraft.mods.yadm.command.Permission;
 import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
@@ -42,11 +44,20 @@ public class WhitelistCommand extends Command
 	}
 
 	@Override
-	public void processCommand( Arguments command )
+	public Permission requiredPermission()
+	{
+		return Permission.OWNER;
+	}	
+	
+	@Override
+	public void processCommand( Arguments args )
 	{		
-		String action = command.next();
+		//Check permission
+		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
+				
+		String action = args.next();
 		
-		EntityPlayer owner = (EntityPlayer)command.sender;
+		EntityPlayer owner = (EntityPlayer)args.sender;
 		
 		if( !YADimensionManager.INSTANCE.exists( owner.dimension ) ) { return; }
 		
@@ -57,7 +68,7 @@ public class WhitelistCommand extends Command
 			dimension.add( new WhitelistSetting() );
 		}
 		WhitelistSetting setting = (WhitelistSetting)dimension.get( SettingType.WHITELIST );
-		Player player = command.parsePlayer();
+		Player player = args.parsePlayer();
 		
 		switch( action )
 		{
@@ -71,11 +82,11 @@ public class WhitelistCommand extends Command
 				
 			case "list" :
 			default :
-				command.sender.addChatMessage( new ChatComponentText( "Whitelist:" ) );
+				args.sender.addChatMessage( new ChatComponentText( "Whitelist:" ) );
 				
 				for( Entry<UUID, Player> entry : setting.getUsers() )
 				{
-					command.sender.addChatMessage( new ChatComponentText( "    - '" + entry.getValue().toString() ) );
+					args.sender.addChatMessage( new ChatComponentText( "    - '" + entry.getValue().toString() ) );
 				}
 				break;
 		}

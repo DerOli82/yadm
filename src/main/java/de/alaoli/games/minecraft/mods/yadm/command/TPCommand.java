@@ -37,22 +37,31 @@ public class TPCommand extends Command
 	}
 	
 	@Override
-	public void processCommand( Arguments command ) 
+	public Permission requiredPermission()
 	{
+		return Permission.OPERATOR;
+	}
+	
+	@Override
+	public void processCommand( Arguments args ) 
+	{
+		//Check permission
+		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
+						
 		//Usage
-		if( command.isEmpty() )
+		if( args.isEmpty() )
 		{
-			this.sendUsage( command.sender );
+			this.sendUsage( args.sender );
 			return;
 		}
-		Dimension dimension = command.parseDimension( true );
+		Dimension dimension = args.parseDimension( true );
 		Coordinate coordinate = null;
 		EntityPlayer player = null;
 		
 		try
 		{
-			coordinate = command.parseCoordinate();
-			player = command.getEntityPlayer( command.parsePlayer() );
+			coordinate = args.parseCoordinate();
+			player = args.getEntityPlayer( args.parsePlayer() );
 		}
 		catch( CommandException e )
 		{
@@ -60,9 +69,9 @@ public class TPCommand extends Command
 		}
 		
 		if( ( player == null ) && 
-			( command.senderIsEntityPlayer ) ) 
+			( args.senderIsEntityPlayer ) ) 
 		{
-			player = (EntityPlayer)command.sender;
+			player = (EntityPlayer)args.sender;
 		}
 		
 		try

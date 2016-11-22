@@ -28,13 +28,22 @@ public class ReloadCommand extends Command
 	}
 
 	@Override
-	public void processCommand( Arguments command ) 
+	public Permission requiredPermission()
 	{
+		return Permission.OPERATOR;
+	}
+	
+	@Override
+	public void processCommand( Arguments args ) 
+	{
+		//Check permission
+		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
+		
 		try 
 		{
 			TemplateManager.INSTANCE.load();
 			
-			command.sender.addChatMessage( new ChatComponentText( "Templates reloaded." ) );
+			args.sender.addChatMessage( new ChatComponentText( "Templates reloaded." ) );
 		}
 		catch ( DataException | IOException e )
 		{

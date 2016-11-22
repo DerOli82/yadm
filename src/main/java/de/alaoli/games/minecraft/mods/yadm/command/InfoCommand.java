@@ -29,13 +29,22 @@ public class InfoCommand extends Command
 	}
 
 	@Override
-	public void processCommand( Arguments command )
+	public Permission requiredPermission()
 	{
+		return Permission.PLAYER;
+	}
+	
+	@Override
+	public void processCommand( Arguments args )
+	{
+		//Check permission
+		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
+				
 		World world;
 		
-		int dimensionId = command.sender.getEntityWorld().provider.dimensionId;
+		int dimensionId = args.sender.getEntityWorld().provider.dimensionId;
 		
-		command.sender.addChatMessage( new ChatComponentText( "Current dimension info:" ) );
+		args.sender.addChatMessage( new ChatComponentText( "Current dimension info:" ) );
 		
 		if( YADimensionManager.INSTANCE.exists( dimensionId ) )
 		{
@@ -44,7 +53,7 @@ public class InfoCommand extends Command
 			
 			if( dimension.hasOwner() )
 			{	
-				command.sender.addChatMessage( new ChatComponentText( "Owner: " + dimension.getOwner().toString() ) );
+				args.sender.addChatMessage( new ChatComponentText( "Owner: " + dimension.getOwner().toString() ) );
 			}
 		}
 		else
@@ -53,9 +62,9 @@ public class InfoCommand extends Command
 		}
 		WorldInfo worldInfo = world.getWorldInfo();
 		
-		command.sender.addChatMessage( new ChatComponentText( "Name: " + world.provider.getDimensionName() ) );
-		command.sender.addChatMessage( new ChatComponentText( "ID: " + world.provider.dimensionId ) );
-		command.sender.addChatMessage( new ChatComponentText( "Seed: " + world.getSeed() ) );
-		command.sender.addChatMessage( new ChatComponentText( "GenOpt: " + world.provider.field_82913_c ) );
+		args.sender.addChatMessage( new ChatComponentText( "Name: " + world.provider.getDimensionName() ) );
+		args.sender.addChatMessage( new ChatComponentText( "ID: " + world.provider.dimensionId ) );
+		args.sender.addChatMessage( new ChatComponentText( "Seed: " + world.getSeed() ) );
+		args.sender.addChatMessage( new ChatComponentText( "GenOpt: " + world.provider.field_82913_c ) );
 	}
 }

@@ -84,9 +84,16 @@ public class Arguments
 	{
 		EntityPlayer result = PlayerSelector.matchOnePlayer( this.sender, player.getManageableName() );
 		
-		if( result == null ) new CommandException( "Couldn't find player entity." );
+		if( result == null ) { throw new CommandException( "Couldn't find player entity." ); }
 		
 		return result;
+	}
+	
+	public EntityPlayer getSenderAsEntityPlayer()
+	{
+		if( !this.senderIsEntityPlayer ) { throw new CommandException( "Sender isn't a player." ); }
+		
+		return (EntityPlayer)this.sender;
 	}
 	
 	/**********************************************************************

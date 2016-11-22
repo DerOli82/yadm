@@ -1,6 +1,8 @@
 package de.alaoli.games.minecraft.mods.yadm.command.list;
 
 import de.alaoli.games.minecraft.mods.yadm.command.Command;
+import de.alaoli.games.minecraft.mods.yadm.command.CommandException;
+import de.alaoli.games.minecraft.mods.yadm.command.Permission;
 import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.util.ChatComponentText;
@@ -27,10 +29,19 @@ public class ListTypeCommand extends Command
 	}
 
 	@Override
-	public void processCommand( Arguments command )
+	public Permission requiredPermission()
 	{
+		return Permission.OPERATOR;
+	}
+	
+	@Override
+	public void processCommand( Arguments args )
+	{
+		//Check permission
+		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
+		
 		StringBuilder msg;
-		command.sender.addChatMessage( new ChatComponentText( "Choosable types:" ) );
+		args.sender.addChatMessage( new ChatComponentText( "Choosable types:" ) );
 		
 		for( String type : WorldBuilder.instance.getWorldTypes().keySet() )
 		{
@@ -38,7 +49,7 @@ public class ListTypeCommand extends Command
 				.append( " - '" )
 				.append( type )
 				.append( "'" );
-			command.sender.addChatMessage( new ChatComponentText( msg.toString() ) );
+			args.sender.addChatMessage( new ChatComponentText( msg.toString() ) );
 		}
 	}
 	

@@ -40,15 +40,24 @@ public class DeleteCommand extends Command
 	}
 	
 	@Override
-	public void processCommand( Arguments command ) 
+	public Permission requiredPermission()
 	{
+		return Permission.OPERATOR;
+	}
+	
+	@Override
+	public void processCommand( Arguments args ) 
+	{
+		//Check permission
+		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
+		
 		//Usage
-		if( command.isEmpty() )
+		if( args.isEmpty() )
 		{
-			this.sendUsage( command.sender );
+			this.sendUsage( args.sender );
 			return;
 		}
-		Dimension dimension = command.parseDimension();
+		Dimension dimension = args.parseDimension();
 				
 		WorldServer world = MinecraftServer.getServer().worldServerForDimension( dimension.getId() );
 		List<EntityPlayerMP> players = new ArrayList<EntityPlayerMP>(world.playerEntities);
@@ -60,6 +69,6 @@ public class DeleteCommand extends Command
 		}
 		YADimensionManager.INSTANCE.delete( dimension );
 		YADM.proxy.unregisterDimension( dimension );
-		command.sender.addChatMessage( new ChatComponentText( "Dimension '" + dimension.getManageableGroupName() + ":" + dimension.getManageableName() + "' removed." ) );
+		args.sender.addChatMessage( new ChatComponentText( "Dimension '" + dimension.getManageableGroupName() + ":" + dimension.getManageableName() + "' removed." ) );
 	}
 }

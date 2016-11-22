@@ -30,14 +30,21 @@ public class ListCommandGroup extends CommandGroup
 	}
 	
 	@Override
-	public void processCommand( Arguments command )
+	public Permission requiredPermission()
 	{
-		super.processCommand( command );
+		return Permission.OPERATOR;
+	}
+	
+	@Override
+	public void processCommand( Arguments args )
+	{
+		//Check permission
+		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
 		
-		if( command.isEmpty() )
+		if( args.isEmpty() )
 		{
-			command.add( "dimension" );
+			args.add( "dimension" );
 		}
-		super.processCommand( command );
+		super.processCommand( args );
 	}	
 }

@@ -3,8 +3,11 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
 public abstract class Command implements ICommand
@@ -42,6 +45,33 @@ public abstract class Command implements ICommand
 	{
 		sender.addChatMessage( new ChatComponentText( this.getCommandUsage( sender ) ) );
 	}
+	
+	public boolean canCommandSenderUseCommand( Arguments args )
+	{
+		if( args.senderIsOP ) { return true; }
+		
+		switch( this.requiredPermission() )
+		{				
+			case OWNER:
+				if( !args.senderIsEntityPlayer ) { return false; }
+				
+				EntityPlayer owner = args.getSenderAsEntityPlayer();
+				
+				if( !YADimensionManager.INSTANCE.exists( owner.dimension ) ) { return false; }
+				
+				Dimension dimension = YADimensionManager.INSTANCE.get( owner.dimension );
+				
+				return dimension.isOwner( owner );
+				
+			case PLAYER:
+				return args.senderIsEntityPlayer;
+				
+			default:
+				return false;
+		}
+	}
+	
+	public abstract Permission requiredPermission();
 	
 	public abstract void processCommand( Arguments args );
 	

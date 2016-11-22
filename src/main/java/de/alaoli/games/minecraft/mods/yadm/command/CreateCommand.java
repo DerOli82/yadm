@@ -38,25 +38,34 @@ public class CreateCommand extends Command
 	}
 	
 	@Override
-	public void processCommand( Arguments command ) 
+	public Permission requiredPermission()
 	{
+		return Permission.OPERATOR;
+	}
+	
+	@Override
+	public void processCommand( Arguments args ) 
+	{
+		//Check permission
+		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
+		
 		//Usage
-		if( command.size() < 2 )
+		if( args.size() < 2 )
 		{
-			this.sendUsage( command.sender );
+			this.sendUsage( args.sender );
 			return;
 		}
 		
 		try
 		{
-			Dimension dimension = command.parseAndCreateDimension();
+			Dimension dimension = args.parseAndCreateDimension();
 
 			YADM.proxy.registerDimension( dimension );
 			
 			if( ( Config.Dimension.teleportOnCreate ) && 
-				( command.senderIsEntityPlayer ) )
+				( args.senderIsEntityPlayer ) )
 			{
-				TeleportUtil.teleport( new TeleportSettings( dimension, (EntityPlayer)command.sender ) );
+				TeleportUtil.teleport( new TeleportSettings( dimension, (EntityPlayer)args.sender ) );
 			}			
 		}
 		catch( CommandException e )
@@ -69,8 +78,7 @@ public class CreateCommand extends Command
 		}
 		catch( RuntimeException e )
 		{
-			e.printStackTrace();
-			command.sender.addChatMessage( new ChatComponentText( e.getMessage() ) );
+			throw new CommandException( e.getMessage(), e );
 		}
 	}
 

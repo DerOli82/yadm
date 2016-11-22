@@ -36,4 +36,19 @@ public class YADMCommandGroup extends CommandGroup
 	{
 		return "Usage: /" + super.getCommandUsage( sender );
 	}
+	
+	@Override
+	public Permission requiredPermission()
+	{
+		return Permission.PLAYER;
+	}	
+	
+	@Override
+	public void processCommand(Arguments args) 
+	{
+		//Check permission
+		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
+		
+		super.processCommand( args );
+	}	
 }

@@ -3,6 +3,8 @@ package de.alaoli.games.minecraft.mods.yadm.command.list;
 import java.util.Map.Entry;
 
 import de.alaoli.games.minecraft.mods.yadm.command.Command;
+import de.alaoli.games.minecraft.mods.yadm.command.CommandException;
+import de.alaoli.games.minecraft.mods.yadm.command.Permission;
 import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.util.ChatComponentText;
@@ -30,10 +32,19 @@ public class ListProviderCommand extends Command
 	}
 
 	@Override
-	public void processCommand( Arguments command ) 
+	public Permission requiredPermission()
 	{
+		return Permission.OPERATOR;
+	}
+	
+	@Override
+	public void processCommand( Arguments args ) 
+	{
+		//Check permission
+		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
+						
 		StringBuilder msg;
-		command.sender.addChatMessage( new ChatComponentText( "Choosable providers:" ) );
+		args.sender.addChatMessage( new ChatComponentText( "Choosable providers:" ) );
 		
 		for( Entry<Integer, Class<? extends WorldProvider>> entry : WorldBuilder.instance.getWorldProviders().entrySet() )
 		{
@@ -41,17 +52,17 @@ public class ListProviderCommand extends Command
 			{
 				case -1:
 					//Nether alias
-					command.sender.addChatMessage( new ChatComponentText( " - 'nether'" ) );
+					args.sender.addChatMessage( new ChatComponentText( " - 'nether'" ) );
 					break;
 					
 				case 0:
 					//Overworld alias
-					command.sender.addChatMessage( new ChatComponentText( " - 'overworld'" ) );
+					args.sender.addChatMessage( new ChatComponentText( " - 'overworld'" ) );
 					break;
 					
 				case 1:
 					//End alias
-					command.sender.addChatMessage( new ChatComponentText( " - 'end'" ) );
+					args.sender.addChatMessage( new ChatComponentText( " - 'end'" ) );
 					break;
 				
 				default:
@@ -62,7 +73,7 @@ public class ListProviderCommand extends Command
 							.append( " - '" )
 							.append( entry.getValue().getName() )
 							.append( "'" );
-						command.sender.addChatMessage( new ChatComponentText( msg.toString() ) );
+						args.sender.addChatMessage( new ChatComponentText( msg.toString() ) );
 					}
 					break;
 			}
