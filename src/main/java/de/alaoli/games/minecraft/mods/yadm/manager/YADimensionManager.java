@@ -44,7 +44,6 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	
 	private boolean dirty;
 	
-	//private Map<Integer, Dimension> dimensionIdMapping;
 	private Map<Integer, Dimension> deletedDimensions;
 	
 	/********************************************************************************
@@ -55,7 +54,6 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	{
 		super( null );
 		
-//		this.dimensionIdMapping = new HashMap<Integer, Dimension>();
 		this.deletedDimensions = new HashMap<Integer, Dimension>();
 	}
 	
@@ -68,7 +66,6 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 		ManageableGroup group = (ManageableGroup)this.get( dimension.getManageableGroupName() );
 		
 		group.add( dimension );
-	//	this.dimensionIdMapping.put( dimension.getId(), dimension );
 	}
 	
 	public void remove( Dimension dimension )
@@ -80,10 +77,11 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 			group.remove( dimension );
 		//	this.dimensionIdMapping.remove( dimension.getId() );
 			
+			/*
 			if( group.isEmpty() )
 			{
 				this.remove( group );
-			}
+			}*/
 		}
 	}
 	
@@ -343,12 +341,9 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 		this.unregister( dimension );
 		
 		//Delete dimension folder
-		StringBuilder path = new StringBuilder()
-			.append( this.getSavePath() )
-			.append( File.separator )
-			.append( "DIM" )
-			.append( dimension.getId() )
-			.append( File.separator );
+		StringJoiner path = new StringJoiner( File.separator )
+			.add( this.getSavePath() )
+			.add( "DIM" + dimension.getId() );
 		File file = new File( path.toString() );
 			
 		if( ( file.exists() ) && ( file.isDirectory() ) )
@@ -488,12 +483,8 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	@Override
 	public String getSavePath() 
 	{
-		StringJoiner joiner = new StringJoiner( File.separator )
-			.add( DimensionManager.getCurrentSaveRootDirectory().toString() )
-			.add( "data" )
-			.add( YADM.MODID )
-			.add( "dimensions" );
-		return joiner.toString();
+
+		return DimensionManager.getCurrentSaveRootDirectory().toString();
 	}
 
 	@Override
@@ -524,7 +515,7 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 	@Override
 	public void save() throws IOException, DataException
 	{
-		if( !this.dirty ) { return; }
+		if( !this.isDirty() ) { return; }
 		
 		Manageable data;
 		
@@ -536,13 +527,19 @@ public class YADimensionManager extends ManageableGroup implements JsonFileAdapt
 			{
 				((JsonFileAdapter)data).save();
 			}		
-		}		
+		}
+		this.setDirty( false );
 	}
 
 	@Override
 	public void load() throws IOException, DataException
 	{
-		File folder	= new File( this.getSavePath() );
+		StringJoiner path = new StringJoiner( File.separator )
+			.add( this.getSavePath() )
+			.add( "data" )
+			.add( YADM.MODID )
+			.add( "dimensions" );
+		File folder	= new File( path.toString() );
 		
 		if( !folder.exists() ) { FileUtils.forceMkdir( folder ); }
 		

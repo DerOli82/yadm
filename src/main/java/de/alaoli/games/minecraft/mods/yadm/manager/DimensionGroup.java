@@ -84,11 +84,24 @@ public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 		Manageable data;
 		String fileName = this.getSavePath() + File.separator + this.getManageableGroupName() + ".json";
 		
+		//Delete file if empty
+		if( this.isEmpty() )
+		{
+			File file = new File( fileName );
+			
+			if( file.isFile() )
+			{
+				file.delete();
+				return;
+			}
+		}
+			
 		try 
 		{
 			OutputStreamWriter writer = new OutputStreamWriter( new FileOutputStream( fileName ), "UTF-8" );
 			
 			this.serialize().writeTo( writer, WriterConfig.PRETTY_PRINT );
+			this.setDirty( false );
 			
 			writer.close();
 		} 
