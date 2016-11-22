@@ -70,6 +70,8 @@ public class WhitelistCommand extends Command
 		WhitelistSetting setting = (WhitelistSetting)dimension.get( SettingType.WHITELIST );
 		Player player = args.parsePlayer();
 		
+		if( !setting.isEditable() ) { throw new CommandException( "Whitelist not editable."); }
+		
 		switch( action )
 		{
 			case "add":

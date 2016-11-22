@@ -22,6 +22,8 @@ public class WhitelistSetting implements Setting, JsonSerializable
 	
 	private Map<UUID, Player> users;
 	
+	private boolean editable;
+	
 	/********************************************************************************
 	 * Methods 
 	 ********************************************************************************/
@@ -29,6 +31,7 @@ public class WhitelistSetting implements Setting, JsonSerializable
 	public WhitelistSetting()
 	{
 		this.users = new HashMap<UUID, Player>();
+		this.editable = true;
 	}
 	
 	public void add( Player player )
@@ -49,6 +52,11 @@ public class WhitelistSetting implements Setting, JsonSerializable
 	public Set<Entry<UUID,Player>> getUsers()
 	{
 		return this.users.entrySet();
+	}
+	
+	public boolean isEditable()
+	{
+		return this.editable;
 	}
 	
 	/********************************************************************************
@@ -84,6 +92,7 @@ public class WhitelistSetting implements Setting, JsonSerializable
 		}
 		json.add( "type", this.getSettingType().toString() );
 		json.add( "users", array );
+		json.add( "editable", this.editable );
 		
 		return json;
 	}
@@ -111,5 +120,9 @@ public class WhitelistSetting implements Setting, JsonSerializable
 			
 			this.add( player );
 		}
+		if( obj.get( "editable" ) == null ) { throw new DataException( "WhitelistSetting 'editable' is missing." ); }
+		if( !obj.get( "editable" ).isBoolean() ) { throw new DataException( "WhitelistSetting 'editable' isn't an boolean." ); }
+		
+		this.editable = obj.get( "editable" ).asBoolean();
 	}	
 }
