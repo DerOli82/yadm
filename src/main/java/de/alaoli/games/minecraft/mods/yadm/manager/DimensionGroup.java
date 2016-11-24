@@ -123,4 +123,10 @@ public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 		
 		reader.close();
 	}
+	
+	@Override
+	public void cleanup()
+	{
+		this.clear();
+	}	
 }
