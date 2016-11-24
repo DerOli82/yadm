@@ -14,4 +14,6 @@ public interface JsonFileAdapter
 	
 	public void save() throws IOException, DataException;
 	public void load() throws IOException, DataException;
+	
+	public void cleanup();
 }

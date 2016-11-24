@@ -16,7 +16,6 @@ import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
-import de.alaoli.games.minecraft.mods.yadm.data.settings.SeedSetting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
@@ -25,18 +24,7 @@ import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ListDimensions;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
 import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
-import de.alaoli.games.minecraft.mods.yadm.world.WorldException;
-import de.alaoli.games.minecraft.mods.yadm.world.WorldServerGeneric;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldManager;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.WorldSettings;
-import net.minecraft.world.storage.ISaveHandler;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
 
 public class YADimensionManager extends ManageableGroup implements ManageDimensions, ListDimensions, JsonFileAdapter 
 {

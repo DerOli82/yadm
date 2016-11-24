@@ -78,11 +78,13 @@ public class TemplateManager extends ManageableGroup implements FindTemplate, Js
 	 * Methods - Implement FindTemplate
 	 ********************************************************************************/	
 	
+	@Override
 	public Template findTemplate( String name ) throws TemplateException
 	{
 		return this.findTemplate( "default", name );
 	}
 	
+	@Override
 	public Template findTemplate( String group, String name ) throws TemplateException
 	{
 		Manageable manageable = this.get( group );

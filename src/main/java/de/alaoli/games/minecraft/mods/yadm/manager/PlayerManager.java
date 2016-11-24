@@ -73,7 +73,7 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 			{
 				this.mapppingId.put( ((Player)entry.getValue()).getId(), (Player)entry.getValue() );
 				
-				return (Player)entry.getValue();
+				return entry.getValue();
 			}
 		}
 		return null;
