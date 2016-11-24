@@ -1,4 +1,4 @@
-package de.alaoli.games.minecraft.mods.yadm.interceptor;
+package de.alaoli.games.minecraft.mods.yadm.world.interceptor;
 
 import java.util.List;
 

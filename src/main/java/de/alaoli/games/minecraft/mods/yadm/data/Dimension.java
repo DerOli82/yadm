@@ -2,6 +2,8 @@ package de.alaoli.games.minecraft.mods.yadm.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -9,10 +11,13 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingFactory;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingGroup;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
-import de.alaoli.games.minecraft.mods.yadm.interceptor.Injectable;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
+import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.FindPlayer;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
+import de.alaoli.games.minecraft.mods.yadm.world.interceptor.Injectable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -25,6 +30,8 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	/********************************************************************************
 	 * Attributes
 	 ********************************************************************************/
+	
+	protected static final FindPlayer findPlayer = PlayerManager.INSTANCE;
 	
 	/**
 	 * Required
@@ -46,7 +53,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	 */
 	private Player owner;
 	
-	private boolean isRegistered;
+	private boolean isRegistered = false;
 	
 	/********************************************************************************
 	 * Methods
@@ -59,15 +66,11 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		this.id = id;
 		this.group = group;
 		this.name = name;
-		this.isRegistered = false;
 	}
 	public Dimension( NBTTagCompound tagCompound ) 
 	{
 		this.readFromNBT( tagCompound );
-		this.isRegistered = false;
-	
 	}
-	
 	
 	@Override
 	public String toString() 
@@ -178,7 +181,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		
 		if( this.owner != null )
 		{
-			json.add( "owner", this.owner.serialize() );
+			json.add( "owner", this.owner.getId().toString() );
 		}
 		json.add( "settings", super.serialize().asArray() );
 		
@@ -209,14 +212,14 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 			
 			//Optional
 			if( ( obj.get("owner") != null ) &&
-				( obj.get( "owner" ).isObject() ) )
+				( obj.get( "owner" ).isString() ) )
 			{
-				this.owner = new Player();
-				this.owner.deserialize( obj.get( "owner").asObject() );
+				this.owner = findPlayer.findPlayer( UUID.fromString( obj.get( "owner" ).asString() ) );
+				this.owner.setDimension( this );
 			}
 			super.deserialize( json );
 		}
-		catch( DataException e )
+		catch( PlayerException|DataException e )
 		{
 			throw new DataException( "Deserialization Exception in: " + this.group + ":" + this.name, e );
 		}

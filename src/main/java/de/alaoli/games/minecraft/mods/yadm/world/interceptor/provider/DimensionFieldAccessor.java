@@ -1,4 +1,4 @@
-package de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider;
+package de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 
