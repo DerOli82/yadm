@@ -1,7 +1,17 @@
 package de.alaoli.games.minecraft.mods.yadm.world;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
+
+import org.apache.commons.io.FileUtils;
+
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.Log;
@@ -12,6 +22,9 @@ import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.DimensionFi
 import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.GetDimensionNameInterceptor;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.RegisterWorldChunkManagerPostInterceptor;
 import de.alaoli.games.minecraft.mods.yadm.interceptor.worldprovider.RegisterWorldChunkManagerPreInterceptor;
+import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.NamingStrategy;
 import net.bytebuddy.description.modifier.Visibility;
@@ -20,23 +33,36 @@ import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.SuperMethodCall;
 import net.bytebuddy.matcher.ElementMatchers;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldManager;
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
+import net.minecraft.world.storage.ISaveHandler;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.WorldEvent;
 
-public class WorldBuilder 
+public class WorldBuilder implements ManageWorlds, ListOptions
 {
 	/********************************************************************************
 	 * Attributes
 	 ********************************************************************************/
 		
-	public static final WorldBuilder instance = new WorldBuilder();
+	public static final WorldBuilder INSTANCE = new WorldBuilder();
 	
-	private static int nextId = Config.Provider.beginsWithId;
+	private static final JsonFileAdapter dimensionFiles = YADimensionManager.INSTANCE;
+	private static final ManageDimensions dimensionManager = YADimensionManager.INSTANCE;
+	
+	private int nextId;
 	
 	private Hashtable<Integer, Class<? extends WorldProvider>> worldProviders;
-
 	private Hashtable<String, WorldType> worldTypes;	
+	
+	private List<Integer> registeredWorldIds;
+	private Map<Integer, Dimension> worldsForDeletion; 
 	
 	/********************************************************************************
 	 * Methods
@@ -44,6 +70,11 @@ public class WorldBuilder
 	
 	private WorldBuilder() 
 	{
+		this.nextId = Config.Provider.beginsWithId;
+		this.worldProviders = new Hashtable<Integer, Class<? extends WorldProvider>>();
+		this.worldTypes = new Hashtable<String, WorldType>();
+		this.worldsForDeletion = new HashMap<Integer, Dimension>();
+		
 		this.initProvider();
 		this.initTypes();
 	}
@@ -51,8 +82,6 @@ public class WorldBuilder
 	@SuppressWarnings( "unchecked" )
 	private void initProvider()
 	{
-		this.worldProviders = new Hashtable<Integer, Class<? extends WorldProvider>>();
-		
 		try 
 		{
 			Hashtable<Integer, Class<? extends WorldProvider>> providers;
@@ -74,8 +103,6 @@ public class WorldBuilder
 		WorldType type;
 		String name;
 		
-		this.worldTypes = new Hashtable<String, WorldType>();
-		
 		for( int i = 0; i < WorldType.worldTypes.length; i++ )
 		{
 			type = WorldType.worldTypes[ i ];
@@ -92,19 +119,9 @@ public class WorldBuilder
 			}
 		}
 	}	
-	
-	public boolean existsWorldProvider( int provider )
-	{
-		return this.worldProviders.containsKey( provider );
-	}
-	
-	public boolean existsWorldType( String type )
-	{
-		return this.worldTypes.containsKey( type );
-	}
-	
+
 	@SuppressWarnings( "unchecked" )
-	public WorldProvider createProvider( Dimension dimension ) throws ClassNotFoundException, InstantiationException, IllegalAccessException  
+	private WorldProvider createProvider( Dimension dimension ) throws ClassNotFoundException, InstantiationException, IllegalAccessException  
 	{
 		Class<? extends WorldProvider> providerClass;
 		
@@ -157,32 +174,205 @@ public class WorldBuilder
 		return (WorldProvider) dynamicType.newInstance();
 	}	
 	
-	public int registerProvider( WorldProvider provider, boolean keepLoaded )
+	private int registerProvider( WorldProvider provider, boolean keepLoaded )
 	{		
 		while( !DimensionManager.registerProviderType( nextId, provider.getClass(), keepLoaded))
 		{
 			nextId++;
 		}
-		
 		return nextId;
 	}
 	
+	private void initWorldServer( Dimension dimension )
+	{	
+        WorldServer overworld = DimensionManager.getWorld(0);
+        if (overworld == null)
+        {
+            throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
+        }
+        try
+        {
+            DimensionManager.getProviderType(dimension.getId());
+        }
+        catch (Exception e)
+        {
+            System.err.println("Cannot Hotload Dim: " + e.getMessage());
+            return; // If a provider hasn't been registered then we can't hotload the dim
+        }
+        MinecraftServer mcServer = overworld.func_73046_m();
+        ISaveHandler savehandler = overworld.getSaveHandler();
+        WorldSettings worldSettings = new WorldSettings( overworld.getWorldInfo() );
+
+        WorldServer world = new WorldServerGeneric( mcServer, savehandler, overworld.getWorldInfo().getWorldName(), dimension, worldSettings, mcServer.theProfiler );
+        world.addWorldAccess( new WorldManager( mcServer, world ) );
+        
+        MinecraftForge.EVENT_BUS.post( new WorldEvent.Load( world ) );
+        if (!mcServer.isSinglePlayer())
+        {
+            world.getWorldInfo().setGameType( mcServer.getGameType() );
+        }
+        mcServer.func_147139_a( mcServer.func_147135_j() );		
+	}
+	
 	/********************************************************************************
-	 * Methods - Getter/Setter
+	 * Methods - Implement ManageWorlds
 	 ********************************************************************************/
 	
-	public WorldType getWorldType( String name )
+	@Override
+	public void registerWorldProviderForDimension( Dimension dimension ) throws WorldException
 	{
-		return this.worldTypes.get( name );
+		StringBuilder msg;
+		WorldProviderSetting providerSetting = (WorldProviderSetting)dimension.get( SettingType.WORLDPROVIDER );
+		
+		try 
+		{
+			WorldProvider provider = this.createProvider( dimension );
+			int providerId = this.registerProvider( provider, false );
+			
+			providerSetting.setId( providerId );
+			
+			msg = new StringBuilder()
+				.append( "Register WorldProvider '" )
+				.append( providerSetting.getName() )
+				.append( "' with Id '" )
+				.append( providerSetting.getId() )
+				.append( "'." );
+			Log.info( msg.toString() );
+		} 
+		catch ( ClassNotFoundException | InstantiationException | IllegalAccessException e )
+		{
+			msg = new StringBuilder()
+				.append( "Couldn't register WorldProvider '" )
+				.append( providerSetting.getName() )
+				.append( "' with Id '" )
+				.append( providerSetting.getId() )
+				.append( "'." );			
+			throw new WorldException( msg.toString(), e );
+		}		
 	}
 	
-	public Hashtable<String, WorldType> getWorldTypes()
+	@Override
+	public void unregisterWorldProviderForDimension( Dimension dimension )
 	{
-		return this.worldTypes;
+		StringBuilder msg;
+		WorldProviderSetting providerSetting = (WorldProviderSetting)dimension.get( SettingType.WORLDPROVIDER );
+		
+		try
+		{
+			DimensionManager.unregisterProviderType( providerSetting.getId() );
+			
+			msg = new StringBuilder()
+				.append( "Unregister WorldProvider '" )
+				.append( providerSetting.getName() )
+				.append( "' with Id '" )
+				.append( providerSetting.getId() )
+				.append( "'." );
+			Log.info( msg.toString() );
+		}
+		catch( Exception e )
+		{
+			msg = new StringBuilder()
+				.append( "Couldn't unregister WorldProvider '" )
+				.append( providerSetting.getName() )
+				.append( "' with Id '" )
+				.append( providerSetting )
+				.append( "'.");
+			throw new WorldException( msg.toString(), e );
+		}		
 	}
 	
-	public Hashtable<Integer, Class<? extends WorldProvider>> getWorldProviders()
+	@Override
+	public void markWorldForDeletion( Dimension dimension )
 	{
-		return this.worldProviders;
-	}	
+		this.worldsForDeletion.put( dimension.getId(), dimension );
+	}
+	
+	@Override
+	public void deleteWorld( World world ) throws WorldException
+	{
+		if( !this.worldsForDeletion.containsKey( world.provider.dimensionId ) ) { return; }
+		
+		Dimension dimension = this.worldsForDeletion.get( world.provider.dimensionId );
+		
+		((WorldServer)world).flush();
+		dimensionManager.unregisterDimension( dimension );
+		
+		//Delete dimension folder
+		StringJoiner path = new StringJoiner( File.separator )
+			.add( DimensionManager.getCurrentSaveRootDirectory().toString() )
+			.add( "DIM" + dimension.getId() );
+		File folder = new File( path.toString() );
+		
+		if( ( folder.exists() ) && ( folder.isDirectory() ) )
+		{
+			StringBuilder msg;
+			
+			try
+			{
+				FileUtils.deleteDirectory( folder );
+				dimensionFiles.setDirty( true );
+				
+				msg = new StringBuilder()
+					.append( "Delete folder for Dimension '" )
+					.append( dimension.toString() )
+					.append( "' with Id '" )
+					.append( dimension.getId() )
+					.append( "'." );
+				Log.info( msg.toString() );
+			}
+			catch ( IOException e ) 
+			{
+				msg = new StringBuilder()
+					.append( "Couldn't delete folder for Dimension '" )
+					.append( dimension.toString() )
+					.append( "' with Id '" )
+					.append( dimension.getId() )
+					.append( "'." );
+				throw new WorldException( msg.toString(), e );
+			}
+		}
+	}
+
+	@Override
+	public WorldServer getWorldServerForDimension( Dimension dimension ) throws WorldException
+	{
+		WorldServer worldServer = null;
+		
+		//Is YADM dimension?
+		if( dimensionManager.existsDimension( dimension.getId() ) )
+		{
+			worldServer = DimensionManager.getWorld( dimension.getId() );
+			
+			//worldServer initialized?
+			if( worldServer == null )
+			{
+				this.initWorldServer( dimension );
+			}
+			worldServer = DimensionManager.getWorld( dimension.getId() );
+		}
+		else
+		{
+			worldServer = MinecraftServer.getServer().worldServerForDimension( dimension.getId() );
+		}
+		//Still not initialized?
+		if( worldServer == null ) { throw new WorldException( "Can't initialize WorldServer." ); }
+		
+		return worldServer;		
+	}
+	
+	/********************************************************************************
+	 * Methods - Implement ListOptions
+	 ********************************************************************************/
+	
+	@Override
+	public Collection<Class<? extends WorldProvider>> listWorldProvider()
+	{
+		return this.worldProviders.values();
+	}
+	
+	@Override
+	public Collection<WorldType> listWorldType()
+	{
+		return this.worldTypes.values();
+	}
 }
