@@ -120,4 +120,10 @@ public class TemplateGroup extends ManageableGroup implements JsonFileAdapter
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public void cleanup()
+	{
+		this.clear();
+	}
 }

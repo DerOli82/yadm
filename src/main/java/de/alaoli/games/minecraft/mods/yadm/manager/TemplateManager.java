@@ -8,8 +8,10 @@ import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
+import de.alaoli.games.minecraft.mods.yadm.manager.template.FindTemplate;
+import de.alaoli.games.minecraft.mods.yadm.manager.template.TemplateException;
 
-public class TemplateManager extends ManageableGroup implements JsonFileAdapter
+public class TemplateManager extends ManageableGroup implements FindTemplate, JsonFileAdapter
 {
 	/********************************************************************************
 	 * Attribute
@@ -62,36 +64,6 @@ public class TemplateManager extends ManageableGroup implements JsonFileAdapter
 		}
 	}
 
-	public boolean exists( String group, String name ) 
-	{
-		Manageable manageable = this.get( group );
-		
-		if( ( manageable != null ) && 
-			( manageable instanceof ManageableGroup ) )
-		{
-			return ((ManageableGroup)manageable).exists( name );
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	public Manageable get( String group, String name )
-	{
-		Manageable manageable = this.get( group );
-		
-		if( ( manageable != null ) && 
-			( manageable instanceof ManageableGroup ) )
-		{
-			return ((ManageableGroup)manageable).get( name );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
 	/********************************************************************************
 	 * Methods - Implement ManageableGroup
 	 ********************************************************************************/	
@@ -100,6 +72,27 @@ public class TemplateManager extends ManageableGroup implements JsonFileAdapter
 	public Manageable create() 
 	{
 		return null;
+	}
+	
+	/********************************************************************************
+	 * Methods - Implement FindTemplate
+	 ********************************************************************************/	
+	
+	public Template findTemplate( String name ) throws TemplateException
+	{
+		return this.findTemplate( "default", name );
+	}
+	
+	public Template findTemplate( String group, String name ) throws TemplateException
+	{
+		Manageable manageable = this.get( group );
+		
+		if( ( manageable != null ) && 
+			( manageable instanceof ManageableGroup ) )
+		{
+			return (Template)((ManageableGroup)manageable).get( name );
+		}
+		throw new TemplateException( "Can't find template '" + group + ":" + name + "'" );
 	}
 	
 	/********************************************************************************
@@ -206,5 +199,11 @@ public class TemplateManager extends ManageableGroup implements JsonFileAdapter
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void cleanup()
+	{
+		this.clear();
 	}
 }
