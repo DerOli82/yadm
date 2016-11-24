@@ -1,4 +1,4 @@
-package de.alaoli.games.minecraft.mods.yadm.teleport;
+package de.alaoli.games.minecraft.mods.yadm.manager.player;
 
 import java.util.Set;
 
@@ -7,11 +7,15 @@ import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SpawnSetting;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
+import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.WorldServer;
 
 public class TeleportSettings
 {
+	private static final ManageWorlds worlds = WorldBuilder.INSTANCE;
+	
 	final public int OFFSETY = 4;
 
 	final public Dimension dimension;
@@ -20,7 +24,7 @@ public class TeleportSettings
 	
 	public Coordinate coordinate;
 	
-	protected Set<TeleportModifier> modifiers;
+	//protected Set<TeleportModifier> modifiers;
 	
 	public TeleportSettings( Dimension dimension, EntityPlayer player )
 	{
@@ -31,8 +35,8 @@ public class TeleportSettings
 	{
 		this.dimension = dimension;
 		this.player = player;
-		this.target = YADimensionManager.INSTANCE.getWorldServerForDimension( dimension );
-		this.modifiers = TeleportModifierFactory.factory( dimension );
+		this.target = worlds.getWorldServerForDimension( dimension );
+		//this.modifiers = TeleportModifierFactory.factory( dimension );
 		
 		if( coordinate == null )
 		{
@@ -56,10 +60,11 @@ public class TeleportSettings
 	public void prepare()
 	{
 		//Apply modifiers
+		/*
 		for( TeleportModifier modifier : this.modifiers )
 		{
-			modifier.applyModifier( this );
-		}
+			modifier.applyTeleportModifier( this );
+		}*/
 		
 		//Prepare player
 		if( this.player.isRiding() )

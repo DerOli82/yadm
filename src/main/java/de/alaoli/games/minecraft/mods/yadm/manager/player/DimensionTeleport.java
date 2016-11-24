@@ -1,4 +1,4 @@
-package de.alaoli.games.minecraft.mods.yadm.teleport;
+package de.alaoli.games.minecraft.mods.yadm.manager.player;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import net.minecraft.entity.Entity;
@@ -39,7 +39,7 @@ public class DimensionTeleport extends Teleporter
     public boolean placeInExistingPortal( Entity entity, double x, double y, double z, float rotationYaw ) { return false; }
 
     @Override
-	public boolean makePortal(Entity p_85188_1_) { return false; }
+	public boolean makePortal( Entity entity ) { return false; }
 
 	@Override
     public void removeStalePortalLocations( long totalWorldTime ) {}    

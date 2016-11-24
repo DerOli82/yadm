@@ -1,4 +1,4 @@
-package de.alaoli.games.minecraft.mods.yadm.teleport;
+package de.alaoli.games.minecraft.mods.yadm.manager.player;
 
 public class TeleportException extends RuntimeException 
 {

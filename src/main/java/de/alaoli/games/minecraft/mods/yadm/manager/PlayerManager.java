@@ -6,7 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.StringJoiner;
 import java.util.UUID;
 
 import com.eclipsesource.json.Json;
@@ -14,18 +17,34 @@ import com.eclipsesource.json.WriterConfig;
 
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.DimensionTeleport;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.FindPlayer;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.ManagePlayers;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportException;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportPlayer;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraftforge.common.DimensionManager;
 
-public class PlayerManager extends ManageableGroup implements JsonFileAdapter 
+public class PlayerManager extends ManageableGroup implements ManagePlayers, FindPlayer, TeleportPlayer, JsonFileAdapter
 {
 	/********************************************************************************
 	 * Attributes
 	 ********************************************************************************/
 	
 	public static final PlayerManager INSTANCE = new PlayerManager();
+	
+	public static final Player dummyP = new Player( null, "@p" );
+	
+	private Map<UUID, Player> mapppingId;
 	
 	private boolean dirty;
 	
@@ -37,35 +56,27 @@ public class PlayerManager extends ManageableGroup implements JsonFileAdapter
 	{
 		super( "players" );
 		
+		this.mapppingId = new HashMap<UUID, Player>();
 		this.setDirty( false );
 	}
-	
-	public boolean exists( EntityPlayer player )
-	{
-		return this.exists( player.getUniqueID() );
-	}
-	
-	public boolean exists( UUID id )
-	{
-		return this.get( id ) != null;
-	}
-	
+
 	public Manageable get( UUID id )
 	{
+		//Mapping
+		if( this.mapppingId.containsKey( id ) ) { return this.mapppingId.get( id ); }
+		
+		//Searching
 		for( Entry<String, Manageable> entry : this.getAll() )
 		{
 			if( ( entry.getValue() instanceof Player ) &&
 				( ((Player)entry.getValue()).getId().equals( id ) ) )
 			{
-				return entry.getValue();
+				this.mapppingId.put( ((Player)entry.getValue()).getId(), (Player)entry.getValue() );
+				
+				return (Player)entry.getValue();
 			}
 		}
 		return null;
-	}
-	
-	public void cleanup()
-	{
-		this.clear();
 	}
 	
 	/********************************************************************************
@@ -76,6 +87,157 @@ public class PlayerManager extends ManageableGroup implements JsonFileAdapter
 	public Manageable create() 
 	{
 		return new Player();
+	}
+
+	/********************************************************************************
+	 * Methods - Implement ManagePlayers
+	 ********************************************************************************/	
+	
+	@Override
+	public boolean existsPlayer( UUID id )
+	{
+		return this.get( id ) != null;
+	}
+	
+	@Override
+	public boolean existsPlayer( String name )
+	{
+		return this.exists( name );
+	}
+	
+	@Override
+	public boolean existsPlayer( EntityPlayer entityPlayer )
+	{
+		return this.existsPlayer( entityPlayer.getUniqueID() );
+	}
+	
+	@Override
+	public void addPlayer( Player player )
+	{
+		this.add( player );
+		this.setDirty( true );
+	}
+	
+	@Override
+	public void addPlayer( EntityPlayer entityPlayer )
+	{
+		this.addPlayer( new Player( entityPlayer ) );
+	}
+	
+	@Override
+	public void removePlayer( UUID id )
+	{
+		Manageable player = this.get( id );
+		
+		if( player instanceof Player )
+		{
+			this.removePlayer( (Player)player );
+		}
+	}
+	
+	@Override
+	public void removePlayer( String name )
+	{
+		Manageable player = this.get( name );
+		
+		if( player instanceof Player )
+		{
+			this.removePlayer( (Player)player );
+		}		
+	}
+	
+	@Override
+	public void removePlayer( Player player )
+	{
+		this.remove( player );
+		this.setDirty( true );
+	}
+	
+	@Override
+	public void removePlayer( EntityPlayer entityPlayer )
+	{
+		this.removePlayer( entityPlayer.getUniqueID() );
+	}
+	
+	/********************************************************************************
+	 * Methods - Implement FindPlayer
+	 ********************************************************************************/	
+	
+	@Override
+	public Player findPlayer( UUID id ) throws PlayerException
+	{
+		Manageable player = this.get( id );
+		
+		if( player instanceof Player )
+		{
+			return (Player)player;
+		}
+		else
+		{
+			throw new PlayerException( "Can't find player with id '" + id.toString() + "'" );
+		}
+	}
+	
+	@Override
+	public Player findPlayer( String name ) throws PlayerException
+	{
+		//Case sensitive
+		if( this.exists( name ) ) { return (Player)this.get( name ); }
+		
+		//@P dummy
+		if( name.contains( "@p" ) ) { return dummyP; }
+		
+		//Not case sensitive
+		for( Entry<String, Manageable> entry : this.getAll() )
+		{
+			if( ( entry.getValue() instanceof Player ) &&
+				( ((Player)entry.getValue()).getManageableName().toLowerCase().equals( name.toLowerCase() ) ) )
+			{
+				return (Player)entry.getValue();
+			}
+		}
+		throw new PlayerException( "Can't find player with name '" + name + "'" );
+	}
+	
+	@Override
+	public Player findPlayer( ICommandSender sender ) throws PlayerException
+	{
+		return this.findPlayer( sender.getCommandSenderName() );
+	}
+	
+	@Override
+	public Player findPlayer( EntityPlayer entityPlayer ) throws PlayerException
+	{
+		return this.findPlayer( entityPlayer.getUniqueID() );
+	}
+
+	/********************************************************************************
+	 * Methods - Implement TeleportPlayer
+	 ********************************************************************************/
+	
+	@Override
+	public void emergencyTeleport( EntityPlayer player )
+	{
+		this.teleport( new TeleportSettings( new DimensionDummy( 0 ), player ) );
+	}
+	
+	@Override
+	public void teleport( TeleportSettings settings )
+	{
+		ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
+		
+		settings.prepare();
+		
+		if( settings.dimension == null ) { throw new TeleportException( "Teleport 'dimension' is missing." ); }
+		if( settings.target == null ) { throw new TeleportException( "Teleport 'target' is missing." ); }
+		if( settings.player == null ) { throw new TeleportException( "Teleport 'player' is missing." ); }
+		if( settings.coordinate == null ) { throw new TeleportException( "Teleport 'coordinate' is missing." ); }
+		
+		scm.transferPlayerToDimension(
+			(EntityPlayerMP)settings.player, 
+			settings.dimension.getId(), 
+			new DimensionTeleport( settings.target, settings.coordinate ) 
+		);		
 	}
 	
 	/********************************************************************************
@@ -88,7 +250,11 @@ public class PlayerManager extends ManageableGroup implements JsonFileAdapter
 	@Override
 	public String getSavePath() 
 	{
-		return DimensionManager.getCurrentSaveRootDirectory() + File.separator + "data" + File.separator + YADM.MODID;
+		StringJoiner path = new StringJoiner( File.separator )
+			.add( DimensionManager.getCurrentSaveRootDirectory().toString() )
+			.add( "data" )
+			.add( YADM.MODID );
+		return path.toString();
 	}
 
 	@Override
@@ -144,5 +310,11 @@ public class PlayerManager extends ManageableGroup implements JsonFileAdapter
 			
 			reader.close();
 		}
+	}		
+	
+	@Override
+	public void cleanup()
+	{
+		this.clear();
 	}		
 }
