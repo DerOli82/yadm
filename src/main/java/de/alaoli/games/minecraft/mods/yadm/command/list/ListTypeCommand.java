@@ -3,12 +3,23 @@ package de.alaoli.games.minecraft.mods.yadm.command.list;
 import de.alaoli.games.minecraft.mods.yadm.command.Command;
 import de.alaoli.games.minecraft.mods.yadm.command.CommandException;
 import de.alaoli.games.minecraft.mods.yadm.command.Permission;
+
+import java.util.Map.Entry;
+
 import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
+import de.alaoli.games.minecraft.mods.yadm.world.ListOptions;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.WorldType;
 
 public class ListTypeCommand extends Command
 {
+	/********************************************************************************
+	 * Attribute
+	 ********************************************************************************/
+	
+	protected static final ListOptions worlds = WorldBuilder.INSTANCE;
+		
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -43,11 +54,11 @@ public class ListTypeCommand extends Command
 		StringBuilder msg;
 		args.sender.addChatMessage( new ChatComponentText( "Choosable types:" ) );
 		
-		for( String type : WorldBuilder.instance.getWorldTypes().keySet() )
+		for( Entry<String, WorldType> entry : worlds.listWorldType() )
 		{
 			msg = new StringBuilder()
 				.append( " - '" )
-				.append( type )
+				.append( entry.getKey() )
 				.append( "'" );
 			args.sender.addChatMessage( new ChatComponentText( msg.toString() ) );
 		}

@@ -1,14 +1,25 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.FindDimension;
+import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
+import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
-import net.minecraftforge.common.DimensionManager;
 
 public class InfoCommand extends Command
 {
+	/********************************************************************************
+	 * Attributes
+	 ********************************************************************************/
+	
+	protected static final ManageWorlds worlds = WorldBuilder.INSTANCE;
+	protected static final FindDimension dimensions = YADimensionManager.INSTANCE;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -39,27 +50,25 @@ public class InfoCommand extends Command
 	{
 		//Check permission
 		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
-				
-		World world;
 		
-		int dimensionId = args.sender.getEntityWorld().provider.dimensionId;
+		Dimension dimension;
 		
 		args.sender.addChatMessage( new ChatComponentText( "Current dimension info:" ) );
 		
-		if( YADimensionManager.INSTANCE.exists( dimensionId ) )
+		try
 		{
-			Dimension dimension = YADimensionManager.INSTANCE.get( dimensionId ); 
-			world = YADimensionManager.INSTANCE.getWorldServerForDimension( dimension );
+			dimension = dimensions.findDimension( args.sender.getEntityWorld().provider.dimensionId );
 			
 			if( dimension.hasOwner() )
-			{	
+			{
 				args.sender.addChatMessage( new ChatComponentText( "Owner: " + dimension.getOwner().toString() ) );
 			}
 		}
-		else
+		catch( DimensionException e )
 		{
-			world = DimensionManager.getWorld( dimensionId );
+			dimension = new DimensionDummy( args.sender.getEntityWorld().provider.dimensionId );
 		}
+		World world = worlds.getWorldServerForDimension( dimension );
 		WorldInfo worldInfo = world.getWorldInfo();
 		
 		args.sender.addChatMessage( new ChatComponentText( "Name: " + world.provider.getDimensionName() ) );

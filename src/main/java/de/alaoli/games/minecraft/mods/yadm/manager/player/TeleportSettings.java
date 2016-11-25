@@ -11,13 +11,13 @@ import net.minecraft.world.WorldServer;
 
 public class TeleportSettings
 {
-	private static final ManageWorlds worlds = WorldBuilder.INSTANCE;
+	protected static final ManageWorlds worlds = WorldBuilder.INSTANCE;
 	
-	final public int OFFSETY = 4;
+	public final int OFFSETY = 4;
 
-	final public Dimension dimension;
-	final public WorldServer target;
-	final public EntityPlayer player;
+	public final Dimension dimension;
+	public final WorldServer target;
+	public final EntityPlayer player;
 	
 	public Coordinate coordinate;
 	

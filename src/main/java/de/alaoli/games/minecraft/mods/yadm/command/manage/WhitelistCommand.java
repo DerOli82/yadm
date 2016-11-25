@@ -12,12 +12,19 @@ import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WhitelistSetting;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.FindDimension;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
 public class WhitelistCommand extends Command
 {
+	/********************************************************************************
+	 * Attribute
+	 ********************************************************************************/
+	
+	protected static final FindDimension dimensions = YADimensionManager.INSTANCE;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -54,14 +61,18 @@ public class WhitelistCommand extends Command
 	{		
 		//Check permission
 		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
-				
+		
+		Dimension dimension;
+		
+		try
+		{
+			dimension = dimensions.findDimension( args.sender.getEntityWorld().provider.dimensionId );
+		}
+		catch( DimensionException e )
+		{
+			throw new CommandException( e.getMessage(), e );
+		}
 		String action = args.next();
-		
-		EntityPlayer owner = (EntityPlayer)args.sender;
-		
-		if( !YADimensionManager.INSTANCE.exists( owner.dimension ) ) { return; }
-		
-		Dimension dimension = YADimensionManager.INSTANCE.get( owner.dimension );
 		
 		if( !dimension.hasSetting( SettingType.WHITELIST ) )
 		{
@@ -70,7 +81,7 @@ public class WhitelistCommand extends Command
 		WhitelistSetting setting = (WhitelistSetting)dimension.get( SettingType.WHITELIST );
 		Player player = args.parsePlayer();
 		
-		if( !setting.isEditable() ) { throw new CommandException( "Whitelist not editable."); }
+		if( !setting.isEditable() ) { throw new CommandException( "Whitelist isn't editable."); }
 		
 		switch( action )
 		{

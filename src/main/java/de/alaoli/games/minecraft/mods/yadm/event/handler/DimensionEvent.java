@@ -8,21 +8,28 @@ import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldBorderSetting;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
+import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
+import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.EntityEvent.EnteringChunk;
 import net.minecraftforge.event.world.WorldEvent;
 
 public class DimensionEvent 
 {
+	protected static final JsonFileAdapter playerFiles = PlayerManager.INSTANCE;
+	protected static final YADimensionManager dimensions = YADimensionManager.INSTANCE;
+	protected static final ManageWorlds worlds = WorldBuilder.INSTANCE;
+	
 	@SubscribeEvent
 	public void onWorldSave( WorldEvent.Save event )
 	{
 		try 
 		{
-			PlayerManager.INSTANCE.save();
-			YADimensionManager.INSTANCE.save();
+			playerFiles.save();
+			dimensions.save();
 		}
 		catch ( DataException | IOException e )
 		{
@@ -36,7 +43,7 @@ public class DimensionEvent
 		//Cleanup deleted dimensions
 		if( !event.world.isRemote )
 		{
-			YADimensionManager.INSTANCE.delete( event.world );
+			worlds.deleteWorld(  event.world );
 		}
 	}
 
@@ -45,10 +52,10 @@ public class DimensionEvent
 	{
 		//World Border, check only on Player and YADM Dimension
 		if( ( event.entity instanceof EntityPlayer ) && 
-			( YADimensionManager.INSTANCE.exists( event.entity.dimension ) ) )
+			( dimensions.existsDimension( event.entity.dimension ) ) )
 		{
 			EntityPlayer player = (EntityPlayer) event.entity;
-			Dimension dimension = YADimensionManager.INSTANCE.get( player.dimension );
+			Dimension dimension = dimensions.findDimension( player.dimension );
 			
 			if( dimension.hasSetting( SettingType.WORLDBORDER ) )
 			{

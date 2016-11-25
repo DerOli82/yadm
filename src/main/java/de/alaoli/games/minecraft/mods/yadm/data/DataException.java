@@ -9,6 +9,6 @@ public class DataException extends RuntimeException
 	
 	public DataException( String message, Exception e )
 	{
-		super(message, e );
+		super( message, e );
 	}
 }

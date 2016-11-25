@@ -3,11 +3,10 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.data.Player;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
 public abstract class Command implements ICommand
@@ -55,13 +54,25 @@ public abstract class Command implements ICommand
 			case OWNER:
 				if( !args.senderIsEntityPlayer ) { return false; }
 				
-				EntityPlayer owner = args.getSenderAsEntityPlayer();
-				
-				if( !YADimensionManager.INSTANCE.exists( owner.dimension ) ) { return false; }
-				
-				Dimension dimension = YADimensionManager.INSTANCE.get( owner.dimension );
-				
-				return dimension.isOwner( owner );
+				try
+				{
+					Player player = args.getSenderAsPlayer();
+					
+					//Player owns current dimension?
+					if( ( player.ownsDimension() ) && 
+						( player.getDimension().getId() == args.sender.getEntityWorld().provider.dimensionId ) )
+					{
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
+				catch( PlayerException e )
+				{
+					return false;
+				}
 				
 			case PLAYER:
 				return args.senderIsEntityPlayer;

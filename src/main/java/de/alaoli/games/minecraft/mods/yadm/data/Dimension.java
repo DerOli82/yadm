@@ -90,7 +90,13 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	
 	public void setOwner( Player owner )
 	{
+		//Unset
+		if( ( this.owner != null ) && ( owner == null ) )
+		{
+			this.owner.setDimension( null );
+		}
 		this.owner = owner;
+		owner.setDimension( this );
 	}
 	
 	public void setRegistered( boolean isRegistered )

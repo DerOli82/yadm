@@ -8,6 +8,7 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
+import de.alaoli.games.minecraft.mods.yadm.world.FindWorldType;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.Injectable;
 import net.minecraft.nbt.NBTTagCompound;
@@ -18,14 +19,10 @@ import net.minecraft.world.storage.WorldInfo;
 public class WorldTypeSetting implements Setting, JsonSerializable, Packageable, Injectable 
 {
 	/********************************************************************************
-	 * Constants
-	 ********************************************************************************/
-	
-	public static final String DEFAULT = "default";
-	
-	/********************************************************************************
 	 * Attributes
 	 ********************************************************************************/
+
+	protected static final FindWorldType worldType = WorldBuilder.INSTANCE;
 	
 	private String name;
 
@@ -46,16 +43,7 @@ public class WorldTypeSetting implements Setting, JsonSerializable, Packageable,
 	{
 		return this.name;
 	}
-	
-	public WorldType getWorldType()
-	{
-		if( this.type == null )
-		{
-			this.type = WorldBuilder.instance.getWorldType( this.name );
-		}
-		return this.type;
-	}
-	
+
 	/********************************************************************************
 	 * Methods - Implements Setting
 	 ********************************************************************************/
@@ -126,7 +114,7 @@ public class WorldTypeSetting implements Setting, JsonSerializable, Packageable,
 		if( target instanceof WorldProvider )
 		{
 			WorldProvider worldProvider = (WorldProvider)target;
-			worldProvider.terrainType = this.getWorldType();
+			worldProvider.terrainType = worldType.findWorldType( this.name );
 		}
 		else if( target instanceof WorldInfo )
 		{
@@ -134,7 +122,7 @@ public class WorldTypeSetting implements Setting, JsonSerializable, Packageable,
 			
 			ReflectionHelper.setPrivateValue( 
 				WorldInfo.class, worldInfo, 
-				WorldBuilder.instance.getWorldType( this.name ), 
+				worldType.findWorldType( this.name ), 
 				new String[] { "field_76098_b", "terrainType" } 
 			);			
 		}

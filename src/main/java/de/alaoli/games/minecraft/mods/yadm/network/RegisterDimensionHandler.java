@@ -6,9 +6,12 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
 
 public class RegisterDimensionHandler implements IMessageHandler<RegisterDimensionMessage, IMessage>
 {
+	protected static final ManageDimensions dimensions = YADimensionManager.INSTANCE;
+	
 	@Override
 	public IMessage onMessage( RegisterDimensionMessage message, MessageContext context ) 
 	{
@@ -16,11 +19,11 @@ public class RegisterDimensionHandler implements IMessageHandler<RegisterDimensi
 		
 		Dimension dimension = message.getDimension();
 		
-		if( !YADimensionManager.INSTANCE.exists( dimension ) )
+		if( !dimensions.existsDimension( dimension.getId() ) )
 		{	 
-			YADimensionManager.INSTANCE.add( dimension );
+			dimensions.addDimension( dimension );
 		}			
-		YADimensionManager.INSTANCE.register( dimension );
+		dimensions.registerDimension( dimension );
 
 		return null;
 	}

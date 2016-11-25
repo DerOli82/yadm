@@ -42,10 +42,7 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	
 	public static final PlayerManager INSTANCE = new PlayerManager();
 	
-	public static final Player dummyP = new Player( null, "@p" );
-	
 	private Map<UUID, Player> mapppingId;
-	
 	private boolean dirty;
 	
 	/********************************************************************************
@@ -183,9 +180,6 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	{
 		//Case sensitive
 		if( this.exists( name ) ) { return (Player)this.get( name ); }
-		
-		//@P dummy
-		if( name.contains( "@p" ) ) { return dummyP; }
 		
 		//Not case sensitive
 		for( Entry<String, Manageable> entry : this.getAll() )

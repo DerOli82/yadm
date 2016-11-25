@@ -20,13 +20,14 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.FindDimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ListDimensions;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
 import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraftforge.common.DimensionManager;
 
-public class YADimensionManager extends ManageableGroup implements ManageDimensions, ListDimensions, JsonFileAdapter 
+public class YADimensionManager extends ManageableGroup implements ManageDimensions, FindDimension, ListDimensions, JsonFileAdapter 
 {
 	/********************************************************************************
 	 * Attributes
@@ -59,7 +60,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	 * 
 	 * @return int
 	 */
-	public int nextDimensionId()
+	protected int nextDimensionId()
 	{
 		while( DimensionManager.isDimensionRegistered( this.nextId ) )
 		{
@@ -68,7 +69,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 		return this.nextId;
 	}
 		
-	public Manageable get( int id )
+	protected Manageable get( int id )
 	{
 		//Mapping
 		if( this.mappingId.containsKey( id ) ) { return this.mappingId.get( id ); }
@@ -90,7 +91,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 		return null;
 	}
 	
-	public Manageable get( String group, String name )
+	protected Manageable get( String group, String name )
 	{
 		if( this.exists( group ) )
 		{
@@ -104,28 +105,6 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 		}
 		return null;
 	}	
-	
-	public void add( Dimension dimension )
-	{
-		if( !this.exists( dimension.getManageableGroupName() ) )
-		{
-			this.add( new DimensionGroup( dimension.getManageableGroupName() ) );
-		}
-		ManageableGroup group = (ManageableGroup)this.get( dimension.getManageableGroupName() );
-		
-		group.add( dimension );
-	}
-	
-	
-	public void remove( Dimension dimension )
-	{
-		if( this.exists( dimension.getManageableGroupName() ) )
-		{
-			ManageableGroup group = (ManageableGroup)this.get( dimension.getManageableGroupName() );
-			
-			group.remove( dimension );
-		}
-	}
 
 	/********************************************************************************
 	 * Methods - Implement ManageableGroup
@@ -254,9 +233,9 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	}
 	
 	@Override
-	public boolean existsDimension( int id )
+	public boolean existsDimension( int dimensionId )
 	{
-		return this.get( id ) != null;
+		return this.get( dimensionId ) != null;
 	}
 	
 	@Override
@@ -276,6 +255,29 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	}
 	
 	@Override
+	public void addDimension( Dimension dimension )
+	{
+		if( !this.exists( dimension.getManageableGroupName() ) )
+		{
+			this.add( new DimensionGroup( dimension.getManageableGroupName() ) );
+		}
+		ManageableGroup group = (ManageableGroup)this.get( dimension.getManageableGroupName() );
+		
+		group.add( dimension );		
+	}
+	
+	@Override
+	public void removeDimension( Dimension dimension )
+	{
+		if( this.exists( dimension.getManageableGroupName() ) )
+		{
+			ManageableGroup group = (ManageableGroup)this.get( dimension.getManageableGroupName() );
+			
+			group.remove( dimension );
+		}		
+	}
+	
+	@Override
 	public Dimension createDimension( String name, Template template ) throws DimensionException
 	{
 		return this.createDimension( "default", name, template );
@@ -287,9 +289,9 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 		Dimension dimension = new Dimension( this.nextDimensionId(), group, name );
 		
 		dimension.add( template.getAll() );
-		this.registerDimension( dimension );
+		YADM.proxy.registerDimension( dimension );
 		
-		this.add( dimension );
+		this.addDimension( dimension );
 		this.setDirty( true );
 
 		return dimension;
@@ -316,12 +318,39 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	@Override
 	public void deleteDimension( Dimension dimension ) throws DimensionException
 	{
-		this.remove( dimension );
+		this.removeDimension( dimension );
 		worldBuilder.markWorldForDeletion( dimension );
 		
+		YADM.proxy.unregisterDimension( dimension );
 		DimensionManager.unloadWorld( dimension.getId() );
 	}
 
+	/********************************************************************************
+	 * Methods - Implement FindDimensions
+	 ********************************************************************************/	
+	
+	@Override
+	public Dimension findDimension( int dimensionId ) throws DimensionException
+	{
+		if( !this.existsDimension( dimensionId ) ) { throw new DimensionException( "Can't find dimension with Id '" + dimensionId + "'."); }
+		
+		return (Dimension)this.get( dimensionId );
+	}
+	
+	@Override
+	public Dimension findDimension( String name ) throws DimensionException
+	{
+		return this.findDimension( "default", name );
+	}
+	
+	@Override
+	public Dimension findDimension( String group, String name ) throws DimensionException
+	{
+		if( !this.existsDimension( group, name ) ) { throw new DimensionException( "Can't find dimension  '" + group + ":" + name + "'."); }
+		
+		return (Dimension) this.get( group, name );
+	}
+	
 	/********************************************************************************
 	 * Methods - Implement ListDimensions
 	 ********************************************************************************/

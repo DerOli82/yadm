@@ -6,12 +6,19 @@ import de.alaoli.games.minecraft.mods.yadm.command.Command;
 import de.alaoli.games.minecraft.mods.yadm.command.CommandException;
 import de.alaoli.games.minecraft.mods.yadm.command.Permission;
 import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
+import de.alaoli.games.minecraft.mods.yadm.world.ListOptions;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.WorldProvider;
 
 public class ListProviderCommand extends Command
 {
+	/********************************************************************************
+	 * Attribute
+	 ********************************************************************************/
+	
+	protected static final ListOptions worlds = WorldBuilder.INSTANCE;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -46,7 +53,7 @@ public class ListProviderCommand extends Command
 		StringBuilder msg;
 		args.sender.addChatMessage( new ChatComponentText( "Choosable providers:" ) );
 		
-		for( Entry<Integer, Class<? extends WorldProvider>> entry : WorldBuilder.instance.getWorldProviders().entrySet() )
+		for( Entry<Integer, Class<? extends WorldProvider>> entry : worlds.listWorldProvider() )
 		{
 			switch( entry.getKey() )
 			{

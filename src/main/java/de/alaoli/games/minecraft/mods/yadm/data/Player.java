@@ -19,6 +19,8 @@ public class Player implements Manageable, JsonSerializable
 	
 	private String name;
 	
+	private Dimension dimension;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -63,6 +65,21 @@ public class Player implements Manageable, JsonSerializable
 		return this.id;
 	}
 	
+	public void setDimension( Dimension dimension )
+	{
+		this.dimension = dimension;
+	}
+	
+	public Dimension getDimension()
+	{
+		return this.dimension;
+	}
+	
+	public boolean ownsDimension()
+	{
+		return this.dimension != null;
+	}
+
 	/********************************************************************************
 	 * Methods - Implement Manageable
 	 ********************************************************************************/

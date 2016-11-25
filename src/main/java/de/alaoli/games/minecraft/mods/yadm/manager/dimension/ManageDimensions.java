@@ -11,9 +11,12 @@ public interface ManageDimensions
 	public void unregisterDimensions() throws DimensionException;
 	public void unregisterDimension( Dimension dimension ) throws DimensionException;
 	
-	public boolean existsDimension( int id );
+	public boolean existsDimension( int dimensionId );
 	public boolean existsDimension( String name );
 	public boolean existsDimension( String group, String name );
+	
+	public void addDimension( Dimension dimension );
+	public void removeDimension( Dimension dimension );
 	
 	public Dimension createDimension( String name, Template template ) throws DimensionException;
 	public Dimension createDimension( String group, String name, Template template ) throws DimensionException;

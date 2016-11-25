@@ -10,10 +10,17 @@ import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ListDimensions;
 import net.minecraft.util.ChatComponentText;
 
 public class ListDimensionCommand extends Command
 {
+	/********************************************************************************
+	 * Attribute
+	 ********************************************************************************/
+	
+	protected static final ListDimensions dimensions = YADimensionManager.INSTANCE;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -50,7 +57,7 @@ public class ListDimensionCommand extends Command
 		
 		args.sender.addChatMessage( new ChatComponentText( "Registered Dimensions:" ) );
 		
-		for( Entry<String, Manageable> groupEntry : YADimensionManager.INSTANCE.getAll() )
+		for( Entry<String, Manageable> groupEntry : dimensions.listDimensions() )
 		{	
 			args.sender.addChatMessage( new ChatComponentText( " - " + groupEntry.getValue().getManageableGroupName() + ":" ) );
 			

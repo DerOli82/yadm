@@ -1,29 +1,16 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
-import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
-import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportException;
-import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportPlayer;
-import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
+import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.command.PlayerSelector;
-import net.minecraft.entity.player.EntityPlayer;
 
-public class TPCommand extends Command
+public class TPToCommand extends Command
 {
-	/********************************************************************************
-	 * Attributes
-	 ********************************************************************************/
-	
-	protected static final TeleportPlayer players = PlayerManager.INSTANCE;
-	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
 
-	public TPCommand( Command parent ) 
+	public TPToCommand( Command parent ) 
 	{
 		super( parent );
 	}
@@ -35,19 +22,19 @@ public class TPCommand extends Command
 	@Override
 	public String getCommandName() 
 	{
-		return "tp";
+		return "tpto";
 	}
 
 	@Override
 	public String getCommandUsage( ICommandSender sender ) 
 	{
-		return super.getCommandUsage( sender ) + " <dimensionName|Id> [<x> <y> <z>] [<player]";
+		return super.getCommandUsage( sender ) + " <dimensionOwner>";
 	}
 	
 	@Override
 	public Permission requiredPermission()
 	{
-		return Permission.OPERATOR;
+		return Permission.PLAYER;
 	}
 	
 	@Override
@@ -62,6 +49,13 @@ public class TPCommand extends Command
 			this.sendUsage( args.sender );
 			return;
 		}
+		Player player = args.parsePlayer();
+		
+		if( !player.ownsDimension() ) { throw new CommandException( player.getManageableName() + "doesn't owns any dimension." );}
+		
+		
+		
+		/*
 		Dimension dimension = args.parseDimension( true );
 		Coordinate coordinate = null;
 		EntityPlayer player = null;
@@ -69,7 +63,7 @@ public class TPCommand extends Command
 		try
 		{
 			coordinate = args.parseCoordinate();
-			player = PlayerSelector.matchOnePlayer( args.sender, args.parsePlayer().getManageableName() );
+			player = args.getEntityPlayer( args.parsePlayer() );
 		}
 		catch( CommandException e )
 		{
@@ -84,11 +78,11 @@ public class TPCommand extends Command
 		
 		try
 		{
-			players.teleport( new TeleportSettings( dimension, player, coordinate ));
+			TeleportUtil.teleport( new TeleportSettings( dimension, player, coordinate ));
 		}
 		catch( TeleportException e )
 		{
 			throw new CommandException( e.getMessage(), e );
-		}
+		}*/
 	}
 }

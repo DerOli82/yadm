@@ -2,6 +2,7 @@ package de.alaoli.games.minecraft.mods.yadm.proxy;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.StringJoiner;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -15,6 +16,7 @@ import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.event.handler.DimensionEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.handler.DimensionFMLEvent;
+import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
@@ -25,56 +27,85 @@ import net.minecraftforge.common.config.Configuration;
 public class CommonProxy 
 {	
 	/********************************************************************************
+	 * Attributes
+	 ********************************************************************************/
+	
+	protected static final JsonFileAdapter templateFiles = TemplateManager.INSTANCE;
+	protected static final JsonFileAdapter playerFiles = PlayerManager.INSTANCE;	
+	protected static final YADimensionManager dimensions = YADimensionManager.INSTANCE;
+	
+	/********************************************************************************
 	 * Methods - FML
 	 ********************************************************************************/
 	
+	/**
+	 * Load templates from JSON files and register network message dispatcher
+	 * 
+	 * @param FMLPreInitializationEvent event
+	 */
 	public void preInit( FMLPreInitializationEvent event ) 
 	{
 		Config.init( new Configuration( event.getSuggestedConfigurationFile() ) );
 		
-		StringBuilder path = new StringBuilder();
+		StringJoiner path = new StringJoiner( File.separator )
+			.add( event.getModConfigurationDirectory().toString() )
+			.add( YADM.MODID + "-templates" );
+		templateFiles.setSavePath( path.toString() );
 		
-		path.append( event.getModConfigurationDirectory().toString() );
-		path.append( File.separator );
-		path.append( YADM.MODID );
-		path.append( "-templates" );
-		path.append( File.separator );
-		
-		TemplateManager.INSTANCE.setSavePath( path.toString() );
 		try 
 		{
-			TemplateManager.INSTANCE.load();
+			templateFiles.load();
 			
 		} catch ( DataException | IOException e )
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		MessageDispatcher.register();
 	}
 	
+	/**
+	 * Register events
+	 * 
+	 * @param FMLInitializationEvent event
+	 */
 	public void init( FMLInitializationEvent event )
 	{
 		FMLCommonHandler.instance().bus().register( new DimensionFMLEvent() );
 		MinecraftForge.EVENT_BUS.register( new DimensionEvent() );
 	}
 	
+	/**
+	 * Load players, dimensions and register server commands
+	 * 
+	 * @param FMLServerStartingEvent event
+	 * @throws DataException
+	 * @throws IOException
+	 */
 	public void serverStarting( FMLServerStartingEvent event ) throws DataException, IOException
 	{
-		PlayerManager.INSTANCE.load();
-		YADimensionManager.INSTANCE.load();
-		YADimensionManager.INSTANCE.register();
+		playerFiles.load();
+		dimensions.load();
+		
+		dimensions.registerDimensions();
 		
 		event.registerServerCommand( new YADMCommandGroup() );
 	}
 
+	/**
+	 * Save players, dimensions and cleanup
+	 * @param event
+	 * @throws DataException
+	 * @throws IOException
+	 */
 	public void serverStopped( FMLServerStoppedEvent event ) throws DataException, IOException 
 	{
-		PlayerManager.INSTANCE.save();
-		PlayerManager.INSTANCE.cleanup();
-		YADimensionManager.INSTANCE.save();
-		YADimensionManager.INSTANCE.cleanup();
+		playerFiles.save();
+		dimensions.save();
+		
+		dimensions.unregisterDimensions();
+		
+		playerFiles.cleanup();
+		dimensions.cleanup();
 	}
 	
 	/********************************************************************************
@@ -83,12 +114,8 @@ public class CommonProxy
 	
 	public void registerDimension( Dimension dimension )
 	{
-		YADimensionManager.INSTANCE.register( dimension );
-		YADimensionManager.INSTANCE.init( dimension );
+		dimensions.registerDimension( dimension );
 	}
 	
-	public void unregisterDimension( Dimension dimension )
-	{
-		//Nothing to do here
-	}
+	public void unregisterDimension( Dimension dimension ) {}
 }

@@ -3,11 +3,12 @@ package de.alaoli.games.minecraft.mods.yadm.world;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.StringJoiner;
 
 import org.apache.commons.io.FileUtils;
@@ -45,7 +46,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 
-public class WorldBuilder implements ManageWorlds, ListOptions
+public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 {
 	/********************************************************************************
 	 * Attributes
@@ -58,8 +59,8 @@ public class WorldBuilder implements ManageWorlds, ListOptions
 	
 	private int nextId;
 	
-	private Hashtable<Integer, Class<? extends WorldProvider>> worldProviders;
-	private Hashtable<String, WorldType> worldTypes;	
+	private Map<Integer, Class<? extends WorldProvider>> worldProviders;
+	private Map<String, WorldType> worldTypes;	
 	
 	private List<Integer> registeredWorldIds;
 	private Map<Integer, Dimension> worldsForDeletion; 
@@ -297,6 +298,7 @@ public class WorldBuilder implements ManageWorlds, ListOptions
 		((WorldServer)world).flush();
 		dimensionManager.unregisterDimension( dimension );
 		
+		
 		//Delete dimension folder
 		StringJoiner path = new StringJoiner( File.separator )
 			.add( DimensionManager.getCurrentSaveRootDirectory().toString() )
@@ -359,20 +361,33 @@ public class WorldBuilder implements ManageWorlds, ListOptions
 		
 		return worldServer;		
 	}
+
+	
+	/********************************************************************************
+	 * Methods - Implement FindWorldType
+	 ********************************************************************************/
+	
+	@Override
+	public WorldType findWorldType( String name ) throws WorldException
+	{
+		if( !this.worldTypes.containsKey( name ) ) { throw new WorldException( "Can't find WorldType '" + name + "'."); }
+		
+		return this.worldTypes.get( name );
+	}
 	
 	/********************************************************************************
 	 * Methods - Implement ListOptions
 	 ********************************************************************************/
 	
 	@Override
-	public Collection<Class<? extends WorldProvider>> listWorldProvider()
+	public Set<Entry<Integer, Class<? extends WorldProvider>>> listWorldProvider()
 	{
-		return this.worldProviders.values();
+		return this.worldProviders.entrySet();
 	}
 	
 	@Override
-	public Collection<WorldType> listWorldType()
+	public Set<Entry<String, WorldType>>  listWorldType()
 	{
-		return this.worldTypes.values();
+		return this.worldTypes.entrySet();
 	}
 }

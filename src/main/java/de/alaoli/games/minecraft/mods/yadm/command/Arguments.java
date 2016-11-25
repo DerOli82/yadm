@@ -5,11 +5,17 @@ import java.util.LinkedList;
 import java.util.Queue;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.FindPlayer;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
+import de.alaoli.games.minecraft.mods.yadm.manager.template.FindTemplate;
+import de.alaoli.games.minecraft.mods.yadm.manager.template.TemplateException;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerSelector;
@@ -18,15 +24,19 @@ import net.minecraftforge.common.DimensionManager;
 
 public class Arguments 
 {
+	protected static final FindPlayer players = PlayerManager.INSTANCE;
+	protected static final FindTemplate templates = TemplateManager.INSTANCE; 
+	protected static final YADimensionManager dimensions = YADimensionManager.INSTANCE;
+	
 	private Queue<String> args;
 	
-	final public ICommandSender sender; 
-	final public boolean senderIsEntityPlayer; 
-	final public boolean senderIsOP;
+	public final ICommandSender sender; 
+	public final boolean senderIsEntityPlayer; 
+	public final boolean senderIsOP;
 	
 	public Arguments( ICommandSender sender, String[] args )
 	{
-		this.sender = sender;	
+		this.sender = sender;
 		this.senderIsEntityPlayer = sender instanceof EntityPlayer;
 		this.senderIsOP = sender.canCommandSenderUseCommand( 2, "yadm" );
 		
@@ -54,7 +64,15 @@ public class Arguments
 	
 	public String next()
 	{
-		return this.args.remove();
+		String next = this.args.remove();
+		
+		//Replace @p with player name
+		if( next.contains( "@p" ) )
+		{
+			EntityPlayer player = PlayerSelector.matchOnePlayer( this.sender, "@p" );
+			next = next.replaceAll( "@p", player.getDisplayName() );
+		}
+		return next;
 	}
 	
 	/********************************************************************************
@@ -79,21 +97,10 @@ public class Arguments
 	    }
 	    return true;
 	}    
-		
-	public EntityPlayer getEntityPlayer( Player player )
+
+	public Player getSenderAsPlayer() throws PlayerException
 	{
-		EntityPlayer result = PlayerSelector.matchOnePlayer( this.sender, player.getManageableName() );
-		
-		if( result == null ) { throw new CommandException( "Couldn't find player entity." ); }
-		
-		return result;
-	}
-	
-	public EntityPlayer getSenderAsEntityPlayer()
-	{
-		if( !this.senderIsEntityPlayer ) { throw new CommandException( "Sender isn't a player." ); }
-		
-		return (EntityPlayer)this.sender;
+		return players.findPlayer( this.sender );
 	}
 	
 	/**********************************************************************
@@ -114,14 +121,7 @@ public class Arguments
 	public String[] parseGroupAndName( String name ) throws CommandException
 	{
 		String[] groupAndName;
-		
-		//Get player name
-		if( name.contains( "@p" ) )
-		{
-			EntityPlayer player = PlayerSelector.matchOnePlayer( this.sender, "@p" );
-			name = name.replaceAll( "@p", player.getDisplayName() );
-		}
-		
+
 		if( name.contains( ":" ) )
 		{
 			groupAndName =  name.split( ":" );
@@ -148,16 +148,11 @@ public class Arguments
 		return groupAndName;
 	}
 	
-	public Template parseTemplate() throws CommandException
+	public Template parseTemplate() throws CommandException, TemplateException
 	{	
 		String[] groupAndName = this.parseGroupAndName();
 
-		//Template exists?
-		if( !TemplateManager.INSTANCE.exists( groupAndName[0], groupAndName[1] ) ) 
-		{
-			throw new CommandException( "Template '" + groupAndName[0] + ":" + groupAndName[1] + "' doesn't exists." );
-		}
-		return (Template) TemplateManager.INSTANCE.get( groupAndName[0], groupAndName[1] );
+		return templates.findTemplate( groupAndName[0], groupAndName[1] );
 	}
 	
 	public Dimension parseDimension() throws CommandException
@@ -165,30 +160,29 @@ public class Arguments
 		return this.parseDimension( false );
 	}
 	
-	public Dimension parseDimension( boolean includeVanillaDimensions ) throws CommandException
+	public Dimension parseDimension( boolean includeVanillaDimensions ) throws CommandException, DimensionException
 	{
 		Dimension dimension;
 		String value = this.next();
 		
 		if( isInt( value ) )
 		{
-			int id = Integer.valueOf( value );
+			int dimensionId = Integer.valueOf( value );
 			
-			if( YADimensionManager.INSTANCE.exists( id ) )
+			if( dimensions.existsDimension(dimensionId) )
 			{
-				dimension = YADimensionManager.INSTANCE.get( id );
+				dimension = dimensions.findDimension( dimensionId );
 			}
 			else
 			{
 				if( ( includeVanillaDimensions ) && 
-					( DimensionManager.isDimensionRegistered( id ) ) )
+					( DimensionManager.isDimensionRegistered( dimensionId ) ) )
 				{
-					dimension = new Dimension( id, null, null );
-					dimension.setRegistered( true );
+					dimension = new DimensionDummy( dimensionId );
 				}
 				else
 				{
-					throw new CommandException( "Dimension '" + id + "' doesn't exists." );
+					throw new CommandException( "Dimension '" + dimensionId + "' doesn't exists." );
 				}
 			}
 		}
@@ -196,31 +190,24 @@ public class Arguments
 		{
 			String[] groupAndName = this.parseGroupAndName( value );
 			
-			if( !YADimensionManager.INSTANCE.exists( groupAndName[0], groupAndName[1] ) )
-			{
-				throw new CommandException( "Dimension '" + groupAndName[0] + ":" + groupAndName[1] + "' doesn't exists." );
-			}
-			dimension = YADimensionManager.INSTANCE.get( groupAndName[0], groupAndName[1] );
+			dimension = dimensions.findDimension( groupAndName[0], groupAndName[1] );
 		}
+		if( dimension == null ) { throw new CommandException( "Couldn't find Dimension '" + value + "'." ); }
 		
-		if( dimension == null )
-		{
-			throw new CommandException( "Couldn't find Dimension '" + value + "'." );
-		}
 		return dimension;		
 	}
 	
-	public Dimension parseAndCreateDimension() throws CommandException
+	public Dimension parseAndCreateDimension() throws CommandException, TemplateException, DimensionException, PlayerException
 	{
 		Player owner = null;
 		Template template = this.parseTemplate();
 		String[] groupAndName = this.parseGroupAndName();
 
-		if( YADimensionManager.INSTANCE.exists( groupAndName[0], groupAndName[1] ) )
+		if( dimensions.existsDimension( groupAndName[0], groupAndName[1] ) )
 		{
 			throw new CommandException( "Dimension '" + groupAndName[0] + ":" + groupAndName[1] + "' already exists." );
 		}
-		Dimension dimension = YADimensionManager.INSTANCE.create( groupAndName[0], groupAndName[1], template );
+		Dimension dimension = dimensions.createDimension( groupAndName[0], groupAndName[1], template );
 		
 		if( dimension == null )
 		{
@@ -230,19 +217,12 @@ public class Arguments
 		try
 		{
 			 owner = this.parsePlayer();
+			 dimension.setOwner( owner );
 		}
-		catch( CommandException e )
+		catch( CommandException|PlayerException e )
 		{
 			//Ignore because optional
 		}
-		
-		if( ( owner == null ) && 
-			( this.senderIsEntityPlayer ) )
-		{
-			owner = (Player) PlayerManager.INSTANCE.get( ((EntityPlayer)this.sender).getUniqueID() );
-		}
-		dimension.setOwner( owner );
-		
 		return dimension;
 	}
 	
@@ -263,23 +243,10 @@ public class Arguments
 		return new Coordinate( Integer.valueOf( x ),Integer.valueOf( y ),Integer.valueOf( z ) );
 	}
 	
-	public Player parsePlayer() throws CommandException
+	public Player parsePlayer() throws CommandException, PlayerException
 	{
-		if( this.isEmpty() )
-		{
-			throw new CommandException( "Missing <player> argument." );
-		}
-		String name = this.next();
+		if( this.isEmpty() ) { throw new CommandException( "Missing <player> argument." ); }
 		
-		if( name.contains( "@p" ) )
-		{
-			return new Player( null, "@p" );
-		}
-		else
-		{
-			if( !PlayerManager.INSTANCE.exists( name ) ) { throw new CommandException( "Couldn't find player." ); }
-			
-			return (Player)PlayerManager.INSTANCE.get( name );
-		}
+		return players.findPlayer( this.next() );
 	}
 }

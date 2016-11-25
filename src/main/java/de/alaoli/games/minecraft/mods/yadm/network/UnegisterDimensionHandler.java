@@ -9,6 +9,8 @@ import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 
 public class UnegisterDimensionHandler implements IMessageHandler<UnregisterDimensionMessage, IMessage>
 {
+	protected static final YADimensionManager dimensions = YADimensionManager.INSTANCE;
+	
 	@Override
 	public IMessage onMessage( UnregisterDimensionMessage message, MessageContext context ) 
 	{
@@ -16,11 +18,11 @@ public class UnegisterDimensionHandler implements IMessageHandler<UnregisterDime
 		
 		int dimensionId = message.getDimensionId();
 		
-		if( YADimensionManager.INSTANCE.exists( dimensionId ) )
+		if( dimensions.existsDimension( dimensionId ) )
 		{
-			Dimension dimension = YADimensionManager.INSTANCE.get( dimensionId );	
-			YADimensionManager.INSTANCE.unregister( dimension );
-			YADimensionManager.INSTANCE.remove( dimension );
+			Dimension dimension = dimensions.findDimension( dimensionId );
+			dimensions.unregisterDimension( dimension );
+			dimensions.removeDimension( dimension );
 		}
 		return null;
 	}

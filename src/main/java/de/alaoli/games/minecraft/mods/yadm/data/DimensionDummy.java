@@ -8,5 +8,6 @@ public class DimensionDummy extends Dimension
 	public DimensionDummy( int id )
 	{
 		super( id, null, null );
+		this.setRegistered( true );
 	}
 }

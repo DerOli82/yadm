@@ -1,17 +1,21 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
 import de.alaoli.games.minecraft.mods.yadm.Config;
-import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.teleport.TeleportException;
-import de.alaoli.games.minecraft.mods.yadm.teleport.TeleportSettings;
-import de.alaoli.games.minecraft.mods.yadm.util.TeleportUtil;
+import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportPlayer;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChatComponentText;
 
 public class CreateCommand extends Command
 {
+	/********************************************************************************
+	 * Attributes
+	 ********************************************************************************/
+	
+	protected static final TeleportPlayer players = PlayerManager.INSTANCE;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -60,21 +64,11 @@ public class CreateCommand extends Command
 		{
 			Dimension dimension = args.parseAndCreateDimension();
 
-			YADM.proxy.registerDimension( dimension );
-			
 			if( ( Config.Dimension.teleportOnCreate ) && 
 				( args.senderIsEntityPlayer ) )
 			{
-				TeleportUtil.teleport( new TeleportSettings( dimension, (EntityPlayer)args.sender ) );
+				players.teleport( new TeleportSettings( dimension, (EntityPlayer)args.sender ) );
 			}			
-		}
-		catch( CommandException e )
-		{
-			throw e;
-		}
-		catch( TeleportException e )
-		{
-			throw new CommandException( e.getMessage(), e );
 		}
 		catch( RuntimeException e )
 		{

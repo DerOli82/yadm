@@ -7,11 +7,19 @@ import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
-import net.minecraft.entity.player.EntityPlayer;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.FindDimension;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
 import net.minecraft.util.ChatComponentText;
 
 public class OwnerCommand extends Command
 {
+	/********************************************************************************
+	 * Attributes
+	 ********************************************************************************/
+	
+	protected static final FindDimension dimensions = YADimensionManager.INSTANCE;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -48,22 +56,35 @@ public class OwnerCommand extends Command
 		switch( cmd )
 		{
 			case "set" :
-				if( args.senderIsEntityPlayer )
+				try
 				{
-					EntityPlayer sender = (EntityPlayer)args.sender;
+					Dimension dimension = dimensions.findDimension( args.sender.getEntityWorld().provider.dimensionId );
+					Player player = args.parsePlayer();
 					
-					if( YADimensionManager.INSTANCE.exists( sender.dimension ) )
-					{
-						Player owner = args.parsePlayer();
-						Dimension dimension = YADimensionManager.INSTANCE.get( sender.dimension );
-						
-						dimension.setOwner( owner );
-						
-						sender.addChatComponentMessage( 
-							new ChatComponentText( owner + " now owns dimension " + dimension )
-						);
-					}
+					dimension.setOwner( player );
+					args.sender.addChatMessage( new ChatComponentText( player + " now owns dimension '" + dimension + "'." ) );
 				}
+				catch( DimensionException|PlayerException e )
+				{
+					throw new CommandException( e.getMessage(), e );
+				}
+				break;
+				
+			case "unset" :
+				try
+				{
+					Dimension dimension = dimensions.findDimension( args.sender.getEntityWorld().provider.dimensionId );
+					
+					if( dimension.hasOwner() )
+					{
+						dimension.setOwner( null );
+					}
+					args.sender.addChatMessage( new ChatComponentText( "Owner has removed form dimension '" + dimension + "'." ) );
+				}
+				catch( DimensionException e )
+				{
+					throw new CommandException( e.getMessage(), e );
+				}				
 				break;
 				
 			default:

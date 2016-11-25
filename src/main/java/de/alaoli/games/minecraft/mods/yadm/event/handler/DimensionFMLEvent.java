@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
@@ -13,11 +12,11 @@ import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.ManagePlayers;
 import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
 import de.alaoli.games.minecraft.mods.yadm.network.SyncDimensionsMessage;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -25,7 +24,9 @@ import net.minecraft.network.NetHandlerPlayServer;
 
 public class DimensionFMLEvent 
 {
-    @SubscribeEvent( priority = EventPriority.HIGHEST )
+	protected static final ManagePlayers playerManager = PlayerManager.INSTANCE; 
+	
+    @SubscribeEvent
     public void onClientConnected( FMLNetworkEvent.ServerConnectionFromClientEvent event )
     {
     	EntityPlayerMP player = ((NetHandlerPlayServer) event.handler).playerEntity;
@@ -33,10 +34,9 @@ public class DimensionFMLEvent
     	Log.info( "Client connected..." );
     	
     	//Register unknown players
-    	if( !PlayerManager.INSTANCE.exists( player ) )
+    	if( !playerManager.existsPlayer( player ) )
     	{
-    		PlayerManager.INSTANCE.add( new Player( player ) );
-    		PlayerManager.INSTANCE.setDirty( true );
+    		playerManager.addPlayer( player );
     	}
     	
     	//Sync dimensions

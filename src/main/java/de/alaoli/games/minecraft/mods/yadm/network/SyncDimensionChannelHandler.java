@@ -5,12 +5,14 @@ import cpw.mods.fml.common.network.FMLIndexedMessageToMessageCodec;
 import cpw.mods.fml.relauncher.Side;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 
 public class SyncDimensionChannelHandler extends FMLIndexedMessageToMessageCodec<SyncDimensionsMessage>
 {
-
+	protected static final ManageDimensions dimensions = YADimensionManager.INSTANCE;
+	
     public SyncDimensionChannelHandler() {
         addDiscriminator(0, SyncDimensionsMessage.class);
     }
@@ -31,11 +33,11 @@ public class SyncDimensionChannelHandler extends FMLIndexedMessageToMessageCodec
 		{
 			for( Dimension dimension : msg.getDimensions() )
 			{	
-				if( !YADimensionManager.INSTANCE.exists( dimension ) )
+				if( !dimensions.existsDimension( dimension.getId() ) )
 				{	 
-					YADimensionManager.INSTANCE.add( dimension );
+					dimensions.addDimension( dimension );
 				}			
-				YADimensionManager.INSTANCE.register( dimension );
+				dimensions.registerDimension( dimension );
 			}
 		}
 	}
