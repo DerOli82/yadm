@@ -6,13 +6,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import sun.misc.Version;
 
 @IFMLLoadingPlugin.MCVersion( value = "1.7.10" )
 @IFMLLoadingPlugin.Name( value = "YADMLoadingPlugin" )
@@ -27,59 +30,13 @@ public class YADMLoadingPlugin implements IFMLLoadingPlugin
 		Properties properties = new Properties();
 		InputStream input = this.getClass().getClassLoader().getResourceAsStream( "dependencies.properties" );
 		
-		if( input == null ) {
-			throw new FileNotFoundException( "Property file 'dependencies.properties' not found in the classpath."  );
-		}
+		if( input == null ) { throw new FileNotFoundException( "Property file 'dependencies.properties' not found in the classpath."  ); }
 		properties.load( input );
 		input.close();
 		
 		return properties;
 	}
-	
-	public static boolean dependencyExists( File folder, String[] dependency )
-	{
-		for( File file :folder.listFiles() )
-		{
-			if( file.getName().contains( dependency[1] ) )
-			{
-				return true;
-			}
-			
-		}
-		return false;
-	}
 
-	public static void downloadDependency( String url, File folder, String[] dependency ) throws MalformedURLException, IOException
-	{
-		Log.info( "Downloading dependencies..." );
-		
-		StringBuilder filename = new StringBuilder()
-			.append( dependency[1] )
-			.append( "-" )
-			.append( dependency[2] )
-			.append( ".jar" );
-		
-		StringBuilder download = new StringBuilder()
-			.append(url)
-			.append( dependency[0].replace( ".", "/" ) )
-			.append( "/" )
-			.append( dependency[1] )
-			.append( "/" )
-			.append( dependency[2] )
-			.append( "/" )
-			.append( filename );
-		Log.info( "Downloading '" + filename.toString() + "' from '" +download.toString() + "'.");
-		FileUtils.copyURLToFile( new URL( download.toString() ), new File( folder, filename.toString() ) );
-	}
-	
-	public static void checkAndDownloadDependency( String url, File folder, String[] dependency ) throws MalformedURLException, IOException
-	{
-		if( !dependencyExists( folder, dependency ) )
-		{
-			downloadDependency( url, folder, dependency );
-		}
-	}
-	
 	/********************************************************************************
 	 * Methods - Implement IFMLLoadingPlugin
 	 ********************************************************************************/
@@ -125,14 +82,22 @@ public class YADMLoadingPlugin implements IFMLLoadingPlugin
         
 		try 
 		{
+			Dependency dependency;
 			Properties properties = this.getProperties();
-			String mavenurl = properties.getProperty( "mavenurl" );
 			
+			Dependency.setMavenUrl( properties.getProperty( "mavenurl" ) );
+			Dependency.setDownloadFolder( folder );
 			properties.remove( "mavenurl" );
 			
 			for( Object property : properties.values() )
 			{
-				checkAndDownloadDependency( mavenurl, folder, ((String)property).split( ";" ) );
+				dependency = new Dependency( (String)property );
+				
+				if( dependency.isDownloadNewer() )
+				{
+					dependency.delete();
+					dependency.download();
+				}
 			}
 		}
 		catch ( IOException e )
