@@ -10,6 +10,7 @@ import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.FindDimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
 public class OwnerCommand extends Command
@@ -39,6 +40,13 @@ public class OwnerCommand extends Command
 		return "owner";
 	}
 
+
+	@Override
+	public String getCommandUsage( ICommandSender sender ) 
+	{
+		return super.getCommandUsage( sender ) + " set <player>|unset";
+	}
+	
 	@Override
 	public Permission requiredPermission()
 	{
@@ -50,8 +58,13 @@ public class OwnerCommand extends Command
 	{
 		//Check permission
 		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
-						
-		String cmd = args.next();
+					
+		String cmd = "";
+		
+		if( !args.isEmpty() )
+		{
+			cmd = args.next();
+		}
 		
 		switch( cmd )
 		{
@@ -90,6 +103,7 @@ public class OwnerCommand extends Command
 				break;
 				
 			default:
+				this.sendUsage( args.sender );
 				break;
 		}
 	}
