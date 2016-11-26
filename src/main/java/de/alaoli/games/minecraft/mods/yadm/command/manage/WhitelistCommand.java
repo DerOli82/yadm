@@ -23,7 +23,7 @@ public class WhitelistCommand extends Command
 	 * Attribute
 	 ********************************************************************************/
 	
-	protected static final FindDimension dimensions = YADimensionManager.INSTANCE;
+	protected static final YADimensionManager dimensions = YADimensionManager.INSTANCE;
 	
 	/********************************************************************************
 	 * Methods
@@ -72,29 +72,40 @@ public class WhitelistCommand extends Command
 		{
 			throw new CommandException( e.getMessage(), e );
 		}
-		String action = args.next();
+		String action = "";
+		
+		if( !args.isEmpty() )
+		{
+			action = args.next();
+		}
 		
 		if( !dimension.hasSetting( SettingType.WHITELIST ) )
 		{
 			dimension.add( new WhitelistSetting() );
 		}
 		WhitelistSetting setting = (WhitelistSetting)dimension.get( SettingType.WHITELIST );
-		Player player = args.parsePlayer();
 		
 		if( !setting.isEditable() ) { throw new CommandException( "Whitelist isn't editable."); }
+		
+		Player player;
 		
 		switch( action )
 		{
 			case "add":
+				player = args.parsePlayer();
 				setting.add( player );
+				dimensions.setDirty( true );
 				break;
 				
 			case "remove":
+				player = args.parsePlayer();
 				setting.remove( player );
+				dimensions.setDirty( true );
 				break;
 				
 			case "list" :
 			default :
+				this.sendUsage( args.sender );
 				args.sender.addChatMessage( new ChatComponentText( "Whitelist:" ) );
 				
 				for( Entry<UUID, Player> entry : setting.getUsers() )

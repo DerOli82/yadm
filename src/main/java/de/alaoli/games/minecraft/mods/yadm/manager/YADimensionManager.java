@@ -80,9 +80,9 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )		
 			{		
 				if( ( dimensionEntry.getValue() instanceof Dimension ) &&
-					( ((Dimension)dimensionEntry).getId() == id ) )
+					( ((Dimension)dimensionEntry.getValue()).getId() == id ) )
 				{
-					this.mappingId.put( ((Dimension)dimensionEntry).getId(), (Dimension)dimensionEntry );
+					this.mappingId.put( ((Dimension)dimensionEntry.getValue()).getId(), (Dimension)dimensionEntry.getValue() );
 					
 					return dimensionEntry.getValue();
 				}
@@ -464,6 +464,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	@Override
 	public void cleanup()
 	{
+		this.mappingId.clear();
 		this.clear();
 	}	
 }

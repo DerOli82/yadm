@@ -18,7 +18,7 @@ public class OwnerCommand extends Command
 	 * Attributes
 	 ********************************************************************************/
 	
-	protected static final FindDimension dimensions = YADimensionManager.INSTANCE;
+	protected static final YADimensionManager dimensions = YADimensionManager.INSTANCE;
 	
 	/********************************************************************************
 	 * Methods
@@ -62,6 +62,7 @@ public class OwnerCommand extends Command
 					Player player = args.parsePlayer();
 					
 					dimension.setOwner( player );
+					dimensions.setDirty( true );
 					args.sender.addChatMessage( new ChatComponentText( player + " now owns dimension '" + dimension + "'." ) );
 				}
 				catch( DimensionException|PlayerException e )
@@ -78,8 +79,9 @@ public class OwnerCommand extends Command
 					if( dimension.hasOwner() )
 					{
 						dimension.setOwner( null );
+						dimensions.setDirty( true );
 					}
-					args.sender.addChatMessage( new ChatComponentText( "Owner has removed form dimension '" + dimension + "'." ) );
+					args.sender.addChatMessage( new ChatComponentText( "Owner has removed from dimension '" + dimension + "'." ) );
 				}
 				catch( DimensionException e )
 				{

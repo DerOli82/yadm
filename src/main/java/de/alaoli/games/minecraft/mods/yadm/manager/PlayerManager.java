@@ -309,6 +309,7 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	@Override
 	public void cleanup()
 	{
+		this.mapppingId.clear();
 		this.clear();
 	}		
 }

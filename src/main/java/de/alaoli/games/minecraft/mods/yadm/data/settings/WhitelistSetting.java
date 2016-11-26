@@ -13,12 +13,16 @@ import com.eclipsesource.json.JsonValue;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.FindPlayer;
 
 public class WhitelistSetting implements Setting, JsonSerializable
 {
 	/********************************************************************************
 	 * Attribute
 	 ********************************************************************************/
+	
+	protected static final FindPlayer players = PlayerManager.INSTANCE;
 	
 	private Map<UUID, Player> users;
 	
@@ -88,7 +92,7 @@ public class WhitelistSetting implements Setting, JsonSerializable
 		
 		for( Entry<UUID, Player> entry : this.users.entrySet() )
 		{
-			array.add( entry.getValue().serialize() );
+			array.add( entry.getValue().getId().toString() );
 		}
 		json.add( "type", this.getSettingType().toString() );
 		json.add( "users", array );
@@ -114,11 +118,9 @@ public class WhitelistSetting implements Setting, JsonSerializable
 		
 		for( JsonValue value : users )
 		{
-			player = new Player();
+			if( !value.isString() ) { throw new DataException( "Whitelist 'user' isn't a string." ); }
 			
-			player.deserialize( value );
-			
-			this.add( player );
+			this.add( players.findPlayer( UUID.fromString( value.asString() ) ) );
 		}
 		if( obj.get( "editable" ) == null ) { throw new DataException( "WhitelistSetting 'editable' is missing." ); }
 		if( !obj.get( "editable" ).isBoolean() ) { throw new DataException( "WhitelistSetting 'editable' isn't an boolean." ); }
