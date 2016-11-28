@@ -92,6 +92,8 @@ public class TemplateManager extends ManageableGroup implements FindTemplate, Js
 		if( ( manageable != null ) && 
 			( manageable instanceof ManageableGroup ) )
 		{
+			if( !((ManageableGroup)manageable).exists( name ) ) { throw new TemplateException( "Can't find template '" + group + ":" + name + "'" ); }
+			
 			return (Template)((ManageableGroup)manageable).get( name );
 		}
 		throw new TemplateException( "Can't find template '" + group + ":" + name + "'" );
