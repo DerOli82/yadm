@@ -212,7 +212,7 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
         {
             world.getWorldInfo().setGameType( mcServer.getGameType() );
         }
-        mcServer.func_147139_a( mcServer.func_147135_j() );		
+        mcServer.setDifficultyForAllWorlds( mcServer.getDifficulty() );		
 	}
 	
 	/********************************************************************************
