@@ -3,6 +3,7 @@ package de.alaoli.games.minecraft.mods.yadm.data.settings;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder.KnockbackSetting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder.MessageSetting;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder.TravelSetting;
 
 public class SettingFactory 
 {
@@ -33,6 +34,9 @@ public class SettingFactory
 			case WHITELIST :
 				return new WhitelistSetting();
 				
+			case WORLDGUARD :
+				return new WorldGuardSetting();				
+				
 			case WORLDBORDER :
 				return new WorldBorderSetting();
 				
@@ -41,6 +45,9 @@ public class SettingFactory
 				
 			case WORLDBORDER_KNOCKBACK :
 				return new KnockbackSetting();
+				
+			case WORLDBORDER_TRAVEL :
+				return new TravelSetting();
 				
 			default:
 				throw new DataException( "Unknown setting type." );

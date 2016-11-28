@@ -16,6 +16,7 @@ import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.event.handler.DimensionEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.handler.DimensionFMLEvent;
+import de.alaoli.games.minecraft.mods.yadm.event.handler.WorldGuardEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
@@ -72,6 +73,7 @@ public class CommonProxy
 	{
 		FMLCommonHandler.instance().bus().register( new DimensionFMLEvent() );
 		MinecraftForge.EVENT_BUS.register( new DimensionEvent() );
+		MinecraftForge.EVENT_BUS.register( new WorldGuardEvent() );
 	}
 	
 	/**

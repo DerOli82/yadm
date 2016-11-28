@@ -10,13 +10,14 @@ public enum SettingType
 	GENERATOROPTIONS( "generatorOptions" ),
 	SPAWN( "spawn" ),
 	WHITELIST( "whitelist" ),
+	WORLDGUARD( "worldGuard" ),
 	WORLDBORDER( "border" ),
 	WORLDBORDER_MESSAGE( "border:message" ),
-	WORLDBORDER_KNOCKBACK( "border:knockback" );
+	WORLDBORDER_KNOCKBACK( "border:knockback" ),
+	WORLDBORDER_TRAVEL( "border:travel" );
 	
-	private String name;
-	
-	private boolean required;
+	public final String name;
+	public final boolean required;
 	
 	private SettingType( String name )
 	{
@@ -27,7 +28,7 @@ public enum SettingType
 	private SettingType( String name, boolean required )
 	{
 		this.name = name;
-		this.required = true;
+		this.required = required;
 	}
 	
 	@Override
@@ -36,11 +37,6 @@ public enum SettingType
 		return this.name;
 	}
 
-	public boolean isRequired()
-	{
-		return this.required;
-	}
-	
 	public static SettingType get( String name )
 	{
 		for( SettingType type : SettingType.values() )
