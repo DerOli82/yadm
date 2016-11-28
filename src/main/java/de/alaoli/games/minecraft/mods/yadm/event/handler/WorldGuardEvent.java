@@ -3,6 +3,8 @@ package de.alaoli.games.minecraft.mods.yadm.event.handler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WhitelistSetting;
@@ -65,11 +67,10 @@ public class WorldGuardEvent
 	 * Methods - Events
 	 ********************************************************************************/
 	
+	@SideOnly( Side.SERVER )
 	@SubscribeEvent( priority = EventPriority.HIGHEST )
 	public void onPlayerInteract( PlayerInteractEvent event )
 	{
-		int dimensionId = event.world.provider.dimensionId;
-		
 		//Is YADM Dimension?
 		if( !dimensions.existsDimension( event.entityPlayer.dimension ) ) { return; }
 		
@@ -85,7 +86,6 @@ public class WorldGuardEvent
 			
 			switch( event.action )
 			{
-				case RIGHT_CLICK_AIR :
 				case RIGHT_CLICK_BLOCK :
 					if( this.isWhitelisted(dimension, event.entityPlayer ) )
 					{
