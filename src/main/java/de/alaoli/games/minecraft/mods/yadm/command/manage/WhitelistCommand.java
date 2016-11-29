@@ -13,7 +13,6 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WhitelistSetting;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
-import de.alaoli.games.minecraft.mods.yadm.manager.dimension.FindDimension;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
