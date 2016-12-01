@@ -5,8 +5,11 @@ import com.eclipsesource.json.JsonValue;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportModifier;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
+import net.minecraft.block.Block;
 
-public class SpawnSetting implements Setting, JsonSerializable
+public class SpawnSetting implements Setting, TeleportModifier, JsonSerializable
 {
 	/********************************************************************************
 	 * Attributes
@@ -52,6 +55,45 @@ public class SpawnSetting implements Setting, JsonSerializable
 	public boolean isRequired() 
 	{
 		return false;
+	}	
+	
+	/********************************************************************************
+	 * Methods - Implement TeleportModifier
+	 ********************************************************************************/
+	
+	@Override
+	public void applyTeleportModifier( TeleportSettings settings )
+	{
+		switch( this.mode )
+		{
+			case EXACT :
+				//Nothing to do
+				break;
+				
+			case TOPDOWN :
+			default :
+				Block block;
+				int y = 255;
+	
+				while ( y > 0 ) 
+				{
+					block = settings.target.getBlock(settings.coordinate.x, y, settings.coordinate.z);
+	
+					if( ( block != null ) && 
+						( !block.isAir(settings.target, settings.coordinate.x, y, settings.coordinate.z ) ) )
+					{
+						settings.coordinate = new Coordinate( 
+							settings.coordinate.x, 
+							y + TeleportSettings.OFFSETY, 
+							settings.coordinate.z 
+						);
+						break;
+					}
+					y--;
+				}		
+				break;
+				
+		}
 	}	
 	
 	/********************************************************************************
@@ -105,5 +147,5 @@ public class SpawnSetting implements Setting, JsonSerializable
 			//Default
 			this.mode = SpawnMode.TOPDOWN;
 		}
-	}	
+	}
 }
