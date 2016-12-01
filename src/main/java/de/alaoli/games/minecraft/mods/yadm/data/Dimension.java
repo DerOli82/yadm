@@ -128,7 +128,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	{
 		if( !this.hasOwner() ) { return false; }
 		
-		return this.owner.equals( new Player( player ) );
+		return this.owner.getId().equals( player.getUniqueID() );
 	}
 	
 	/********************************************************************************
