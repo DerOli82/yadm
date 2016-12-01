@@ -14,7 +14,7 @@ public class TeleportSettings
 {
 	protected static final ManageWorlds worlds = WorldBuilder.INSTANCE;
 	
-	public final int OFFSETY = 4;
+	public static final int OFFSETY = 4;
 
 	public final Dimension dimension;
 	public final WorldServer target;
