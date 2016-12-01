@@ -25,7 +25,7 @@ public enum BorderSide
 		return this.name;
 	}
 
-	public static BorderSide get( String name )
+	public static BorderSide get( String name ) throws DataException
 	{
 		for( BorderSide side : BorderSide.values() )
 		{

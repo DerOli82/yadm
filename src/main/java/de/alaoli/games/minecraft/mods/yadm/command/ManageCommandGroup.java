@@ -2,6 +2,7 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 
 import de.alaoli.games.minecraft.mods.yadm.command.manage.WhitelistCommand;
 import de.alaoli.games.minecraft.mods.yadm.command.manage.OwnerCommand;
+import de.alaoli.games.minecraft.mods.yadm.command.manage.TravelCommand;
 
 public class ManageCommandGroup extends CommandGroup
 {
@@ -15,6 +16,7 @@ public class ManageCommandGroup extends CommandGroup
 		
 		this.add( new OwnerCommand( this ) );
 		this.add( new WhitelistCommand( this ) );
+		this.add( new TravelCommand( this ) );
 	}
 
 	/********************************************************************************
