@@ -10,6 +10,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import de.alaoli.games.minecraft.mods.yadm.data.ChunkCoordinate;
+import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderAction;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
@@ -49,6 +50,30 @@ public class WorldBorderSetting implements Setting, JsonSerializable, WorldBorde
 		{
 			this.actions.put(side, new HashSet<WorldBorderAction>() );
 		}
+	}
+	
+	public void addAction( BorderSide side, WorldBorderAction action )
+	{
+		if( action.allowedBorderSides().contains( side ) ) { new DataException( "BorderSide '" + side + "' not allowed for this action" ); }
+		
+		this.actions.get( side ).add( action );
+	}
+	
+	public void removeAction( BorderSide side, WorldBorderAction action )
+	{
+		this.actions.get( side ).remove( action );
+	}
+	
+	public WorldBorderAction getAction( BorderSide side, Class<? extends WorldBorderAction> clazz )
+	{
+		for( WorldBorderAction action : this.actions.get( side ) )
+		{
+			if( action.getClass() == clazz )
+			{
+				return action;
+			}
+		}
+		return null;
 	}
 	
 	public ChunkCoordinate getPointCenter() 
@@ -177,6 +202,40 @@ public class WorldBorderSetting implements Setting, JsonSerializable, WorldBorde
 		}
 	}
 
+	public Coordinate toCoordinate( BorderSide side, int y ) throws DataException
+	{
+		int x = 0; 
+		int z = 0;
+		
+		switch( side )
+		{
+			case NORTH :
+				x = ( this.pointA.x + ( this.radius / 2 ) ) * 16;
+				z = ( this.pointA.z - 1 ) * 16;
+				break;
+				
+			case EAST :
+				x = ( this.pointB.x - 1 ) * 16;
+				z = ( this.pointB.z + ( this.radius / 2 ) ) * 16;
+				break;
+				
+			case SOUTH :
+				x = ( this.pointC.x + this.radius / 2 ) * 16;
+				z = ( this.pointC.z + 1 ) * 16;
+				break;
+				
+			case WEST :
+				x = ( this.pointA.x + 1 ) * 16;
+				z = ( this.pointA.z + ( this.radius / 2 ) ) * 16;
+				break;
+				
+			default :
+				throw new DataException( "Invalid border side." );
+					
+		}
+		return new Coordinate( x, y, z );
+	}
+	
 	/********************************************************************************
 	 * Methods - Implement Setting
 	 ********************************************************************************/
