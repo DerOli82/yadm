@@ -15,7 +15,9 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderAction;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 
 public class KnockbackSetting implements Setting, WorldBorderAction, JsonSerializable 
 {
@@ -69,6 +71,8 @@ public class KnockbackSetting implements Setting, WorldBorderAction, JsonSeriali
 			if( !obj.get( "multiplier" ).isNumber() ) { throw new DataException( "KnockbackSetting 'multiplier' isn't a number." ); }
 			
 			this.multiplier = obj.get( "multiplier" ).asFloat();
+			
+			if( this.multiplier <= 0 ) { throw new DataException( "KnockbackSetting 'multiplier' must be greater than 0." ); }
 		}
 	}
 
@@ -92,16 +96,32 @@ public class KnockbackSetting implements Setting, WorldBorderAction, JsonSeriali
 	@Override
 	public void performAction( WorldBorderEvent event ) 
 	{
-		EntityPlayer player = (EntityPlayer)event.chunkEvent.entity;
-
+		Block block;
 		Vector2d centerPlayer = new Vector2d( 
 			event.chunkEvent.newChunkX - event.setting.getPointCenter().x,
 			event.chunkEvent.newChunkZ - event.setting.getPointCenter().z
 		);
 		centerPlayer.scale( -1 / centerPlayer.length());
 		
-		player.motionX = centerPlayer.x * this.multiplier;
-		player.motionY = 0.4D;
-		player.motionZ = centerPlayer.y * this.multiplier;
+		EntityPlayer player = (EntityPlayer)event.chunkEvent.entity;
+		World world = player.worldObj; 
+		int checkY = 255;
+		int x = (int)( player.posX + (centerPlayer.x * 16 * this.multiplier ) );
+		int y = (int)player.posY;
+		int z = (int)( player.posZ + (centerPlayer.y * 16 * this.multiplier) );
+		
+		while ( checkY > 0 ) 
+		{
+			block = world.getBlock( x, checkY, z );
+
+			if( ( block != null ) && 
+				( !block.isAir( world, x, checkY, z ) ) )
+			{
+				y = checkY + 1;
+				break;
+			}
+			checkY--;
+		}
+		player.setPositionAndUpdate( x, y, z );
 	}
 }
