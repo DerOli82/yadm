@@ -65,7 +65,17 @@ public class TravelSetting implements Setting, WorldBorderAction, JsonSerializab
 	{
 		return false;
 	}
-		
+	
+	public int getTargetId() 
+	{
+		return this.targetId;
+	}
+
+	public BorderSide getTargetSide() 
+	{
+		return this.targetSide;
+	}
+
 	/********************************************************************************
 	 * Methods - Implement JsonSerializable
 	 ********************************************************************************/

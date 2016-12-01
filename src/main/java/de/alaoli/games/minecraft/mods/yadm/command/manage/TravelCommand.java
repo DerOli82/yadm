@@ -124,6 +124,19 @@ public class TravelCommand extends Command
 			case "list" :
 			default:
 				this.sendUsage( args.sender );
+				args.sender.addChatMessage( new ChatComponentText( "Border travel connections:" ) );
+				
+				for( BorderSide side : BorderSide.values() )
+				{
+					action = border.getAction( side, TravelSetting.class );
+					
+					if( action != null )
+					{
+						target = dimensions.findDimension( ((TravelSetting)action).getTargetId() );
+						
+						args.sender.addChatMessage( new ChatComponentText( "  - '" + side + "' border to '" + target + "'" ) );
+					}
+				}
 				break;
 		}
 	}
