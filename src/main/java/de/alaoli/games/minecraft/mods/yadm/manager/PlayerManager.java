@@ -227,11 +227,23 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 		if( settings.player == null ) { throw new TeleportException( "Teleport 'player' is missing." ); }
 		if( settings.coordinate == null ) { throw new TeleportException( "Teleport 'coordinate' is missing." ); }
 		
-		scm.transferPlayerToDimension(
-			(EntityPlayerMP)settings.player, 
-			settings.dimension.getId(), 
-			new DimensionTeleport( settings.target, settings.coordinate ) 
-		);		
+		if( ( settings.coordinate != null ) &&
+			( settings.player.dimension == settings.dimension.getId() ) ) 
+		{
+			settings.player.setPositionAndUpdate( 
+				settings.coordinate.x,
+				settings.coordinate.y,
+				settings.coordinate.z	
+			);
+		}
+		else
+		{
+			scm.transferPlayerToDimension(
+				(EntityPlayerMP)settings.player, 
+				settings.dimension.getId(), 
+				new DimensionTeleport( settings.target, settings.coordinate ) 
+			);
+		}
 	}
 	
 	/********************************************************************************
