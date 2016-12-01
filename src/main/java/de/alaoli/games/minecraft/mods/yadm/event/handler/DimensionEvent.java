@@ -46,12 +46,13 @@ public class DimensionEvent
 			worlds.deleteWorld(  event.world );
 		}
 	}
-
+ 
 	@SubscribeEvent
 	public void onEnteringChunk( EnteringChunk event )
 	{
 		//World Border, check only on Player and YADM Dimension
-		if( ( event.entity instanceof EntityPlayer ) && 
+		if( ( !event.entity.worldObj.isRemote ) &&
+			( event.entity instanceof EntityPlayer ) && 
 			( dimensions.existsDimension( event.entity.dimension ) ) )
 		{
 			EntityPlayer player = (EntityPlayer) event.entity;
