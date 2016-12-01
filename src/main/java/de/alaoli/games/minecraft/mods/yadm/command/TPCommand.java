@@ -6,7 +6,6 @@ import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportException;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportPlayer;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerSelector;
 import net.minecraft.entity.player.EntityPlayer;

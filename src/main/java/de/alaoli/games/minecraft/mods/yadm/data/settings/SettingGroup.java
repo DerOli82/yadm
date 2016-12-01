@@ -84,7 +84,7 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 	{
 		for( SettingType type : SettingType.values() )
 		{
-			if( ( type.isRequired() ) && 
+			if( ( type.required ) && 
 				( !this.hasSetting( type ) ) )
 			{
 				return false;

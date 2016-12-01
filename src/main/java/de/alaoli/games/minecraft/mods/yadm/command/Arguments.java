@@ -4,10 +4,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
@@ -16,7 +18,6 @@ import de.alaoli.games.minecraft.mods.yadm.manager.player.FindPlayer;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
 import de.alaoli.games.minecraft.mods.yadm.manager.template.FindTemplate;
 import de.alaoli.games.minecraft.mods.yadm.manager.template.TemplateException;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerSelector;
 import net.minecraft.entity.player.EntityPlayer;
@@ -248,5 +249,19 @@ public class Arguments
 		if( this.isEmpty() ) { throw new CommandException( "Missing <player> argument." ); }
 		
 		return players.findPlayer( this.next() );
+	}
+	
+	public BorderSide parseBorderSide() throws CommandException
+	{
+		if( this.isEmpty() ) { throw new CommandException( "Missing <borderSide> argument." ); }
+		
+		try
+		{
+			return BorderSide.get( this.next() );
+		}
+		catch( DataException e )
+		{
+			throw new CommandException( e.getMessage(), e );
+		}
 	}
 }

@@ -8,7 +8,6 @@ import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
-import de.alaoli.games.minecraft.mods.yadm.manager.dimension.FindDimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;

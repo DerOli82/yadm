@@ -1,7 +1,6 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 
 public class TPToCommand extends Command

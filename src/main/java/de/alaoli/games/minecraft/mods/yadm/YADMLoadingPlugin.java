@@ -4,18 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-
-import org.apache.commons.io.FileUtils;
-
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
-import sun.misc.Version;
 
 @IFMLLoadingPlugin.MCVersion( value = "1.7.10" )
 @IFMLLoadingPlugin.Name( value = "YADMLoadingPlugin" )
