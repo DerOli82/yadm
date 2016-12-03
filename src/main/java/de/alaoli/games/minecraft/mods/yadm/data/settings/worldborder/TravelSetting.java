@@ -9,10 +9,11 @@ import com.eclipsesource.json.JsonValue;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
-import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderAction;
+import de.alaoli.games.minecraft.mods.yadm.event.PerformWorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
@@ -21,7 +22,7 @@ import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportPlayer;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
 import net.minecraft.entity.player.EntityPlayer;
 
-public class TravelSetting implements Setting, WorldBorderAction, JsonSerializable 
+public class TravelSetting implements Setting, PerformWorldBorderEvent, JsonSerializable 
 {
 	/********************************************************************************
 	 * Attribute
@@ -135,6 +136,13 @@ public class TravelSetting implements Setting, WorldBorderAction, JsonSerializab
 	 * Methods - Implement WorldBorderAction
 	 ********************************************************************************/
 	
+	
+	@Override
+	public int priority()
+	{
+		return 100;
+	}
+	
 	@Override
 	public Set<BorderSide> allowedBorderSides()
 	{
@@ -148,11 +156,23 @@ public class TravelSetting implements Setting, WorldBorderAction, JsonSerializab
 	}
 	
 	@Override
-	public void performAction( WorldBorderEvent event ) 
+	public void performWorldBorderEvent( WorldBorderEvent event ) 
 	{
+		Dimension dimension;
 		EntityPlayer player = (EntityPlayer)event.chunkEvent.entity; 
-		Dimension dimension = dimensions.findDimension( this.targetId );
-	
+		
+		if( dimensions.existsDimension( this.targetId ) )
+		{
+			dimension = dimensions.findDimension( this.targetId );
+		}
+		else
+		{
+			dimension = new DimensionDummy( this.targetId );
+		}
+		
+		//Cancel other events
+		event.setCanceled( true );
+		
 		if( this.targetSide != null )
 		{
 			Coordinate coordinate = event.setting.toCoordinate( targetSide, (int)player.posY );
