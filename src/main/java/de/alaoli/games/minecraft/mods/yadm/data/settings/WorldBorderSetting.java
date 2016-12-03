@@ -4,11 +4,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+
+import de.alaoli.games.minecraft.mods.yadm.comparator.PriorityComparator;
 import de.alaoli.games.minecraft.mods.yadm.data.ChunkCoordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
@@ -36,7 +39,7 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 	
 	private int radius;
 
-	private Map<BorderSide, Set<PerformWorldBorderEvent>> actions;
+	private Map<BorderSide, PriorityQueue<PerformWorldBorderEvent>> actions;
 	
 	/********************************************************************************
 	 * Methods
@@ -44,11 +47,11 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 
 	public WorldBorderSetting()
 	{
-		this.actions = new HashMap<BorderSide, Set<PerformWorldBorderEvent>>();
+		this.actions = new HashMap<BorderSide, PriorityQueue<PerformWorldBorderEvent>>();
 		
 		for( BorderSide side : BorderSide.values() )
 		{
-			this.actions.put(side, new HashSet<PerformWorldBorderEvent>() );
+			this.actions.put(side, new PriorityQueue<PerformWorldBorderEvent>( new PriorityComparator()) );
 		}
 	}
 	
@@ -270,11 +273,11 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 
 		JsonObject obj;
 		BorderSide side;
-		Set<PerformWorldBorderEvent> actions;
+		PriorityQueue<PerformWorldBorderEvent> actions;
 		
 		JsonArray array = new JsonArray();
 		
-		for( Entry<BorderSide, Set<PerformWorldBorderEvent>> entry : this.actions.entrySet() )
+		for( Entry<BorderSide, PriorityQueue<PerformWorldBorderEvent>> entry : this.actions.entrySet() )
 		{
 			side = entry.getKey();
 			actions = entry.getValue();
@@ -403,5 +406,4 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 			}	
 		}
 	}
-	
 }
