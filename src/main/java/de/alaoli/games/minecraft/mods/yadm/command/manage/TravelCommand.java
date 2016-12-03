@@ -111,6 +111,8 @@ public class TravelCommand extends Command
 				
 				if( action != null )
 				{
+					if( !((TravelSetting)action).isEditable() ) { throw new CommandException( sourceSide + " border isn't editable." ); }
+					
 					border.removeAction( sourceSide, action );
 					dimensions.setDirty( true );
 					args.sender.addChatMessage( new ChatComponentText( "Travel setting on '" + sourceSide + "' border removed." ) );

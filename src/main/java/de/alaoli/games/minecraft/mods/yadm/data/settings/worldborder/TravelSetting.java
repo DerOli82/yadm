@@ -32,7 +32,8 @@ public class TravelSetting implements Setting, WorldBorderAction, JsonSerializab
 	
 	private int targetId;
 	private BorderSide targetSide;
-
+	private boolean editable = true;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -75,6 +76,11 @@ public class TravelSetting implements Setting, WorldBorderAction, JsonSerializab
 	{
 		return this.targetSide;
 	}
+	
+	public boolean isEditable()
+	{
+		return this.editable;
+	}
 
 	/********************************************************************************
 	 * Methods - Implement JsonSerializable
@@ -93,6 +99,7 @@ public class TravelSetting implements Setting, WorldBorderAction, JsonSerializab
 		{
 			json.add( "targetSide", this.targetSide.toString() );
 		}
+		json.add( "editable", this.editable );
 		
 		return json;
 	}
@@ -118,6 +125,10 @@ public class TravelSetting implements Setting, WorldBorderAction, JsonSerializab
 			
 			this.targetSide = BorderSide.get( side );
 		}
+		if( obj.get( "editable" ) == null ) { throw new DataException( "TravelSetting 'editable' is missing." ); }
+		if( !obj.get( "editable" ).isBoolean() ) { throw new DataException( "TravelSetting 'editable' isn't an boolean." ); }
+		
+		this.editable = obj.get( "editable" ).asBoolean(); 
 	}
 
 	/********************************************************************************
