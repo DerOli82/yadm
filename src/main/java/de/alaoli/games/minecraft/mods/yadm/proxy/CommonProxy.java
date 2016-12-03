@@ -14,9 +14,10 @@ import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.command.YADMCommandGroup;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.event.handler.DimensionEvent;
-import de.alaoli.games.minecraft.mods.yadm.event.handler.DimensionFMLEvent;
-import de.alaoli.games.minecraft.mods.yadm.event.handler.WorldGuardEvent;
+import de.alaoli.games.minecraft.mods.yadm.event.handler.DimensionEventHandler;
+import de.alaoli.games.minecraft.mods.yadm.event.handler.DimensionFMLEventHandler;
+import de.alaoli.games.minecraft.mods.yadm.event.handler.WorldBorderEventHandler;
+import de.alaoli.games.minecraft.mods.yadm.event.handler.WorldGuardEventHandler;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
@@ -71,9 +72,10 @@ public class CommonProxy
 	 */
 	public void init( FMLInitializationEvent event )
 	{
-		FMLCommonHandler.instance().bus().register( new DimensionFMLEvent() );
-		MinecraftForge.EVENT_BUS.register( new DimensionEvent() );
-		MinecraftForge.EVENT_BUS.register( new WorldGuardEvent() );
+		FMLCommonHandler.instance().bus().register( new DimensionFMLEventHandler() );
+		MinecraftForge.EVENT_BUS.register( new DimensionEventHandler() );
+		MinecraftForge.EVENT_BUS.register( new WorldBorderEventHandler() );
+		MinecraftForge.EVENT_BUS.register( new WorldGuardEventHandler() );
 	}
 	
 	/**

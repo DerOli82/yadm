@@ -8,7 +8,7 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldBorderSetting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder.TravelSetting;
-import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderAction;
+import de.alaoli.games.minecraft.mods.yadm.event.PerformWorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraft.command.ICommandSender;
@@ -67,7 +67,7 @@ public class TravelCommand extends Command
 		{
 			cmd = args.next();
 		}
-		WorldBorderAction action;
+		PerformWorldBorderEvent action;
 		BorderSide targetSide, sourceSide;
 		Dimension target, source = dimensions.findDimension( ((EntityPlayer)args.sender).dimension );
 		

@@ -22,7 +22,7 @@ import de.alaoli.games.minecraft.mods.yadm.network.SyncDimensionsMessage;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
 
-public class DimensionFMLEvent 
+public class DimensionFMLEventHandler 
 {
 	protected static final ManagePlayers playerManager = PlayerManager.INSTANCE; 
 	

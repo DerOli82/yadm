@@ -14,7 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
-public class WorldGuardEvent 
+public class WorldGuardEventHandler 
 {
 	/********************************************************************************
 	 * Attribute
