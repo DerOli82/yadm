@@ -1,5 +1,17 @@
 # Changelog
 
+# Version 0.6.0
+- Implement WorldBorderEvent priority
+- Fixes knockback issue ( https://github.com/DerOli82/yadm/issues/22 )
+- Implement WorldBorder TravelSetting
+- Implement WorldGuardSetting
+- Implement better dependencies download/update mechanism
+- Implement Interfaces for more structure ( see https://github.com/DerOli82/yadm/blob/master/uml/SimplifiedComponentsDiagram.png )
+- Implement command permissions (Operator, Owner & Player )
+- Options to lock the whitelist
+- Delete dimension json file if empty
+- Implement teleport modifier
+
 # Version 0.5.0
 - Hopefully fixed worldtime per dimension problems
 - Fix random deleted worlds
@@ -41,7 +53,7 @@
 # Version 0.4.1
 - Fixes https://github.com/DerOli82/yadm/issues/2
 - Fixes https://github.com/DerOli82/yadm/issues/3
-- Rewoked chat command structure
+- Reworked chat command structure
 - Added permission level
 
 # Version 0.4.0
