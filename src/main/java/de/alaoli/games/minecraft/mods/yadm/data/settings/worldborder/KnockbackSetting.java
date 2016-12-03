@@ -12,14 +12,14 @@ import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
-import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderAction;
+import de.alaoli.games.minecraft.mods.yadm.event.PerformWorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 
-public class KnockbackSetting implements Setting, WorldBorderAction, JsonSerializable 
+public class KnockbackSetting implements Setting, PerformWorldBorderEvent, JsonSerializable 
 {
 	/********************************************************************************
 	 * Attribute
@@ -81,6 +81,12 @@ public class KnockbackSetting implements Setting, WorldBorderAction, JsonSeriali
 	 ********************************************************************************/
 	
 	@Override
+	public int priority()
+	{
+		return 10;
+	}
+	
+	@Override
 	public Set<BorderSide> allowedBorderSides()
 	{
 		Set<BorderSide> allowed = new HashSet<BorderSide>();
@@ -94,7 +100,7 @@ public class KnockbackSetting implements Setting, WorldBorderAction, JsonSeriali
 	}
 	
 	@Override
-	public void performAction( WorldBorderEvent event ) 
+	public void performWorldBorderEvent( WorldBorderEvent event ) 
 	{
 		Block block;
 		Vector2d centerPlayer = new Vector2d( 

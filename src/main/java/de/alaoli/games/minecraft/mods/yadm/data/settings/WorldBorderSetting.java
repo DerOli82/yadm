@@ -12,11 +12,11 @@ import com.eclipsesource.json.JsonValue;
 import de.alaoli.games.minecraft.mods.yadm.data.ChunkCoordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
-import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderAction;
+import de.alaoli.games.minecraft.mods.yadm.event.PerformWorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 
-public class WorldBorderSetting implements Setting, JsonSerializable, WorldBorderAction
+public class WorldBorderSetting implements Setting, JsonSerializable, PerformWorldBorderEvent
 {
 	/********************************************************************************
 	 * Attributes
@@ -36,7 +36,7 @@ public class WorldBorderSetting implements Setting, JsonSerializable, WorldBorde
 	
 	private int radius;
 
-	private Map<BorderSide, Set<WorldBorderAction>> actions;
+	private Map<BorderSide, Set<PerformWorldBorderEvent>> actions;
 	
 	/********************************************************************************
 	 * Methods
@@ -44,29 +44,29 @@ public class WorldBorderSetting implements Setting, JsonSerializable, WorldBorde
 
 	public WorldBorderSetting()
 	{
-		this.actions = new HashMap<BorderSide, Set<WorldBorderAction>>();
+		this.actions = new HashMap<BorderSide, Set<PerformWorldBorderEvent>>();
 		
 		for( BorderSide side : BorderSide.values() )
 		{
-			this.actions.put(side, new HashSet<WorldBorderAction>() );
+			this.actions.put(side, new HashSet<PerformWorldBorderEvent>() );
 		}
 	}
 	
-	public void addAction( BorderSide side, WorldBorderAction action )
+	public void addAction( BorderSide side, PerformWorldBorderEvent action )
 	{
 		if( action.allowedBorderSides().contains( side ) ) { new DataException( "BorderSide '" + side + "' not allowed for this action" ); }
 		
 		this.actions.get( side ).add( action );
 	}
 	
-	public void removeAction( BorderSide side, WorldBorderAction action )
+	public void removeAction( BorderSide side, PerformWorldBorderEvent action )
 	{
 		this.actions.get( side ).remove( action );
 	}
 	
-	public WorldBorderAction getAction( BorderSide side, Class<? extends WorldBorderAction> clazz )
+	public PerformWorldBorderEvent getAction( BorderSide side, Class<? extends PerformWorldBorderEvent> clazz )
 	{
-		for( WorldBorderAction action : this.actions.get( side ) )
+		for( PerformWorldBorderEvent action : this.actions.get( side ) )
 		{
 			if( action.getClass() == clazz )
 			{
@@ -270,16 +270,16 @@ public class WorldBorderSetting implements Setting, JsonSerializable, WorldBorde
 
 		JsonObject obj;
 		BorderSide side;
-		Set<WorldBorderAction> actions;
+		Set<PerformWorldBorderEvent> actions;
 		
 		JsonArray array = new JsonArray();
 		
-		for( Entry<BorderSide, Set<WorldBorderAction>> entry : this.actions.entrySet() )
+		for( Entry<BorderSide, Set<PerformWorldBorderEvent>> entry : this.actions.entrySet() )
 		{
 			side = entry.getKey();
 			actions = entry.getValue();
 			
-			for( WorldBorderAction action : actions )
+			for( PerformWorldBorderEvent action : actions )
 			{
 				if( action instanceof JsonSerializable )
 				{
@@ -343,16 +343,16 @@ public class WorldBorderSetting implements Setting, JsonSerializable, WorldBorde
 			setting = SettingFactory.createNewInstance( this.getSettingType().toString() + ":" + action.get( "type" ).asString() );
 			side = BorderSide.get( action.get( "side" ).asString() );
 			
-			if( !(setting instanceof WorldBorderAction) ) { throw new DataException( "WorldBorderSetting unknown 'action'." ); }
+			if( !(setting instanceof PerformWorldBorderEvent) ) { throw new DataException( "WorldBorderSetting unknown 'action'." ); }
 			if ( this.actions.get( side ).contains( setting ) ) { throw new DataException( "WorldBorderSetting duplicate 'action'." ); }
 			
-			Set<BorderSide> allowedSides = ((WorldBorderAction)setting).allowedBorderSides();
+			Set<BorderSide> allowedSides = ((PerformWorldBorderEvent)setting).allowedBorderSides();
 			
 			if( !allowedSides.contains( side ) ) { throw new DataException( "WorldBorderSetting 'action' not allowed for 'side'." ); }
 			
 			((JsonSerializable)setting).deserialize( value );
 			
-			this.actions.get( side ).add( (WorldBorderAction)setting );
+			this.actions.get( side ).add( (PerformWorldBorderEvent)setting );
 		}
 	}
 
@@ -360,6 +360,12 @@ public class WorldBorderSetting implements Setting, JsonSerializable, WorldBorde
 	/********************************************************************************
 	 * Methods - Implement WorldBorderAction
 	 ********************************************************************************/
+	
+	@Override
+	public int priority()
+	{
+		return 0;
+	}
 	
 	@Override
 	public Set<BorderSide> allowedBorderSides()
@@ -374,13 +380,13 @@ public class WorldBorderSetting implements Setting, JsonSerializable, WorldBorde
 	}
 	
 	@Override
-	public void performAction( WorldBorderEvent event ) 
+	public void performWorldBorderEvent( WorldBorderEvent event ) 
 	{
-		for( WorldBorderAction action : this.actions.get( event.side ) )
+		for( PerformWorldBorderEvent action : this.actions.get( event.side ) )
 		{
 			if( event.isCanceled() ) { return; }
 			
-			action.performAction( event );
+			action.performWorldBorderEvent( event );
 		}
 		
 		//All sides action
@@ -389,11 +395,11 @@ public class WorldBorderSetting implements Setting, JsonSerializable, WorldBorde
 			( event.side == BorderSide.SOUTH ) ||
 			( event.side == BorderSide.WEST ) )
 		{
-			for( WorldBorderAction action : this.actions.get( BorderSide.ALL ) )
+			for( PerformWorldBorderEvent action : this.actions.get( BorderSide.ALL ) )
 			{
 				if( event.isCanceled() ) { return; }
 				
-				action.performAction( event );
+				action.performWorldBorderEvent( event );
 			}	
 		}
 	}

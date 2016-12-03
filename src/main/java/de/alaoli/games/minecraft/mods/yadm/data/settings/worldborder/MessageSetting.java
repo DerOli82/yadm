@@ -10,13 +10,13 @@ import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
-import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderAction;
+import de.alaoli.games.minecraft.mods.yadm.event.PerformWorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
-public class MessageSetting implements Setting, WorldBorderAction, JsonSerializable 
+public class MessageSetting implements Setting, PerformWorldBorderEvent, JsonSerializable 
 {
 	private String message;
 	
@@ -70,6 +70,12 @@ public class MessageSetting implements Setting, WorldBorderAction, JsonSerializa
 	 ********************************************************************************/
 	
 	@Override
+	public int priority()
+	{
+		return 0;
+	}
+	
+	@Override
 	public Set<BorderSide> allowedBorderSides()
 	{
 		Set<BorderSide> allowed = new HashSet<BorderSide>();
@@ -82,7 +88,7 @@ public class MessageSetting implements Setting, WorldBorderAction, JsonSerializa
 	}
 	
 	@Override
-	public void performAction( WorldBorderEvent event ) 
+	public void performWorldBorderEvent( WorldBorderEvent event ) 
 	{
 		EntityPlayer player = (EntityPlayer)event.chunkEvent.entity;
 		
