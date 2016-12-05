@@ -7,7 +7,6 @@ import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportException;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportPlayer;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.command.PlayerSelector;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class TPCommand extends Command
@@ -68,7 +67,7 @@ public class TPCommand extends Command
 		try
 		{
 			coordinate = args.parseCoordinate();
-			player = PlayerSelector.matchOnePlayer( args.sender, args.parsePlayer().getManageableName() );
+			player = args.parseEntityPlayer();
 		}
 		catch( CommandException e )
 		{

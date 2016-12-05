@@ -1,5 +1,8 @@
 # Changelog
 
+# Version 0.6.2
+- Fix CommandBlock PlayerSelector problem
+
 # Version 0.6.1
 - WorldGuard blocks explosion block damage
 

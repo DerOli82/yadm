@@ -18,8 +18,8 @@ import de.alaoli.games.minecraft.mods.yadm.manager.player.FindPlayer;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
 import de.alaoli.games.minecraft.mods.yadm.manager.template.FindTemplate;
 import de.alaoli.games.minecraft.mods.yadm.manager.template.TemplateException;
+import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.command.PlayerSelector;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.DimensionManager;
 
@@ -70,7 +70,7 @@ public class Arguments
 		//Replace @p with player name
 		if( next.contains( "@p" ) )
 		{
-			EntityPlayer player = PlayerSelector.matchOnePlayer( this.sender, "@p" );
+			EntityPlayer player = CommandBase.getPlayer( this.sender, "@p" );
 			next = next.replaceAll( "@p", player.getDisplayName() );
 		}
 		return next;
@@ -242,6 +242,18 @@ public class Arguments
 			throw new CommandException( "Invalid coordinate argument." );
 		}
 		return new Coordinate( Integer.valueOf( x ),Integer.valueOf( y ),Integer.valueOf( z ) );
+	}
+	
+	public EntityPlayer parseEntityPlayer() throws CommandException
+	{
+		if( this.isEmpty() ) { throw new CommandException( "Missing <player> argument." ); }
+		
+		String playerName = this.next();
+		EntityPlayer player = CommandBase.getPlayer( this.sender, playerName );
+		
+		if( player == null ) { throw new CommandException( "Can't find player '" + playerName + "'." ); }
+		
+		return player;
 	}
 	
 	public Player parsePlayer() throws CommandException, PlayerException
