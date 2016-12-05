@@ -1,5 +1,8 @@
 # Changelog
 
+# Version 0.6.1
+- WorldGuard blocks explosion block damage
+
 # Version 0.6.0
 - Implement WorldBorderEvent priority
 - Fixes knockback issue ( https://github.com/DerOli82/yadm/issues/22 )

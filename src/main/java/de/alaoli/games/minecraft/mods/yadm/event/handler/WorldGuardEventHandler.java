@@ -13,6 +13,7 @@ import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 
 public class WorldGuardEventHandler 
 {
@@ -75,7 +76,7 @@ public class WorldGuardEventHandler
 		if( !dimensions.existsDimension( event.entityPlayer.dimension ) ) { return; }
 		
 		ServerConfigurationManager scm = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager();
-		Dimension dimension = dimensions.findDimension( event.world.provider.dimensionId );
+		Dimension dimension = dimensions.findDimension( event.entityPlayer.dimension );
 		
 		//WorldGuard active and player isn't owner or operator
 		if( ( dimension.hasSetting( SettingType.WORLDGUARD ) ) && 
@@ -111,6 +112,23 @@ public class WorldGuardEventHandler
 					break;
 			}
 	
+		}
+	}
+	
+	@SubscribeEvent
+	public void onExplosion( ExplosionEvent.Detonate event )
+	{
+		if( event.world.isRemote ) { return; }
+		
+		//Is YADM Dimension?
+		if( !dimensions.existsDimension( event.world.provider.dimensionId ) ) { return; }
+		
+		Dimension dimension = dimensions.findDimension( event.world.provider.dimensionId );
+		
+		//WorldGuard active 
+		if( dimension.hasSetting( SettingType.WORLDGUARD ) ) 
+		{		
+			event.explosion.affectedBlockPositions.clear();
 		}
 	}
 }
