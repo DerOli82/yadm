@@ -3,12 +3,11 @@ package de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.vecmath.Vector2d;
-
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.yadm.data.Vector2d;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
