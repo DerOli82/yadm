@@ -1,6 +1,5 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportException;

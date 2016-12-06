@@ -1,5 +1,11 @@
 # Changelog
 
+# Version 0.6.3
+- Intercept WorldProvider.getSpawnPoint
+- Implement TPto Command
+- No events inside border
+- Replace javax.vecmath.Vector2d
+
 # Version 0.6.2
 - Fix CommandBlock PlayerSelector problem
 
