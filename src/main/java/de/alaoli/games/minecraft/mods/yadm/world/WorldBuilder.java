@@ -24,6 +24,7 @@ import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.DimensionFieldAccessor;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.GetDimensionNameInterceptor;
+import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.GetSpawnPointInterceptor;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.RegisterWorldChunkManagerPostInterceptor;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.RegisterWorldChunkManagerPreInterceptor;
 import net.bytebuddy.ByteBuddy;
@@ -153,6 +154,12 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 			WorldProvider.class, (WorldProvider)providerClass.newInstance(), 
 			new String[]{ "func_80007_l", "getDimensionName" } 
 		).getName();
+		String getSpawnPointMethodName = ReflectionHelper.findMethod( 
+				WorldProvider.class, (WorldProvider)providerClass.newInstance(), 
+				new String[]{ "func_72861_E", "getSpawnPoint" } 
+			).getName();
+		
+		
 		
 		Class<?> dynamicType = new ByteBuddy()
 			.with( new NamingStrategy.SuffixingRandom( "YADM" ) )
@@ -168,6 +175,8 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 			)
 			.method( ElementMatchers.named( getDimensionNameMethodName ) )
 			.intercept( MethodDelegation.to( GetDimensionNameInterceptor.class ) )
+			.method( ElementMatchers.named( getSpawnPointMethodName ) )
+			.intercept( MethodDelegation.to( GetSpawnPointInterceptor.class ) )
 			.make()
 			.load( getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER )
 			.getLoaded();
