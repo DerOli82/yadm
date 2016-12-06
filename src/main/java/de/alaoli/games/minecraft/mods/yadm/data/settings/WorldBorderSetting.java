@@ -385,6 +385,13 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 	@Override
 	public void performWorldBorderEvent( WorldBorderEvent event ) 
 	{
+		//No events inside Border
+		if( event.side == BorderSide.INSIDE ) 
+		{
+			event.setCanceled( true );
+			return;
+		}
+		
 		for( PerformWorldBorderEvent action : this.actions.get( event.side ) )
 		{
 			if( event.isCanceled() ) { return; }
