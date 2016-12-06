@@ -1,10 +1,22 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
+import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
+import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportException;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportPlayer;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 
 public class TPToCommand extends Command
 {
+	/********************************************************************************
+	 * Attributes
+	 ********************************************************************************/
+	
+	protected static final TeleportPlayer players = PlayerManager.INSTANCE;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -51,37 +63,15 @@ public class TPToCommand extends Command
 		Player player = args.parsePlayer();
 		
 		if( !player.ownsDimension() ) { throw new CommandException( player.getManageableName() + "doesn't owns any dimension." );}
-		
-		
-		
-		/*
-		Dimension dimension = args.parseDimension( true );
-		Coordinate coordinate = null;
-		EntityPlayer player = null;
+		if( !args.senderIsEntityPlayer ) { throw new CommandException( "Command sender must be an player." );}
 		
 		try
 		{
-			coordinate = args.parseCoordinate();
-			player = args.getEntityPlayer( args.parsePlayer() );
-		}
-		catch( CommandException e )
-		{
-			//Ignore optional argument Exceptions
-		}
-		
-		if( ( player == null ) && 
-			( args.senderIsEntityPlayer ) ) 
-		{
-			player = (EntityPlayer)args.sender;
-		}
-		
-		try
-		{
-			TeleportUtil.teleport( new TeleportSettings( dimension, player, coordinate ));
+			players.teleport( new TeleportSettings( player.getDimension(), (EntityPlayer)args.sender, null ));
 		}
 		catch( TeleportException e )
 		{
 			throw new CommandException( e.getMessage(), e );
-		}*/
+		}
 	}
 }

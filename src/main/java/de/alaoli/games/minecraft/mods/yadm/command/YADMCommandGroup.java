@@ -18,6 +18,7 @@ public class YADMCommandGroup extends CommandGroup
 		this.add( new CreateCommand( this ) );
 		this.add( new DeleteCommand( this ) );
 		this.add( new TPCommand( this ) );
+		this.add( new TPToCommand( this ) );
 		this.add( new InfoCommand( this ) );
 	}
 
