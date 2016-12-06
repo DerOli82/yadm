@@ -7,9 +7,12 @@ import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportModifier;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
+import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import net.minecraft.block.Block;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
-public class SpawnSetting implements Setting, TeleportModifier, JsonSerializable
+public class SpawnSetting implements Setting, TeleportModifier, Packageable, JsonSerializable
 {
 	/********************************************************************************
 	 * Attributes
@@ -95,6 +98,31 @@ public class SpawnSetting implements Setting, TeleportModifier, JsonSerializable
 				
 		}
 	}	
+	
+	/********************************************************************************
+	 * Methods - Implement Packageable
+	 ********************************************************************************/
+	
+	@Override
+	public void writeToNBT( NBTTagCompound tagCompound ) 
+	{	
+		tagCompound.setInteger( "x", this.coordinate.x );
+		tagCompound.setInteger( "y", this.coordinate.y );
+		tagCompound.setInteger( "z", this.coordinate.z );
+		
+		tagCompound.setString( "mode", this.mode.toString() );
+	}
+
+	@Override
+	public void readFromNBT( NBTTagCompound tagCompound ) 
+	{
+		this.coordinate = new Coordinate(
+			tagCompound.getInteger( "x" ),
+			tagCompound.getInteger( "y" ),
+			tagCompound.getInteger( "z" )
+		);
+		this.mode = SpawnMode.get( tagCompound.getString( "mode" ) );
+	}
 	
 	/********************************************************************************
 	 * Methods - Implement JsonSerializable

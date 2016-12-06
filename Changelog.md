@@ -1,5 +1,8 @@
 # Changelog
 
+# Version 0.6.4
+- Fix client<->server spawnpoint interception error 
+
 # Version 0.6.3
 - Intercept WorldProvider.getSpawnPoint
 - Implement TPto Command
