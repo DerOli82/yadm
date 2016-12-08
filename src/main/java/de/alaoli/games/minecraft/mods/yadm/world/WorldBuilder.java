@@ -154,12 +154,6 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 			WorldProvider.class, (WorldProvider)providerClass.newInstance(), 
 			new String[]{ "func_80007_l", "getDimensionName" } 
 		).getName();
-		String getSpawnPointMethodName = ReflectionHelper.findMethod( 
-				WorldProvider.class, (WorldProvider)providerClass.newInstance(), 
-				new String[]{ "func_72861_E", "getSpawnPoint" } 
-			).getName();
-		
-		
 		
 		Class<?> dynamicType = new ByteBuddy()
 			.with( new NamingStrategy.SuffixingRandom( "YADM" ) )
@@ -175,8 +169,6 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 			)
 			.method( ElementMatchers.named( getDimensionNameMethodName ) )
 			.intercept( MethodDelegation.to( GetDimensionNameInterceptor.class ) )
-			/*.method( ElementMatchers.named( getSpawnPointMethodName ) )
-			.intercept( MethodDelegation.to( GetSpawnPointInterceptor.class ) )*/
 			.make()
 			.load( getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER )
 			.getLoaded();
