@@ -170,9 +170,6 @@ public class TravelSetting implements Setting, PerformWorldBorderEvent, JsonSeri
 			dimension = new DimensionDummy( this.targetId );
 		}
 		
-		//Cancel other events
-		event.setCanceled( true );
-		
 		if( this.targetSide != null )
 		{
 			Coordinate coordinate = event.setting.toCoordinate( targetSide, (int)player.posY );
@@ -182,6 +179,9 @@ public class TravelSetting implements Setting, PerformWorldBorderEvent, JsonSeri
 		{
 			players.teleport( new TeleportSettings( dimension, (EntityPlayer)event.chunkEvent.entity ) );
 		}
+
+		//Cancel other events
+		event.setCanceled( true );		
 	}
 
 }
