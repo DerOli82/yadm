@@ -1,5 +1,10 @@
 # Changelog
 
+# Version 0.6.5
+- Fixes TravelSetting error https://github.com/DerOli82/yadm/issues/26
+- Remove SpawnPoint interceptor and override getSpawnPoint in generic WolrdServer
+- Ugly workaround to prevent loading "vanilla" WorldServer for YADM Dimensions
+
 # Version 0.6.4
 - Fix client<->server spawnpoint interception error 
 
