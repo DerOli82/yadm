@@ -1,10 +1,17 @@
 package de.alaoli.games.minecraft.mods.yadm.manager.player;
 
-public class PlayerException extends RuntimeException 
+import de.alaoli.games.minecraft.mods.yadm.YADMException;
+
+public class PlayerException extends YADMException 
 {
-	public PlayerException( String message ) 
+	public PlayerException( String msg ) 
 	{
-		super( message );
+		super( msg );
+	}
+	
+	public PlayerException( String msg, Exception e )
+	{
+		super( msg, e );
 	}
 
 }

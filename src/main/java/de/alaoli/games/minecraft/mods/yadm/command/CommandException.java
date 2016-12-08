@@ -1,14 +1,16 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-public class CommandException extends RuntimeException 
+import de.alaoli.games.minecraft.mods.yadm.YADMException;
+
+public class CommandException extends YADMException 
 {
-	public CommandException( String message )
+	public CommandException( String msg )
 	{
-		super( message );
+		super( msg );
 	}
 	
-	public CommandException( String message, Exception e )
+	public CommandException( String msg, Exception e )
 	{
-		super( message, e );
+		super( msg, e );
 	}	
 }

@@ -1,14 +1,16 @@
 package de.alaoli.games.minecraft.mods.yadm.world;
 
-public class WorldException extends RuntimeException 
+import de.alaoli.games.minecraft.mods.yadm.YADMException;
+
+public class WorldException extends YADMException 
 {
-	public WorldException( String message )
+	public WorldException( String msg )
 	{
-		super( message ); 
+		super( msg ); 
 	}
 	
-	public WorldException( String message, Exception e )
+	public WorldException( String msg, Exception e )
 	{
-		super( message, e ); 
+		super( msg, e ); 
 	}	
 }

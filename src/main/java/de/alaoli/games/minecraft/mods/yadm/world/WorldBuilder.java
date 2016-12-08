@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.Log;
+import de.alaoli.games.minecraft.mods.yadm.YADMException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
@@ -24,7 +25,6 @@ import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.DimensionFieldAccessor;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.GetDimensionNameInterceptor;
-import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.GetSpawnPointInterceptor;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.RegisterWorldChunkManagerPostInterceptor;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.RegisterWorldChunkManagerPreInterceptor;
 import net.bytebuddy.ByteBuddy;
@@ -175,8 +175,8 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 			)
 			.method( ElementMatchers.named( getDimensionNameMethodName ) )
 			.intercept( MethodDelegation.to( GetDimensionNameInterceptor.class ) )
-			.method( ElementMatchers.named( getSpawnPointMethodName ) )
-			.intercept( MethodDelegation.to( GetSpawnPointInterceptor.class ) )
+			/*.method( ElementMatchers.named( getSpawnPointMethodName ) )
+			.intercept( MethodDelegation.to( GetSpawnPointInterceptor.class ) )*/
 			.make()
 			.load( getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER )
 			.getLoaded();
@@ -198,7 +198,7 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
         WorldServer overworld = DimensionManager.getWorld(0);
         if (overworld == null)
         {
-            throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
+            throw new YADMException("Cannot Hotload Dim: Overworld is not Loaded!");
         }
         try
         {
@@ -355,7 +355,8 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 			worldServer = DimensionManager.getWorld( dimension.getId() );
 			
 			//worldServer initialized?
-			if( worldServer == null )
+			if( ( worldServer == null ) || 
+				( !(worldServer instanceof WorldServerGeneric) ) )
 			{
 				this.initWorldServer( dimension );
 			}

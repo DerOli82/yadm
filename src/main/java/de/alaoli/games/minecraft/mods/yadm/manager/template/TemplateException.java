@@ -1,9 +1,16 @@
 package de.alaoli.games.minecraft.mods.yadm.manager.template;
 
-public class TemplateException extends RuntimeException 
+import de.alaoli.games.minecraft.mods.yadm.YADMException;
+
+public class TemplateException extends YADMException 
 {
-	public TemplateException( String message )
+	public TemplateException( String msg )
 	{
-		super( message );
+		super( msg );
+	}
+	
+	public TemplateException( String msg, Exception e )
+	{
+		super( msg, e );
 	}
 }

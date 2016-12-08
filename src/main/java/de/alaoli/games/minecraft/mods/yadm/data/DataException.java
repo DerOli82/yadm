@@ -1,14 +1,16 @@
 package de.alaoli.games.minecraft.mods.yadm.data;
 
-public class DataException extends RuntimeException 
+import de.alaoli.games.minecraft.mods.yadm.YADMException;
+
+public class DataException extends YADMException 
 {
-	public DataException( String message )
+	public DataException( String msg )
 	{
-		super( message );
+		super( msg );
 	}
 	
-	public DataException( String message, Exception e )
+	public DataException( String msg, Exception e )
 	{
-		super( message, e );
+		super( msg, e );
 	}
 }

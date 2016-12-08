@@ -1,14 +1,16 @@
 package de.alaoli.games.minecraft.mods.yadm.manager.dimension;
 
-public class DimensionException extends RuntimeException 
+import de.alaoli.games.minecraft.mods.yadm.YADMException;
+
+public class DimensionException extends YADMException 
 {
-	public DimensionException( String message )
+	public DimensionException( String msg )
 	{
-		super( message );
+		super( msg );
 	}
 	
-	public DimensionException( String message, Exception e )
+	public DimensionException( String msg, Exception e )
 	{
-		super( message, e );
+		super( msg, e );
 	}	
 }

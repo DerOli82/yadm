@@ -1,6 +1,7 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
 import de.alaoli.games.minecraft.mods.yadm.Config;
+import de.alaoli.games.minecraft.mods.yadm.YADMException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportPlayer;
@@ -70,7 +71,7 @@ public class CreateCommand extends Command
 				players.teleport( new TeleportSettings( dimension, (EntityPlayer)args.sender ) );
 			}			
 		}
-		catch( RuntimeException e )
+		catch( YADMException e )
 		{
 			throw new CommandException( e.getMessage(), e );
 		}

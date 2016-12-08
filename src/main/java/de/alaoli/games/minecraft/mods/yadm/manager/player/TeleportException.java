@@ -1,14 +1,16 @@
 package de.alaoli.games.minecraft.mods.yadm.manager.player;
 
-public class TeleportException extends RuntimeException 
+import de.alaoli.games.minecraft.mods.yadm.YADMException;
+
+public class TeleportException extends YADMException 
 {
-	public TeleportException( String message )
+	public TeleportException( String msg )
 	{
-		super( message );
+		super( msg );
 	}
 	
-	public TeleportException( String message, Exception e )
+	public TeleportException( String msg, Exception e )
 	{
-		super(message, e );
+		super( msg, e );
 	}
 }
