@@ -11,6 +11,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
+import de.alaoli.games.minecraft.mods.yadm.YADMException;
 import de.alaoli.games.minecraft.mods.yadm.comparator.PriorityComparator;
 import de.alaoli.games.minecraft.mods.yadm.data.ChunkCoordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
@@ -18,6 +19,7 @@ import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.event.PerformWorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
+import net.minecraft.util.ChatComponentText;
 
 public class WorldBorderSetting implements Setting, JsonSerializable, PerformWorldBorderEvent
 {
@@ -213,23 +215,23 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 		switch( side )
 		{
 			case NORTH :
-				x = ( this.pointA.x + ( this.radius / 2 ) ) * 16;
-				z = ( this.pointA.z - 1 ) * 16;
+				x = 16 * this.pointCenter.x;
+				z = 16 * ( this.pointCenter.z + this.radius - 1 );
 				break;
 				
 			case EAST :
-				x = ( this.pointB.x - 1 ) * 16;
-				z = ( this.pointB.z + ( this.radius / 2 ) ) * 16;
+				x = 16 * ( this.pointCenter.x + this.radius - 1 );
+				z = 16 * this.pointCenter.z;
 				break;
 				
 			case SOUTH :
-				x = ( this.pointC.x + this.radius / 2 ) * 16;
-				z = ( this.pointC.z + 1 ) * 16;
+				x = 16 * this.pointCenter.x;
+				z = 16 * ( this.pointCenter.x - this.radius + 1 );
 				break;
 				
 			case WEST :
-				x = ( this.pointA.x + 1 ) * 16;
-				z = ( this.pointA.z + ( this.radius / 2 ) ) * 16;
+				x = 16 * ( this.pointCenter.x - this.radius + 1 ); 
+				z = 16 * this.pointCenter.z;
 				break;
 				
 			default :
@@ -396,7 +398,15 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 		{
 			if( event.isCanceled() ) { return; }
 			
-			action.performWorldBorderEvent( event );
+			try
+			{
+				action.performWorldBorderEvent( event );
+			}
+			catch( YADMException e )
+			{
+				
+				event.player.addChatComponentMessage( new ChatComponentText( e.getMessage() ) );
+			}
 		}
 		
 		//All sides action
@@ -409,7 +419,14 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 			{
 				if( event.isCanceled() ) { return; }
 				
-				action.performWorldBorderEvent( event );
+				try
+				{
+					action.performWorldBorderEvent( event );
+				}
+				catch( YADMException e )
+				{
+					event.player.addChatComponentMessage( new ChatComponentText( e.getMessage() ) );
+				}
 			}	
 		}
 	}

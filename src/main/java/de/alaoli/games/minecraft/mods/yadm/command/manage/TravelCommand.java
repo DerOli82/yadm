@@ -8,9 +8,10 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldBorderSetting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder.TravelSetting;
-import de.alaoli.games.minecraft.mods.yadm.event.PerformWorldBorderEvent;
+import de.alaoli.games.minecraft.mods.yadm.YADMException;
 import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
@@ -56,7 +57,7 @@ public class TravelCommand extends Command
 	}	
 	
 	@Override
-	public void processCommand( Arguments args )
+	public void processCommand( Arguments args ) throws CommandException
 	{
 		//Check permission
 		if( !this.canCommandSenderUseCommand( args ) ) { throw new CommandException( "You're not allowed to perform this command."); }
@@ -67,9 +68,18 @@ public class TravelCommand extends Command
 		{
 			cmd = args.next();
 		}
-		PerformWorldBorderEvent action;
+		TravelSetting action;
 		BorderSide targetSide, sourceSide;
-		Dimension target, source = dimensions.findDimension( ((EntityPlayer)args.sender).dimension );
+		Dimension target, source;
+		
+		try
+		{
+			source = dimensions.findDimension( ((EntityPlayer)args.sender).dimension );
+		}
+		catch( DimensionException e )
+		{
+			throw new CommandException( e.getMessage(), e );
+		}
 		
 		if( !source.hasSetting( SettingType.WORLDBORDER ) ) { throw new CommandException( "Travel option requires a WorldBorder." ); }
 		
@@ -82,6 +92,21 @@ public class TravelCommand extends Command
 				target = args.parseDimension( true );
 				targetSide = null;
 				
+				//Non YADM Dimension Target only OP
+				if( ( !dimensions.existsDimension( target.getId() ) ) && 
+					( !args.senderIsOP ) ) 
+				{ 
+					throw new CommandException("Target must be a YADM Dimension.");
+				}
+				action = (TravelSetting)border.getAction(sourceSide, TravelSetting.class );
+				
+				//Check if editable
+				if( ( action != null ) &&
+					( !action.isEditable() ) )
+				{
+					throw new CommandException( "Border '" + sourceSide + "' isn't editable." );
+				}
+				
 				try
 				{
 					targetSide = args.parseBorderSide();
@@ -90,6 +115,8 @@ public class TravelCommand extends Command
 				{
 					//Ignore because optional
 				}
+				
+				
 				if( !border.allowedBorderSides().contains( sourceSide ) ) { throw new CommandException( "Source '" + sourceSide + "' border not allowed." );}
 				if( ( targetSide != null ) && 
 					( !border.allowedBorderSides().contains( targetSide ) ) )
@@ -107,11 +134,11 @@ public class TravelCommand extends Command
 				
 			case "unset" :
 				sourceSide = args.parseBorderSide();
-				action = border.getAction( sourceSide, TravelSetting.class );
+				action = (TravelSetting) border.getAction( sourceSide, TravelSetting.class );
 				
 				if( action != null )
 				{
-					if( !((TravelSetting)action).isEditable() ) { throw new CommandException( sourceSide + " border isn't editable." ); }
+					if( !action.isEditable() ) { throw new CommandException( "Border '" + sourceSide + "' isn't editable." ); }
 					
 					border.removeAction( sourceSide, action );
 					dimensions.setDirty( true );
@@ -130,13 +157,21 @@ public class TravelCommand extends Command
 				
 				for( BorderSide side : BorderSide.values() )
 				{
-					action = border.getAction( side, TravelSetting.class );
+					action = (TravelSetting)border.getAction( side, TravelSetting.class );
 					
 					if( action != null )
 					{
-						target = dimensions.findDimension( ((TravelSetting)action).getTargetId() );
+						int targetId = action.getTargetId();
 						
-						args.sender.addChatMessage( new ChatComponentText( "  - '" + side + "' border to '" + target + "'" ) );
+						try
+						{
+							target = dimensions.findDimension( targetId );
+							args.sender.addChatMessage( new ChatComponentText( "  - '" + side + "' border to '" + target + "'" ) );
+						}
+						catch( YADMException e )
+						{
+							args.sender.addChatMessage( new ChatComponentText( "  - '" + side + "' border to '" + targetId + "'" ) );
+						}
 					}
 				}
 				break;

@@ -18,9 +18,11 @@ import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportPlayer;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.common.DimensionManager;
 
 public class TravelSetting implements Setting, PerformWorldBorderEvent, JsonSerializable 
 {
@@ -165,9 +167,13 @@ public class TravelSetting implements Setting, PerformWorldBorderEvent, JsonSeri
 		{
 			dimension = dimensions.findDimension( this.targetId );
 		}
-		else
+		else if( DimensionManager.isDimensionRegistered( this.targetId ) )
 		{
 			dimension = new DimensionDummy( this.targetId );
+		}
+		else
+		{
+			throw new DimensionException( "Dimension with Id '" + targetId + "' doesn't exists or isn't registered." );
 		}
 		
 		if( this.targetSide != null )
@@ -179,7 +185,7 @@ public class TravelSetting implements Setting, PerformWorldBorderEvent, JsonSeri
 		{
 			players.teleport( new TeleportSettings( dimension, (EntityPlayer)event.chunkEvent.entity ) );
 		}
-
+		
 		//Cancel other events
 		event.setCanceled( true );		
 	}
