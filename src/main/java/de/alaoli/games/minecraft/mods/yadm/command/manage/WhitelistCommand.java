@@ -94,12 +94,14 @@ public class WhitelistCommand extends Command
 				player = args.parsePlayer();
 				setting.add( player );
 				dimensions.setDirty( true );
+				args.sender.addChatMessage( new ChatComponentText( "Player '" + player + "' added to whitelist." ) );
 				break;
 				
 			case "remove":
 				player = args.parsePlayer();
 				setting.remove( player );
 				dimensions.setDirty( true );
+				args.sender.addChatMessage( new ChatComponentText( "Player '" + player + "' removed from whitelist." ) );
 				break;
 				
 			case "list" :
