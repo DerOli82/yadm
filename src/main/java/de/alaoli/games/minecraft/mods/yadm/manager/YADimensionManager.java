@@ -35,7 +35,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	
 	public static final YADimensionManager INSTANCE = new YADimensionManager();
 	
-	private static final ManageWorlds worldBuilder = WorldBuilder.INSTANCE;
+	private static final ManageWorlds worlds = WorldBuilder.INSTANCE;
 	
 	private int nextId;
 	
@@ -133,7 +133,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
  					 
  				if( !dimension.isRegistered() )					
  				{	
- 					this.registerDimension( dimension );				
+ 					this.registerDimension( dimension );
  				}		
  			}		
  		}		
@@ -154,7 +154,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 		
 		try
 		{
-			worldBuilder.registerWorldProviderForDimension( dimension );
+			worlds.registerWorldProviderForDimension( dimension );
 			DimensionManager.registerDimension( dimension.getId(), providerSetting.getId() );
 			dimension.setRegistered( true );
 			
@@ -216,7 +216,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 				.append( "'." );
 			Log.info( msg.toString() );
 			
-			worldBuilder.unregisterWorldProviderForDimension( dimension );
+			worlds.unregisterWorldProviderForDimension( dimension );
 			dimension.setRegistered( false );
 			YADM.proxy.unregisterDimension( dimension );
 		}
@@ -319,7 +319,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	public void deleteDimension( Dimension dimension ) throws DimensionException
 	{
 		this.removeDimension( dimension );
-		worldBuilder.markWorldForDeletion( dimension );
+		worlds.markWorldForDeletion( dimension );
 		
 		YADM.proxy.unregisterDimension( dimension );
 		DimensionManager.unloadWorld( dimension.getId() );
