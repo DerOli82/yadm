@@ -10,7 +10,6 @@ import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 
 public class SpawnSetting implements Setting, TeleportModifier, Packageable, JsonSerializable
 {
