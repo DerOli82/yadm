@@ -81,6 +81,11 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 		return null;
 	}
 	
+	public boolean hasAction( BorderSide side, Class<? extends PerformWorldBorderEvent> clazz )
+	{
+		return this.getAction( side, clazz ) != null;
+	}
+	
 	public ChunkCoordinate getPointCenter() 
 	{
 		return this.pointCenter;

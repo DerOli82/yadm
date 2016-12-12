@@ -36,18 +36,8 @@ public class TeleportEventHandler
 	}
 	
 	/********************************************************************************
-	 * Methods - Events
-	 ********************************************************************************/	
-	
-	@SubscribeEvent
-	public void triggerTeleport( TeleportEvent event )
-	{
-		if( !event.target.isRemote ) 
-		{
-			this.teleports.add( event );
-		}
-		
-	}
+	 * Methods - FML Events
+	 ********************************************************************************/
 	
 	@SubscribeEvent
 	public void executeTeleport( TickEvent.WorldTickEvent event )
@@ -74,5 +64,18 @@ public class TeleportEventHandler
 			}
 			this.teleports.removeAll( remove );
 		}
-	}   	
+	}
+	
+	/********************************************************************************
+	 * Methods - Forge Events
+	 ********************************************************************************/	
+	
+	@SubscribeEvent
+	public void triggerTeleport( TeleportEvent event )
+	{
+		if( !event.target.isRemote ) 
+		{
+			this.teleports.add( event );
+		}
+	}
 }

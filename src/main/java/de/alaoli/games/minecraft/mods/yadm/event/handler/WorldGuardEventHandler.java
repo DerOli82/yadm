@@ -12,6 +12,7 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldGuardSetting;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.management.ServerConfigurationManager;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 
@@ -21,11 +22,19 @@ public class WorldGuardEventHandler
 	 * Attribute
 	 ********************************************************************************/
 	
+	public static final WorldGuardEventHandler INSTANCE = new WorldGuardEventHandler();
 	protected static final YADimensionManager dimensions = YADimensionManager.INSTANCE;
 	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
+	
+	private WorldGuardEventHandler() {}
+	
+	public static void register()
+	{
+		MinecraftForge.EVENT_BUS.register( INSTANCE );
+	}	
 	
 	protected boolean isWhitelisted( Dimension dimension, EntityPlayer player )
 	{
@@ -65,7 +74,7 @@ public class WorldGuardEventHandler
 	}
 	
 	/********************************************************************************
-	 * Methods - Events
+	 * Methods - Forge Events
 	 ********************************************************************************/
 	
 	@SideOnly( Side.SERVER )
@@ -111,7 +120,6 @@ public class WorldGuardEventHandler
 				default:
 					break;
 			}
-	
 		}
 	}
 	
