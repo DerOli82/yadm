@@ -130,7 +130,7 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 	 * @param toCheck
 	 * @return
 	 */
-	public boolean isNorthBorder( ChunkCoordinate toCheck )
+	public boolean isSouthBorder( ChunkCoordinate toCheck )
 	{
 		return (( toCheck.x >= this.pointA.x ) && 
 				( toCheck.x <= this.pointB.x ) &&
@@ -156,7 +156,7 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 	 * @param toCheck
 	 * @return
 	 */
-	public boolean isSouthBorder( ChunkCoordinate toCheck )
+	public boolean isNorthBorder( ChunkCoordinate toCheck )
 	{
 		return (( toCheck.x >= this.pointC.x ) && 
 				( toCheck.x <= this.pointD.x ) &&
@@ -221,7 +221,7 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 		{
 			case NORTH :
 				x = 16 * this.pointCenter.x;
-				z = 16 * ( this.pointCenter.z + this.radius - 1 );
+				z = 16 * ( this.pointCenter.z - this.radius + 1 );
 				break;
 				
 			case EAST :
@@ -231,7 +231,7 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 				
 			case SOUTH :
 				x = 16 * this.pointCenter.x;
-				z = 16 * ( this.pointCenter.x - this.radius + 1 );
+				z = 16 * ( this.pointCenter.x + this.radius - 1 );
 				break;
 				
 			case WEST :
