@@ -1,6 +1,5 @@
 package de.alaoli.games.minecraft.mods.yadm.event.handler;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
