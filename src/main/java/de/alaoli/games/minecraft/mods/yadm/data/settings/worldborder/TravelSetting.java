@@ -177,16 +177,22 @@ public class TravelSetting implements Setting, PerformWorldBorderEvent, JsonSeri
 		{
 			throw new DimensionException( "Dimension with Id '" + targetId + "' doesn't exists or isn't registered." );
 		}
+		TeleportEvent teleport;
 		
 		if( this.targetSide != null )
 		{
 			Coordinate coordinate = event.setting.toCoordinate( targetSide, (int)player.posY );
-			
-			MinecraftForge.EVENT_BUS.post( new TeleportEvent( dimension, (EntityPlayerMP)player, coordinate ) );
+			teleport = new TeleportEvent( dimension, (EntityPlayerMP)player, coordinate );
 		}
 		else
 		{
-			MinecraftForge.EVENT_BUS.post( new TeleportEvent( dimension, (EntityPlayerMP)event.chunkEvent.entity ) );
+			teleport = new TeleportEvent( dimension, (EntityPlayerMP)event.chunkEvent.entity );
+		}
+		MinecraftForge.EVENT_BUS.post( teleport );
+		
+		if( teleport.canPlayerTeleport() )
+		{
+			event.setCanceled( true );
 		}
 	}
 
