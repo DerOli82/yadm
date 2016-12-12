@@ -116,15 +116,21 @@ public class TravelCommand extends Command
 					//Ignore because optional
 				}
 				
-				
 				if( !border.allowedBorderSides().contains( sourceSide ) ) { throw new CommandException( "Source '" + sourceSide + "' border not allowed." );}
 				if( ( targetSide != null ) && 
 					( !border.allowedBorderSides().contains( targetSide ) ) )
 				{
 					throw new CommandException( "Source '" + targetSide + "' border not allowed." );
 				}
+				
+				//Remove old
+				if( action != null )
+				{
+					border.removeAction( sourceSide, action );
+				}
 				action = new TravelSetting( target.getId(), targetSide );
 				border.addAction( sourceSide, action );
+				
 				dimensions.setDirty( true );
 				
 				args.sender.addChatMessage( 
