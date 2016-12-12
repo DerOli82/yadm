@@ -3,6 +3,8 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 import java.util.ArrayList;
 import java.util.List;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
+import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
@@ -12,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.MinecraftForge;
 
 public class DeleteCommand extends Command
 {
@@ -73,7 +76,7 @@ public class DeleteCommand extends Command
 		//Teleport all players out
 		for( EntityPlayerMP player : playersInDimension )
 		{
-			players.emergencyTeleport( player );
+			MinecraftForge.EVENT_BUS.post( new TeleportEvent( new DimensionDummy( 0 ), player ) );
 		}
 		dimensions.deleteDimension( dimension );
 		args.sender.addChatMessage( new ChatComponentText( "Dimension '" + dimension + "' removed." ) );

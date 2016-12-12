@@ -14,15 +14,17 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.event.PerformWorldBorderEvent;
+import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportPlayer;
-import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
 
 public class TravelSetting implements Setting, PerformWorldBorderEvent, JsonSerializable 
 {
@@ -179,15 +181,13 @@ public class TravelSetting implements Setting, PerformWorldBorderEvent, JsonSeri
 		if( this.targetSide != null )
 		{
 			Coordinate coordinate = event.setting.toCoordinate( targetSide, (int)player.posY );
-			players.teleport( new TeleportSettings( dimension, player, coordinate ));
+			
+			MinecraftForge.EVENT_BUS.post( new TeleportEvent( dimension, (EntityPlayerMP)player, coordinate ) );
 		}
 		else
 		{
-			players.teleport( new TeleportSettings( dimension, (EntityPlayer)event.chunkEvent.entity ) );
+			MinecraftForge.EVENT_BUS.post( new TeleportEvent( dimension, (EntityPlayerMP)event.chunkEvent.entity ) );
 		}
-		
-		//Cancel other events
-		event.setCanceled( true );		
 	}
 
 }

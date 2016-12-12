@@ -1,33 +1,43 @@
-package de.alaoli.games.minecraft.mods.yadm.manager.player;
+package de.alaoli.games.minecraft.mods.yadm.event;
 
+import cpw.mods.fml.common.eventhandler.Event;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SpawnSetting;
+import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportModifier;
 import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.WorldServer;
 
-public class TeleportSettings
+public class TeleportEvent extends Event 
 {
+	/********************************************************************************
+	 * Attributes
+	 ********************************************************************************/
+	
 	protected static final ManageWorlds worlds = WorldBuilder.INSTANCE;
 	
 	public static final int OFFSETY = 4;
 
 	public final Dimension dimension;
 	public final WorldServer target;
-	public final EntityPlayer player;
+	public final EntityPlayerMP player;
 	
 	public Coordinate coordinate;
 	
-	public TeleportSettings( Dimension dimension, EntityPlayer player )
+	/********************************************************************************
+	 * Methods
+	 ********************************************************************************/
+	
+	public TeleportEvent( Dimension dimension, EntityPlayerMP player )
 	{
 		this( dimension, player, null );
 	}
 	
-	public TeleportSettings( Dimension dimension, EntityPlayer player, Coordinate coordinate )
+	public TeleportEvent( Dimension dimension, EntityPlayerMP player, Coordinate coordinate )
 	{
 		this.dimension = dimension;
 		this.player = player;
@@ -51,7 +61,7 @@ public class TeleportSettings
 		}
 		this.coordinate = coordinate;
 	}
-	
+
 	public void prepare()
 	{
 		//Apply modifiers
@@ -73,5 +83,16 @@ public class TeleportSettings
 			this.player.setSneaking( false );
 		}		
 	}
-
+	
+	/********************************************************************************
+	 * Methods - Implement Event
+	 ********************************************************************************/
+	
+	@Override
+	public boolean isCancelable() 
+	{
+		return true;
+	}
+	
+	
 }

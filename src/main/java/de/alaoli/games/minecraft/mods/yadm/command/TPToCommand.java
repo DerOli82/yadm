@@ -1,12 +1,12 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
+import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
-import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportException;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportPlayer;
-import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.common.MinecraftForge;
 
 public class TPToCommand extends Command
 {
@@ -64,13 +64,6 @@ public class TPToCommand extends Command
 		if( !player.ownsDimension() ) { throw new CommandException( player.getManageableName() + "doesn't owns any dimension." );}
 		if( !args.senderIsEntityPlayer ) { throw new CommandException( "Command sender must be an player." );}
 		
-		try
-		{
-			players.teleport( new TeleportSettings( player.getDimension(), (EntityPlayer)args.sender, null ));
-		}
-		catch( TeleportException e )
-		{
-			throw new CommandException( e.getMessage(), e );
-		}
+		MinecraftForge.EVENT_BUS.post( new TeleportEvent( player.getDimension(), (EntityPlayerMP)args.sender ) );
 	}
 }

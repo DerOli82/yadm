@@ -1,11 +1,9 @@
 package de.alaoli.games.minecraft.mods.yadm.event.handler;
 
 import java.io.IOException;
-
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
@@ -15,7 +13,7 @@ import net.minecraftforge.event.world.WorldEvent;
 
 public class DimensionEventHandler 
 {
-	protected static final JsonFileAdapter playerFiles = PlayerManager.INSTANCE;
+	protected static final PlayerManager players = PlayerManager.INSTANCE;
 	protected static final YADimensionManager dimensions = YADimensionManager.INSTANCE;
 	protected static final ManageWorlds worlds = WorldBuilder.INSTANCE;
 	
@@ -24,7 +22,7 @@ public class DimensionEventHandler
 	{
 		try 
 		{
-			playerFiles.save();
+			players.save();
 			dimensions.save();
 		}
 		catch ( DataException | IOException e )
@@ -56,4 +54,11 @@ public class DimensionEventHandler
 			worlds.deleteWorld(  event.world );
 		}
 	}
+
+	
+	/*
+	public void onChangeDimension( PlayerEvent.PlayerChangedDimensionEvent event )
+	{
+		
+	}*/
 }

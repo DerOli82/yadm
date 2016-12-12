@@ -17,8 +17,8 @@ import com.eclipsesource.json.WriterConfig;
 
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
-import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
+import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.DimensionTeleport;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.FindPlayer;
@@ -26,7 +26,6 @@ import de.alaoli.games.minecraft.mods.yadm.manager.player.ManagePlayers;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportException;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportPlayer;
-import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -210,40 +209,37 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	 ********************************************************************************/
 	
 	@Override
-	public void emergencyTeleport( EntityPlayer player )
+	public void teleport( TeleportEvent event )
 	{
-		this.teleport( new TeleportSettings( new DimensionDummy( 0 ), player ) );
-	}
-	
-	@Override
-	public void teleport( TeleportSettings settings )
-	{
+		if( event.isCanceled() ) { return; }
+		
+		event.prepare();
+		
+		if( event.dimension == null ) { throw new TeleportException( "Teleport 'dimension' is missing." ); }
+		if( event.target == null ) { throw new TeleportException( "Teleport 'target' is missing." ); }
+		if( event.target.isRemote ) { return; }
+		if( event.player == null ) { throw new TeleportException( "Teleport 'player' is missing." ); }
+		if( !(event.player instanceof EntityPlayerMP ) ) { return; }
+		if( event.coordinate == null ) { throw new TeleportException( "Teleport 'coordinate' is missing." ); }
+
 		ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
 		
-		settings.prepare();
-		
-		if( settings.dimension == null ) { throw new TeleportException( "Teleport 'dimension' is missing." ); }
-		if( settings.target == null ) { throw new TeleportException( "Teleport 'target' is missing." ); }
-		if( settings.player == null ) { throw new TeleportException( "Teleport 'player' is missing." ); }
-		if( settings.coordinate == null ) { throw new TeleportException( "Teleport 'coordinate' is missing." ); }
-		
-		if( ( settings.coordinate != null ) &&
-			( settings.player.dimension == settings.dimension.getId() ) ) 
-		{
-			settings.player.setPositionAndUpdate( 
-				settings.coordinate.x,
-				settings.coordinate.y,
-				settings.coordinate.z	
-			);
-		}
-		else
+		//Dimension transfer
+		if( event.player.dimension != event.dimension.getId() ) 
 		{
 			scm.transferPlayerToDimension(
-				(EntityPlayerMP)settings.player, 
-				settings.dimension.getId(), 
-				new DimensionTeleport( settings.target, settings.coordinate ) 
+					event.player, 
+					event.dimension.getId(), 
+				new DimensionTeleport( event.target, event.coordinate ) 
 			);
 		}
+		event.player.playerNetServerHandler.setPlayerLocation(
+			event.coordinate.x,
+			event.coordinate.y,
+			event.coordinate.z,
+			event.player.rotationYaw,
+			event.player.rotationPitch
+		);
 	}
 	
 	/********************************************************************************

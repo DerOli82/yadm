@@ -4,9 +4,9 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportModifier;
-import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
 import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
@@ -64,7 +64,7 @@ public class SpawnSetting implements Setting, TeleportModifier, Packageable, Jso
 	 ********************************************************************************/
 	
 	@Override
-	public void applyTeleportModifier( TeleportSettings settings )
+	public void applyTeleportModifier( TeleportEvent event )
 	{
 		switch( this.mode )
 		{
@@ -79,15 +79,15 @@ public class SpawnSetting implements Setting, TeleportModifier, Packageable, Jso
 	
 				while ( y > 0 ) 
 				{
-					block = settings.target.getBlock(settings.coordinate.x, y, settings.coordinate.z);
+					block = event.target.getBlock(event.coordinate.x, y, event.coordinate.z);
 	
 					if( ( block != null ) && 
-						( !block.isAir(settings.target, settings.coordinate.x, y, settings.coordinate.z ) ) )
+						( !block.isAir(event.target, event.coordinate.x, y, event.coordinate.z ) ) )
 					{
-						settings.coordinate = new Coordinate( 
-							settings.coordinate.x, 
-							y + TeleportSettings.OFFSETY, 
-							settings.coordinate.z 
+						event.coordinate = new Coordinate( 
+								event.coordinate.x, 
+							y + TeleportEvent.OFFSETY, 
+							event.coordinate.z 
 						);
 						break;
 					}

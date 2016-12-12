@@ -13,12 +13,12 @@ import com.eclipsesource.json.JsonValue;
 import cpw.mods.fml.common.FMLCommonHandler;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
+import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.FindPlayer;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportException;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportModifier;
-import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportSettings;
 import net.minecraft.server.management.ServerConfigurationManager;
 
 public class WhitelistSetting implements Setting, TeleportModifier, JsonSerializable
@@ -94,17 +94,17 @@ public class WhitelistSetting implements Setting, TeleportModifier, JsonSerializ
 	 ********************************************************************************/
 	
 	@Override
-	public void applyTeleportModifier( TeleportSettings settings )
+	public void applyTeleportModifier( TeleportEvent event )
 	{
 		ServerConfigurationManager scm = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager();
 		
 		//Operator and owner always allowed
-		if( ( settings.dimension.isOwner( settings.player ) ) || ( scm.canSendCommands( settings.player.getGameProfile() )) ) { return; }
+		if( ( event.dimension.isOwner( event.player ) ) || ( scm.canSendCommands( event.player.getGameProfile() )) ) { return; }
 			
 		//Player isn't whitelisted
-		if( !this.exists( settings.player.getUniqueID() ) )
+		if( !this.exists( event.player.getUniqueID() ) )
 		{
-			throw new TeleportException( "You're not allowed to teleport to dimension '" + settings.dimension + "'." );
+			throw new TeleportException( "You're not allowed to teleport to dimension '" + event.dimension + "'." );
 		}
 	}
 	
