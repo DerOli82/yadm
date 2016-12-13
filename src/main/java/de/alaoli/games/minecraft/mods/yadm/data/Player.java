@@ -30,7 +30,7 @@ public class Player implements Manageable, JsonSerializable
 	public Player( EntityPlayer player )
 	{
 		this.id = player.getUniqueID();
-		this.name = player.getDisplayName();
+		this.name = player.getGameProfile().getName();
 	}
 	
 	public Player( UUID id, String name )

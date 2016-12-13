@@ -71,7 +71,7 @@ public class Arguments
 		if( next.contains( "@p" ) )
 		{
 			EntityPlayer player = CommandBase.getPlayer( this.sender, "@p" );
-			next = next.replaceAll( "@p", player.getDisplayName() );
+			next = next.replaceAll( "@p", player.getGameProfile().getName() );
 		}
 		return next;
 	}
