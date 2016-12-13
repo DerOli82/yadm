@@ -1,5 +1,11 @@
 # Changelog
 
+# Version 0.6.6
+- Replace old TravelSetting on manage set command
+- Teleport as next tick Event, solve some positioning problems
+- Swap north and south border (had wrong directions)
+- Use GameProfil name instead of display name
+
 # Version 0.6.5
 - Fixes TravelSetting error https://github.com/DerOli82/yadm/issues/26
 - Remove SpawnPoint interceptor and override getSpawnPoint in generic WolrdServer
