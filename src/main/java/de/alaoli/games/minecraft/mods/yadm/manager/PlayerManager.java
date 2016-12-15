@@ -213,8 +213,6 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	{
 		if( event.isCanceled() ) { return; }
 		
-		event.prepare();
-		
 		if( event.dimension == null ) { throw new TeleportException( "Teleport 'dimension' is missing." ); }
 		if( event.target == null ) { throw new TeleportException( "Teleport 'target' is missing." ); }
 		if( event.target.isRemote ) { return; }
@@ -223,6 +221,8 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 		if( event.coordinate == null ) { throw new TeleportException( "Teleport 'coordinate' is missing." ); }
 
 		ServerConfigurationManager scm = MinecraftServer.getServer().getConfigurationManager();
+		
+		event.prepare();
 		
 		//Dimension transfer
 		if( event.player.dimension != event.dimension.getId() ) 
