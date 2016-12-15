@@ -1,5 +1,8 @@
 # Changelog
 
+# Version 0.6.7
+- Fixes Error on teleport https://github.com/DerOli82/yadm/issues/29
+
 # Version 0.6.6
 - Replace old TravelSetting on manage set command
 - Teleport as next tick Event, solve some positioning problems
