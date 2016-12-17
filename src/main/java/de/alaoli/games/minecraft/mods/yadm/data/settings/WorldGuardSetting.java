@@ -1,7 +1,13 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+
+import de.alaoli.games.minecraft.mods.yadm.comparator.BlockComparator;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 
@@ -14,6 +20,8 @@ public class WorldGuardSetting implements Setting, JsonSerializable
 	private boolean whitelistAllowed;
 	private boolean interactionAllowed;
 	
+	private Set<BlockComparator> leftClickWhitelist;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -22,6 +30,7 @@ public class WorldGuardSetting implements Setting, JsonSerializable
 	{
 		this.whitelistAllowed = false;
 		this.interactionAllowed = true;
+		this.leftClickWhitelist = new HashSet<BlockComparator>();
 	}
 
 	public boolean isWhitelistAllowed()
@@ -32,6 +41,14 @@ public class WorldGuardSetting implements Setting, JsonSerializable
 	public boolean isInteractionAllowed()
 	{
 		return this.interactionAllowed;
+
+	}
+	
+	public boolean isLeftClickAllowed( BlockComparator block )
+	{
+		if( this.leftClickWhitelist.isEmpty() ) { return false; }
+		
+		return this.leftClickWhitelist.contains( block );
 	}
 	
 	/********************************************************************************
@@ -63,6 +80,17 @@ public class WorldGuardSetting implements Setting, JsonSerializable
 		json.add( "whitelistAllowed", this.whitelistAllowed );
 		json.add( "interactionAllowed", this.interactionAllowed );
 		
+		//Optional
+		if( !this.leftClickWhitelist.isEmpty() )
+		{
+			JsonArray array = new JsonArray();
+			
+			for( BlockComparator block : this.leftClickWhitelist )
+			{
+				array.add( block.toString() );
+			}
+			json.add( "leftClickWhitelist", array );
+		}
 		return json;
 	}
 
@@ -80,6 +108,7 @@ public class WorldGuardSetting implements Setting, JsonSerializable
 			
 			this.whitelistAllowed = obj.get( "whitelistAllowed" ).asBoolean();
 		}
+		
 		//Optional
 		if( obj.get( "interactionAllowed" ) != null )
 		{
@@ -87,5 +116,16 @@ public class WorldGuardSetting implements Setting, JsonSerializable
 			
 			this.interactionAllowed = obj.get( "interactionAllowed" ).asBoolean();
 		}		
+		
+		//Optional
+		if( obj.get( "leftClickWhitelist" ) != null )
+		{
+			if( !obj.get( "leftClickWhitelist" ).isArray() ) { throw new DataException( "WorldGuardSetting 'leftClickWhitelist' isn't an array." ); }
+			
+			for( JsonValue value : obj.get( "leftClickWhitelist" ).asArray() )
+			{
+				this.leftClickWhitelist.add( new BlockComparator( value.asString() ) );
+			}
+		}
 	}		
 }

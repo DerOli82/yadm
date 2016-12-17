@@ -5,6 +5,7 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import de.alaoli.games.minecraft.mods.yadm.comparator.BlockComparator;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WhitelistSetting;
@@ -55,10 +56,8 @@ public class WorldGuardEventHandler
 		}
 	}
 	
-	public boolean isInteractionAllowed( Dimension dimension, EntityPlayer player )
+	protected boolean isInteractionAllowed( WorldGuardSetting worldGuard, EntityPlayer player )
 	{
-		WorldGuardSetting worldGuard = (WorldGuardSetting)dimension.get( SettingType.WORLDGUARD );
-		
 		//Interaction isn't allowed
 		if( !worldGuard.isInteractionAllowed() ) { return false; } 
 				
@@ -72,6 +71,16 @@ public class WorldGuardEventHandler
 			return false;
 		}
 	}
+
+	protected boolean isLeftClickAllowed( WorldGuardSetting worldGuard, PlayerInteractEvent event )
+	{
+		BlockComparator block = new BlockComparator( 
+			event.world.getBlock( event.x, event.y, event.z ),
+			event.world.getBlockMetadata( event.x, event.y, event.z )
+		);
+		return worldGuard.isLeftClickAllowed( block );
+	}
+
 	
 	/********************************************************************************
 	 * Methods - Forge Events
@@ -92,18 +101,19 @@ public class WorldGuardEventHandler
 			( !dimension.isOwner( event.entityPlayer )) && 
 			( !scm.canSendCommands( event.entityPlayer.getGameProfile() ) ) ) 
 		{
+			WorldGuardSetting worldGuard = (WorldGuardSetting)dimension.get( SettingType.WORLDGUARD );
 			event.setCanceled( true );
 			
 			switch( event.action )
 			{
 				case RIGHT_CLICK_BLOCK :
-					if( this.isWhitelisted(dimension, event.entityPlayer ) )
+					if( this.isWhitelisted( dimension, event.entityPlayer ) )
 					{
 						event.setCanceled( false );
 					} 
 					else
 					{
-						if( this.isInteractionAllowed(dimension, event.entityPlayer ) )
+						if( this.isInteractionAllowed( worldGuard, event.entityPlayer ) )
 						{
 							event.setCanceled( false );
 						}
@@ -111,10 +121,11 @@ public class WorldGuardEventHandler
 					break;
 					
 				case LEFT_CLICK_BLOCK :
-					if( this.isWhitelisted( dimension, event.entityPlayer ) )
+					if( ( this.isWhitelisted( dimension, event.entityPlayer ) ) || 
+						( this.isLeftClickAllowed( worldGuard, event) ) )
 					{
 						event.setCanceled( false );
-					}
+					}					
 					break;
 					
 				default:
