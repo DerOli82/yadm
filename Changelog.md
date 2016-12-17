@@ -1,5 +1,8 @@
 # Changelog
 
+# Version 0.7.0
+- WorldGuard block whitelist
+
 # Version 0.6.7
 - Fixes Error on teleport https://github.com/DerOli82/yadm/issues/29
 
