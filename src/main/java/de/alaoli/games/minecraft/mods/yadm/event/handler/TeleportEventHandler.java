@@ -5,6 +5,7 @@ import java.util.List;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportException;
@@ -57,7 +58,14 @@ public class TeleportEventHandler
 					}
 					catch( TeleportException e )
 					{
-						teleport.player.addChatComponentMessage( new ChatComponentText( e.getMessage() ) );
+						if( teleport.player != null )
+						{
+							teleport.player.addChatComponentMessage( new ChatComponentText( e.getMessage() ) );
+						}
+						else
+						{
+							Log.info( e.getMessage() );
+						}
 					}
 					remove.add( teleport );
 				}
