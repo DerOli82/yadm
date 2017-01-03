@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
@@ -267,13 +266,6 @@ public class Arguments
 	{
 		if( this.isEmpty() ) { throw new CommandException( "Missing <borderSide> argument." ); }
 		
-		try
-		{
-			return BorderSide.get( this.next() );
-		}
-		catch( DataException e )
-		{
-			throw new CommandException( e.getMessage(), e );
-		}
+		return BorderSide.get( this.next() );
 	}
 }

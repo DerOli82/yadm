@@ -1,7 +1,6 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
 import de.alaoli.games.minecraft.mods.yadm.Config;
-import de.alaoli.games.minecraft.mods.yadm.YADMException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
@@ -61,21 +60,13 @@ public class CreateCommand extends Command
 			this.sendUsage( args.sender );
 			return;
 		}
-		
-		try
-		{
-			Dimension dimension = args.parseAndCreateDimension();
+		Dimension dimension = args.parseAndCreateDimension();
 
-			if( ( Config.Dimension.teleportOnCreate ) && 
-				( args.senderIsEntityPlayer ) )
-			{
-				MinecraftForge.EVENT_BUS.post( new TeleportEvent( dimension, (EntityPlayerMP)args.sender ) );
-			}			
-		}
-		catch( YADMException e )
+		if( ( Config.Dimension.teleportOnCreate ) && 
+			( args.senderIsEntityPlayer ) )
 		{
-			throw new CommandException( e.getMessage(), e );
-		}
+			MinecraftForge.EVENT_BUS.post( new TeleportEvent( dimension, (EntityPlayerMP)args.sender ) );
+		}			
 	}
 
 }
