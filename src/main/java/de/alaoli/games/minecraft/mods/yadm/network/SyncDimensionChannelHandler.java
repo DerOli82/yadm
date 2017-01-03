@@ -3,7 +3,6 @@ package de.alaoli.games.minecraft.mods.yadm.network;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.FMLIndexedMessageToMessageCodec;
 import cpw.mods.fml.relauncher.Side;
-import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
 import io.netty.buffer.ByteBuf;
@@ -21,24 +20,14 @@ public class SyncDimensionChannelHandler extends FMLIndexedMessageToMessageCodec
 	public void encodeInto( ChannelHandlerContext ctx, SyncDimensionsMessage msg, ByteBuf target ) throws Exception 
 	{
 		msg.toBytes( target );
-		
 	}
 
 	@Override
 	public void decodeInto( ChannelHandlerContext ctx, ByteBuf source, SyncDimensionsMessage msg ) 
 	{
-		msg.fromBytes( source );
-		
 		if( FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT )
 		{
-			for( Dimension dimension : msg.getDimensions() )
-			{	
-				if( !dimensions.existsDimension( dimension.getId() ) )
-				{	 
-					dimensions.addDimension( dimension );
-				}			
-				dimensions.registerDimension( dimension );
-			}
+			msg.fromBytes( source );
 		}
 	}
 }

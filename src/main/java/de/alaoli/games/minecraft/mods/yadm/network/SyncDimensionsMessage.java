@@ -1,11 +1,11 @@
 package de.alaoli.games.minecraft.mods.yadm.network;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -16,37 +16,8 @@ public class SyncDimensionsMessage implements IMessage
 	 * Attribute
 	 ********************************************************************************/
 	
-	private Set<Dimension> dimensions;
-	
-	/********************************************************************************
-	 * Methods
-	 ********************************************************************************/
-	
-	public SyncDimensionsMessage()
-	{
-		this.dimensions = new HashSet<Dimension>();
-	}
-	
-	public SyncDimensionsMessage( Dimension dimension )
-	{
-		this();
-		this.dimensions.add( dimension );
-	}
-	
-	public SyncDimensionsMessage( Set<Dimension> dimensions )
-	{
-		this.dimensions = dimensions;
-	}
-	
-	/********************************************************************************
-	 * Methods - Getter/Setter
-	 ********************************************************************************/
-	 
-	 public Set<Dimension> getDimensions()
-	 {
-		 return this.dimensions;
-	 }
-	 
+	protected static final YADimensionManager dimensions = YADimensionManager.INSTANCE;
+
 	/********************************************************************************
 	 * Implements - IMessage
 	 ********************************************************************************/
@@ -67,7 +38,11 @@ public class SyncDimensionsMessage implements IMessage
 				packet = new PacketBuffer( buffer );
 				dimension = new Dimension( packet.readNBTTagCompoundFromBuffer() );
 				
-				this.dimensions.add( dimension );
+				if( !dimensions.existsDimension( dimension.getId() ) )
+				{	 
+					dimensions.addDimension( dimension );
+				}			
+				dimensions.registerDimension( dimension );
 			} 
 			catch ( IOException e ) 
 			{
@@ -80,25 +55,22 @@ public class SyncDimensionsMessage implements IMessage
 	public void toBytes( ByteBuf buffer) 
 	{
 		PacketBuffer packet;
-		NBTTagCompound tagCompound;
 		
-		buffer.writeInt( this.dimensions.size() );
+		Set<NBTTagCompound> nbtDimensions = dimensions.getAsNBT();
 		
-		for( Dimension dimension : this.dimensions )
-		{						
+		buffer.writeInt( nbtDimensions.size() );
+		
+		for( NBTTagCompound compound : nbtDimensions )
+		{
 			try 
 			{
-				packet		= new PacketBuffer( buffer );
-				tagCompound	= new NBTTagCompound();
-				
-				dimension.writeToNBT( tagCompound );
-				packet.writeNBTTagCompoundToBuffer(tagCompound);
+				packet = new PacketBuffer( buffer );
+				packet.writeNBTTagCompoundToBuffer( compound );
 			} 
 			catch ( IOException e )
 			{
 				e.printStackTrace();
 			}
-			
 		}
 	}
 }

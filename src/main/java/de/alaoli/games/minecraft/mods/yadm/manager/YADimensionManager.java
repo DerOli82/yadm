@@ -3,6 +3,7 @@ package de.alaoli.games.minecraft.mods.yadm.manager;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -25,6 +26,7 @@ import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ListDimensions;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
 import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.DimensionManager;
 
 public class YADimensionManager extends ManageableGroup implements ManageDimensions, FindDimension, ListDimensions, JsonFileAdapter 
@@ -43,6 +45,8 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	
 	private Map<Integer, Dimension> mappingId;
 	
+	private Set<NBTTagCompound> nbtDimensions;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
@@ -53,6 +57,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 		
 		this.nextId = Config.Dimension.beginsWithId;
 		this.mappingId = new HashMap<Integer, Dimension>();
+		this.nbtDimensions = new HashSet<NBTTagCompound>();
 	}
 	
 	/**
@@ -106,6 +111,30 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 		return null;
 	}	
 
+	public Set<NBTTagCompound> getAsNBT()
+	{
+		if( ( !this.isEmpty() ) && 
+			( this.nbtDimensions.isEmpty() ) )
+		{
+			StringBuilder msg;
+			Dimension dimension;
+			NBTTagCompound compound;
+			
+			for( Entry<String, Manageable> groupEntry : this.getAll() )
+			{	
+				for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
+				{
+		    		dimension = (Dimension) dimensionEntry.getValue();
+					compound = new NBTTagCompound();
+					
+					((Dimension)dimensionEntry.getValue()).writeToNBT( compound );
+					this.nbtDimensions.add( compound );
+				}
+			}
+		}
+		return this.nbtDimensions;
+	}
+	
 	/********************************************************************************
 	 * Methods - Implement ManageableGroup
 	 ********************************************************************************/	
@@ -377,6 +406,11 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	@Override
 	public void setDirty( boolean flag )
 	{
+		if( flag == true )
+		{
+			this.mappingId.clear();
+			this.nbtDimensions.clear();
+		}
 		this.dirty = flag;
 	}
 
