@@ -103,7 +103,8 @@ public class TeleportEvent extends Event
 		if( this.player.isSneaking() )
 		{
 			this.player.setSneaking( false );
-		}		
+		}
+		this.player.fallDistance = 0;
 	}
 	
 	/********************************************************************************
