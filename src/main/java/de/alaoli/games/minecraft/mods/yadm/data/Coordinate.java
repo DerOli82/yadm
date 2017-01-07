@@ -1,5 +1,7 @@
 package de.alaoli.games.minecraft.mods.yadm.data;
 
+import java.util.StringJoiner;
+
 public class Coordinate 
 {
 	public final int x;
@@ -13,5 +15,15 @@ public class Coordinate
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+
+	@Override
+	public String toString() 
+	{
+		StringJoiner join = new StringJoiner( ", " )
+			.add( String.valueOf( this.x ) )
+			.add( String.valueOf( this.y ) )
+			.add( String.valueOf( this.z ) );
+		return join.toString();
 	}
 }

@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.SpawnMode;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
@@ -262,10 +264,17 @@ public class Arguments
 		return players.findPlayer( this.next() );
 	}
 	
-	public BorderSide parseBorderSide() throws CommandException
+	public BorderSide parseBorderSide() throws CommandException, DataException
 	{
 		if( this.isEmpty() ) { throw new CommandException( "Missing <borderSide> argument." ); }
 		
 		return BorderSide.get( this.next() );
+	}
+	
+	public SpawnMode parseSpawnMode() throws CommandException, DataException
+	{
+		if( this.isEmpty() ) { throw new CommandException( "Missing <spawnMode> argument." ); }
+		
+		return SpawnMode.get( this.next() );
 	}
 }

@@ -56,8 +56,6 @@ public class DimensionEventHandler
     {
     	EntityPlayerMP player = ((NetHandlerPlayServer) event.handler).playerEntity;
     	
-    	Log.info( "Client connected..." );
-    	
     	//Register unknown players
     	if( !players.existsPlayer( player ) )
     	{
@@ -68,7 +66,7 @@ public class DimensionEventHandler
     	if( !dimensions.isEmpty() )
     	{
 	    	StringBuilder msg = new StringBuilder()
-    			.append( "... sync dimensions to Player '" )
+    			.append( "Sync dimensions to Player '" )
 	    		.append( player.getUniqueID() )
 	    		.append( "':" );
 	    	Log.info( msg.toString() );
@@ -78,10 +76,6 @@ public class DimensionEventHandler
 	    	channel.attr(FMLOutboundHandler.FML_MESSAGETARGET ).set( FMLOutboundHandler.OutboundTarget.DISPATCHER );
 	    	channel.attr( FMLOutboundHandler.FML_MESSAGETARGETARGS ).set(event.manager.channel().attr( NetworkDispatcher.FML_DISPATCHER ).get() );
 	    	channel.writeOutbound( new SyncDimensionsMessage() );	    	
-    	}
-    	else
-    	{
-    		Log.info( "... nothing to sync." );
     	}
     }
     

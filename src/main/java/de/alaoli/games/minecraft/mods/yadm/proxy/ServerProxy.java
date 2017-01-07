@@ -4,6 +4,7 @@ import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
 import de.alaoli.games.minecraft.mods.yadm.network.RegisterDimensionMessage;
 import de.alaoli.games.minecraft.mods.yadm.network.UnregisterDimensionMessage;
+import de.alaoli.games.minecraft.mods.yadm.network.UpdateDimensionMessage;
 
 public class ServerProxy extends CommonProxy
 {
@@ -25,5 +26,13 @@ public class ServerProxy extends CommonProxy
 		super.unregisterDimension( dimension );
 		
 		MessageDispatcher.network.sendToAll( new UnregisterDimensionMessage( dimension.getId() ) );
+	}
+	
+	@Override
+	public void updateDimension( Dimension dimension ) 
+	{
+		super.updateDimension( dimension );
+		
+		MessageDispatcher.network.sendToAll( new UpdateDimensionMessage( dimension ) );
 	}
 }

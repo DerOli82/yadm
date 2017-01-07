@@ -1,5 +1,7 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+
 public enum SpawnMode 
 {
 	EXACT( "exact"),
@@ -32,6 +34,6 @@ public enum SpawnMode
 				return mode;
 			}
 		}
-		return null;
+		throw new DataException( "Unknown SpawnMode." );
 	}	
 }

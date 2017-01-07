@@ -3,6 +3,7 @@ package de.alaoli.games.minecraft.mods.yadm.command.manage;
 import de.alaoli.games.minecraft.mods.yadm.command.Command;
 import de.alaoli.games.minecraft.mods.yadm.command.CommandException;
 import de.alaoli.games.minecraft.mods.yadm.command.Permission;
+import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
@@ -111,7 +112,7 @@ public class TravelCommand extends Command
 				{
 					targetSide = args.parseBorderSide();
 				}
-				catch( CommandException e )
+				catch( CommandException | DataException e )
 				{
 					//Ignore because optional
 				}

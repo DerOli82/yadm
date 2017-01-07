@@ -81,7 +81,8 @@ public abstract class CommandGroup extends Command
 	{
 		List<String> list = new ArrayList<String>();
 		
-		if( this.commands.containsKey( args[ 0 ] ) )
+		if( ( args.length > 1 ) && 
+			( this.commands.containsKey( args[ 0 ] ) ) )
 		{
 			Command command = this.commands.get( args[ 0 ] );
 			

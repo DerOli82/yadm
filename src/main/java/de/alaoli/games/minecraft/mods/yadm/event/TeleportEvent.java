@@ -23,7 +23,7 @@ public class TeleportEvent extends Event
 	
 	protected static final ManageWorlds worlds = WorldBuilder.INSTANCE;
 	
-	public static final int OFFSETY = 4;
+	public static final int OFFSETY = 2;
 
 	public final Dimension dimension;
 	public final WorldServer target;

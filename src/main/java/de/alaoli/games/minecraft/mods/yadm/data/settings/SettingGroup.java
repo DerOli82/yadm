@@ -42,6 +42,11 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 		}
 	}
 	
+	public void update( Setting setting )
+	{
+		this.settings.put( setting.getSettingType(), setting );
+	}
+	
 	public void remove( Setting setting )
 	{
 		if( this.settings.containsKey( setting.getSettingType() ) )

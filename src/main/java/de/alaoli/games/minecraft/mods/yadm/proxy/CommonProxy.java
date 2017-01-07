@@ -120,4 +120,6 @@ public class CommonProxy
 	}
 	
 	public void unregisterDimension( Dimension dimension ) {}
+	
+	public void updateDimension( Dimension dimension ) {}
 }
