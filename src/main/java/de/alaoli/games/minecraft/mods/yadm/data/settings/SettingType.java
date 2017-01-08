@@ -12,6 +12,7 @@ public enum SettingType
 	WHITELIST( "whitelist" ),
 	WORLDGUARD( "worldGuard" ),
 	WORLDBORDER( "border" ),
+	ENTITYSPAWN( "entityspawn" ),
 	WORLDBORDER_MESSAGE( "border:message" ),
 	WORLDBORDER_KNOCKBACK( "border:knockback" ),
 	WORLDBORDER_TRAVEL( "border:travel" );

@@ -40,6 +40,9 @@ public class SettingFactory
 			case WORLDBORDER :
 				return new WorldBorderSetting();
 				
+			case ENTITYSPAWN :
+				return new EntitySpawnSetting();
+				
 			case WORLDBORDER_MESSAGE :
 				return new MessageSetting();
 				
