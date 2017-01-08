@@ -82,12 +82,6 @@ public class WorldServerGeneric extends WorldServer
 			EntitySpawnSetting setting = (EntitySpawnSetting)this.dimension.get( SettingType.ENTITYSPAWN );
 			
 			setting.increase( entity );
-			
-			//Force removing if limit is reached
-			if( setting.isLimitReached( entity ) )
-			{
-				this.removeEntity( entity );
-			}
 		}
 		super.onEntityAdded( entity );
 	}
@@ -104,4 +98,6 @@ public class WorldServerGeneric extends WorldServer
 		}
 		super.onEntityRemoved( entity );
 	}
+	
+	
 }

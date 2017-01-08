@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import net.minecraft.entity.Entity;
@@ -59,9 +60,6 @@ public class EntitySpawnSetting implements Setting, JsonSerializable
 		if( ( type != null ) &&
 			( this.typeSpawnLimit.containsKey( type ) ) )
 		{
-			int spawn = this.typeSpawn.get( type );
-			int limit =this.typeSpawnLimit.get( type );
-			
 			return this.typeSpawn.get( type ) >= this.typeSpawnLimit.get( type );
 		}
 		else
@@ -90,19 +88,25 @@ public class EntitySpawnSetting implements Setting, JsonSerializable
 			
 			if( ( name == null ) || ( !this.entitySpawn.containsKey( name ) ) ) { return; }
 			
-			this.entitySpawn.put( name, this.entitySpawn.get( name) + 1 );
+			this.entitySpawn.put( name, this.entitySpawn.get( name ) + 1 );
 		}
 	}
 	
 	public void decrease( Entity entity )
 	{
+		int spawned;
 		EnumCreatureType type = this.getCreatureType( entity );
 		
 		//Type limit overrides entity limit
 		if( ( type != null ) &&
 			( this.typeSpawnLimit.containsKey( type ) ) )
 		{
-			this.typeSpawn.put( type, this.typeSpawn.get( type ) + 1 );
+			spawned = this.typeSpawn.get( type );
+			
+			if( spawned > 0 )
+			{
+				this.typeSpawn.put( type, spawned - 1 );
+			}
 		}
 		else
 		{
@@ -110,7 +114,12 @@ public class EntitySpawnSetting implements Setting, JsonSerializable
 			
 			if( ( name == null ) || ( !this.entitySpawn.containsKey( name ) ) ) { return; }
 			
-			this.entitySpawn.put( name, this.entitySpawn.get( name) - 1 );
+			spawned = this.entitySpawn.get( name );
+			
+			if( spawned > 0 )
+			{
+				this.entitySpawn.put( name, spawned - 1 );
+			}
 		}
 	}
 	
@@ -164,7 +173,7 @@ public class EntitySpawnSetting implements Setting, JsonSerializable
 					break;
 			}
 		}
-		json.add( "typeLimit", entityLimit );
+		json.add( "typeLimit", typeLimit );
 		
 		for( Entry<String, Integer> entry : this.entitySpawnLimit.entrySet() )
 		{
