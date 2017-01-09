@@ -17,21 +17,15 @@ public class WorldGuardSetting implements Setting, JsonSerializable
 	 * Attributes
 	 ********************************************************************************/
 
-	private boolean whitelistAllowed;
-	private boolean interactionAllowed;
+	private boolean whitelistAllowed = false;
+	private boolean interactionAllowed = true;
+	private boolean allowFood = true;
 	
-	private Set<BlockComparator> leftClickWhitelist;
+	private Set<BlockComparator> leftClickWhitelist = new HashSet<BlockComparator>();
 	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
-	
-	public WorldGuardSetting()
-	{
-		this.whitelistAllowed = false;
-		this.interactionAllowed = true;
-		this.leftClickWhitelist = new HashSet<BlockComparator>();
-	}
 
 	public boolean isWhitelistAllowed()
 	{
@@ -42,6 +36,11 @@ public class WorldGuardSetting implements Setting, JsonSerializable
 	{
 		return this.interactionAllowed;
 
+	}
+	
+	public boolean isFoodAllowed()
+	{
+		return this.allowFood;
 	}
 	
 	public boolean isLeftClickAllowed( BlockComparator block )
@@ -79,6 +78,7 @@ public class WorldGuardSetting implements Setting, JsonSerializable
 		json.add( "type", this.getSettingType().toString() );
 		json.add( "whitelistAllowed", this.whitelistAllowed );
 		json.add( "interactionAllowed", this.interactionAllowed );
+		json.add( "allowFood", this.allowFood );
 		
 		//Optional
 		if( !this.leftClickWhitelist.isEmpty() )
@@ -115,7 +115,15 @@ public class WorldGuardSetting implements Setting, JsonSerializable
 			if( !obj.get( "interactionAllowed" ).isBoolean() ) { throw new DataException( "WorldGuardSetting 'whitelistAllowed' isn't an boolean." ); }
 			
 			this.interactionAllowed = obj.get( "interactionAllowed" ).asBoolean();
-		}		
+		}
+		
+		//Optional
+		if( obj.get( "allowFood" ) != null )
+		{
+			if( !obj.get( "allowFood" ).isBoolean() ) { throw new DataException( "WorldGuardSetting 'allowFood' isn't an boolean." ); }
+			
+			this.allowFood = obj.get( "allowFood" ).asBoolean();
+		}			
 		
 		//Optional
 		if( obj.get( "leftClickWhitelist" ) != null )
