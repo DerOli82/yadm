@@ -22,7 +22,7 @@ public class YADM
 
 	public static final String MODID	= "yadm";
 	public static final String NAME		= "YADM - Yes Another Dimension Manager";
-	public static final String VERSION	= "0.7.0";
+	public static final String VERSION	= "0.8.0";
 						
 	/********************************************************************************
 	 * Forge

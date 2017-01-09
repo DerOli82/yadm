@@ -1,5 +1,13 @@
 # Changelog
 
+# Version 0.8.0
+- Caching dimension NBTs for network transfer
+- Slight exception optimization
+- Fix teleport falling damage
+- Add dimension owner spawnpoint management command
+- Add EntitySpawnSetting
+- Hopefully fix worldguard food problem.
+
 # Version 0.7.0
 - WorldGuard block whitelist
 
