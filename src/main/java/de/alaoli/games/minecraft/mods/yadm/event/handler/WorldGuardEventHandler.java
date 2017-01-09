@@ -3,6 +3,8 @@ package de.alaoli.games.minecraft.mods.yadm.event.handler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import de.alaoli.games.minecraft.mods.yadm.comparator.BlockComparator;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
@@ -10,7 +12,6 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.WhitelistSetting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldGuardSetting;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemFood;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -71,23 +72,6 @@ public class WorldGuardEventHandler
 		}
 	}
 
-	protected boolean isFoodAllowed( WorldGuardSetting worldGuard, EntityPlayer player )
-	{
-		//Food isn't allowed
-		if( !worldGuard.isFoodAllowed() ) { return false; }
-		
-		if( ( player.getCurrentEquippedItem() != null ) && 
-			( player.getCurrentEquippedItem().getItem() != null ) &&
-			( player.getCurrentEquippedItem().getItem() instanceof ItemFood ) )
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
 	protected boolean isLeftClickAllowed( WorldGuardSetting worldGuard, PlayerInteractEvent event )
 	{
 		BlockComparator block = new BlockComparator( 
@@ -102,11 +86,10 @@ public class WorldGuardEventHandler
 	 * Methods - Forge Events
 	 ********************************************************************************/
 	
+	@SideOnly( Side.SERVER )
 	@SubscribeEvent( priority = EventPriority.HIGHEST )
 	public void onPlayerInteract( PlayerInteractEvent event )
 	{
-		if( !event.world.isRemote ) {return;} 
-		
 		//Is YADM Dimension?
 		if( !dimensions.existsDimension( event.entityPlayer.dimension ) ) { return; }
 		
@@ -130,8 +113,7 @@ public class WorldGuardEventHandler
 					} 
 					else
 					{
-						if( ( this.isInteractionAllowed( worldGuard, event.entityPlayer ) ) ||
-							( this.isFoodAllowed( worldGuard, event.entityPlayer ) ) )
+						if( this.isInteractionAllowed( worldGuard, event.entityPlayer ) )
 						{
 							event.setCanceled( false );
 						}
@@ -140,8 +122,7 @@ public class WorldGuardEventHandler
 					
 				case LEFT_CLICK_BLOCK :
 					if( ( this.isWhitelisted( dimension, event.entityPlayer ) ) || 
-						( this.isLeftClickAllowed( worldGuard, event ) ) ) 
-						
+						( this.isLeftClickAllowed( worldGuard, event) ) )
 					{
 						event.setCanceled( false );
 					}					
