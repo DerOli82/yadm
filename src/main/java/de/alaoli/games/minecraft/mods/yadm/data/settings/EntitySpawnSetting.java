@@ -54,22 +54,27 @@ public class EntitySpawnSetting implements Setting, JsonSerializable
 	
 	public boolean isLimitReached( Entity entity )
 	{
+		boolean typeLimit = false;
 		EnumCreatureType type = this.getCreatureType( entity );
 		
-		//Type limit overrides entity limit
+		//Type limit
 		if( ( type != null ) &&
 			( this.typeSpawnLimit.containsKey( type ) ) )
 		{
-			return this.typeSpawn.get( type ) >= this.typeSpawnLimit.get( type );
+			typeLimit = this.typeSpawn.get( type ) >= this.typeSpawnLimit.get( type );
+		}
+		String name = (String)EntityList.classToStringMapping.get( entity.getClass() );
+		
+		if( ( name != null ) && 
+			( this.entitySpawnLimit.containsKey( name ) ) && 
+			( this.entitySpawn.containsKey( name ) ) ) 
+		{ 
+			return typeLimit || this.entitySpawn.get( name ) >= this.entitySpawnLimit.get( name ); 
 		}
 		else
 		{
-			String name = (String)EntityList.classToStringMapping.get( entity.getClass() );
-			
-			if( ( name == null ) || ( !this.entitySpawnLimit.containsKey( name ) ) || ( !this.entitySpawn.containsKey( name ) ) ) { return false; }
-			
-			return this.entitySpawn.get( name ) >= this.entitySpawnLimit.get( name );
-		}
+			return typeLimit || false;
+		}	
 	}
 	
 	public void increase( Entity entity )
@@ -82,12 +87,11 @@ public class EntitySpawnSetting implements Setting, JsonSerializable
 		{
 			this.typeSpawn.put( type, this.typeSpawn.get( type ) + 1 );
 		}
-		else
+		String name = (String)EntityList.classToStringMapping.get( entity.getClass() );
+			
+		if( ( name != null ) && 
+			( this.entitySpawn.containsKey( name ) ) )
 		{
-			String name = (String)EntityList.classToStringMapping.get( entity.getClass() );
-			
-			if( ( name == null ) || ( !this.entitySpawn.containsKey( name ) ) ) { return; }
-			
 			this.entitySpawn.put( name, this.entitySpawn.get( name ) + 1 );
 		}
 	}
@@ -108,12 +112,11 @@ public class EntitySpawnSetting implements Setting, JsonSerializable
 				this.typeSpawn.put( type, spawned - 1 );
 			}
 		}
-		else
+		String name = (String)EntityList.classToStringMapping.get( entity.getClass() );
+			
+		if( ( name != null ) &&
+			( this.entitySpawn.containsKey( name ) ) ) 
 		{
-			String name = (String)EntityList.classToStringMapping.get( entity.getClass() );
-			
-			if( ( name == null ) || ( !this.entitySpawn.containsKey( name ) ) ) { return; }
-			
 			spawned = this.entitySpawn.get( name );
 			
 			if( spawned > 0 )
