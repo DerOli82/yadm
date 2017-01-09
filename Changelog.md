@@ -1,5 +1,8 @@
 # Changelog
 
+# Version 0.8.1
+- Rollback food problem fix
+
 # Version 0.8.0
 - Caching dimension NBTs for network transfer
 - Slight exception optimization
