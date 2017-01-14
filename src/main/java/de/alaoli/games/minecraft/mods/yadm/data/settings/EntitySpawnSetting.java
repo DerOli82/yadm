@@ -29,7 +29,7 @@ public class EntitySpawnSetting implements Setting, JsonSerializable
 	 * Methods
 	 ********************************************************************************/
 
-	public EnumCreatureType getCreatureType( Entity entity )
+	protected EnumCreatureType getCreatureType( Entity entity )
 	{
 		EnumCreatureType type = null;
 	
@@ -52,76 +52,91 @@ public class EntitySpawnSetting implements Setting, JsonSerializable
 		return type;
 	}
 	
+	protected boolean ignoreEntityLimit( String name )
+	{
+		if( !this.entitySpawnLimit.containsKey( name ) ) { return false; } 
+		
+		return this.entitySpawnLimit.get( name ) < 0;
+	}
+	
 	public boolean isLimitReached( Entity entity )
 	{
-		boolean typeLimit = false;
 		EnumCreatureType type = this.getCreatureType( entity );
-		
-		//Type limit
-		if( ( type != null ) &&
-			( this.typeSpawnLimit.containsKey( type ) ) )
-		{
-			typeLimit = this.typeSpawn.get( type ) >= this.typeSpawnLimit.get( type );
-		}
 		String name = (String)EntityList.classToStringMapping.get( entity.getClass() );
 		
+		//Ignore all limits
+		if( this.ignoreEntityLimit( name ) ) { return false; }
+		
+		//Entity limit over type limit
 		if( ( name != null ) && 
 			( this.entitySpawnLimit.containsKey( name ) ) && 
 			( this.entitySpawn.containsKey( name ) ) ) 
 		{ 
-			return typeLimit || this.entitySpawn.get( name ) >= this.entitySpawnLimit.get( name ); 
+			return this.entitySpawn.get( name ) >= this.entitySpawnLimit.get( name ); 
+		}
+		else if( ( type != null ) &&
+				 ( this.typeSpawnLimit.containsKey( type ) ) )
+		{
+			return this.typeSpawn.get( type ) >= this.typeSpawnLimit.get( type );
 		}
 		else
 		{
-			return typeLimit || false;
-		}	
+			return false;
+		}
 	}
 	
 	public void increase( Entity entity )
 	{
 		EnumCreatureType type = this.getCreatureType( entity );
+		String name = (String)EntityList.classToStringMapping.get( entity.getClass() );
 		
-		//Type limit overrides entity limit
-		if( ( type != null ) &&
-			( this.typeSpawnLimit.containsKey( type ) ) )
+		//Ignore all limits
+		if( this.ignoreEntityLimit( name ) ) { return; }
+		
+		//Entity limit over type limit
+		if( ( name != null ) && 
+			( this.entitySpawnLimit.containsKey( name ) ) && 
+			( this.entitySpawn.containsKey( name ) ) ) 
+		{ 
+			this.entitySpawn.put( name, this.entitySpawn.get( name ) + 1 );
+		}
+		else if( ( type != null ) &&
+				 ( this.typeSpawnLimit.containsKey( type ) ) )
 		{
 			this.typeSpawn.put( type, this.typeSpawn.get( type ) + 1 );
-		}
-		String name = (String)EntityList.classToStringMapping.get( entity.getClass() );
-			
-		if( ( name != null ) && 
-			( this.entitySpawn.containsKey( name ) ) )
-		{
-			this.entitySpawn.put( name, this.entitySpawn.get( name ) + 1 );
 		}
 	}
 	
 	public void decrease( Entity entity )
 	{
-		int spawned;
 		EnumCreatureType type = this.getCreatureType( entity );
+		String name = (String)EntityList.classToStringMapping.get( entity.getClass() );
 		
-		//Type limit overrides entity limit
-		if( ( type != null ) &&
-			( this.typeSpawnLimit.containsKey( type ) ) )
+		//Ignore all limits
+		if( this.ignoreEntityLimit( name ) ) { return; }
+		
+		int spawned;
+		
+		//Entity limit over type limit
+		if( ( name != null ) && 
+			( this.entitySpawnLimit.containsKey( name ) ) && 
+			( this.entitySpawn.containsKey( name ) ) ) 
+		{ 
+			spawned = this.entitySpawn.get( name );
+			
+			if( spawned > 0 )
+			{
+				this.entitySpawn.put( name, spawned - 1 );
+			}
+		}
+		else if( ( type != null ) &&
+				 ( this.typeSpawnLimit.containsKey( type ) ) )
 		{
 			spawned = this.typeSpawn.get( type );
 			
 			if( spawned > 0 )
 			{
 				this.typeSpawn.put( type, spawned - 1 );
-			}
-		}
-		String name = (String)EntityList.classToStringMapping.get( entity.getClass() );
-			
-		if( ( name != null ) &&
-			( this.entitySpawn.containsKey( name ) ) ) 
-		{
-			spawned = this.entitySpawn.get( name );
-			
-			if( spawned > 0 )
-			{
-				this.entitySpawn.put( name, spawned - 1 );
 			}
 		}
 	}

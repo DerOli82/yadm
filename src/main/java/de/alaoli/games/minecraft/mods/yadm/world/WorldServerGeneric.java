@@ -60,7 +60,7 @@ public class WorldServerGeneric extends WorldServer
 	{
 		if( entity instanceof EntityPlayer )  { return super.spawnEntityInWorld( entity ); }
 		if( !this.dimension.hasSetting( SettingType.ENTITYSPAWN ) ) { return super.spawnEntityInWorld( entity ); }
-
+		
     	EntitySpawnSetting setting = (EntitySpawnSetting)this.dimension.get( SettingType.ENTITYSPAWN );
     		
 		if( setting.isLimitReached( entity ) )
