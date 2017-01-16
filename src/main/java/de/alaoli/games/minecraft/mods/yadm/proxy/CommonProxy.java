@@ -52,14 +52,6 @@ public class CommonProxy
 			.add( YADM.MODID + "-templates" );
 		templateFiles.setSavePath( path.toString() );
 		
-		try 
-		{
-			templateFiles.load();
-			
-		} catch ( DataException | IOException e )
-		{
-			e.printStackTrace();
-		}
 		MessageDispatcher.register();
 	}
 	
@@ -74,6 +66,15 @@ public class CommonProxy
 		WorldBorderEventHandler.register();
 		WorldGuardEventHandler.register();
 		TeleportEventHandler.register();
+		
+		try 
+		{
+			templateFiles.load();
+		}
+		catch ( DataException | IOException e )
+		{
+			e.printStackTrace();
+		}		
 	}
 	
 	/**
