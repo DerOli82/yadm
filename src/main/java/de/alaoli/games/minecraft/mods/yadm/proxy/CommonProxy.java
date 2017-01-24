@@ -9,12 +9,14 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
+import de.alaoli.games.minecraft.mods.lib.common.Config;
 import de.alaoli.games.minecraft.mods.lib.common.Initialize;
 import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.lib.common.json.JsonFileAdapter;
-import de.alaoli.games.minecraft.mods.yadm.Config;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.command.YADMCommandGroup;
+import de.alaoli.games.minecraft.mods.yadm.config.ConfigDimensionSection;
+import de.alaoli.games.minecraft.mods.yadm.config.ConfigProviderSection;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.event.handler.DimensionEventHandler;
 import de.alaoli.games.minecraft.mods.yadm.event.handler.TeleportEventHandler;
@@ -24,7 +26,6 @@ import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
-import net.minecraftforge.common.config.Configuration;
 
 public class CommonProxy implements Initialize
 {	
@@ -43,12 +44,18 @@ public class CommonProxy implements Initialize
 	@Override
 	public void preInit( FMLPreInitializationEvent event ) throws IOException, DataException
 	{
-		Config.init( new Configuration( event.getSuggestedConfigurationFile() ) );
-		
 		StringJoiner path = new StringJoiner( File.separator )
 			.add( event.getModConfigurationDirectory().toString() )
-			.add( YADM.MODID + "-templates" );
-		templateFiles.setSavePath( path.toString() );
+			.add( YADM.MODID );
+		Config config = new Config();
+			
+		config.setSavePath( path.toString() + ".json" );
+		config.registerSection( ConfigProviderSection.class );
+		config.registerSection( ConfigDimensionSection.class );
+		config.load();
+		config.cleanup();
+		
+		templateFiles.setSavePath( path.toString() + "-templates" );
 		
 		MessageDispatcher.register();
 	}
