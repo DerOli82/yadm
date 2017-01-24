@@ -1,4 +1,4 @@
-package de.alaoli.games.minecraft.mods.yadm.data;
+package de.alaoli.games.minecraft.mods.lib.common.data;
 
 import java.util.StringJoiner;
 

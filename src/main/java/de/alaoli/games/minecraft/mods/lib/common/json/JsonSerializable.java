@@ -1,8 +1,8 @@
-package de.alaoli.games.minecraft.mods.yadm.json;
+package de.alaoli.games.minecraft.mods.lib.common.json;
 
 import com.eclipsesource.json.JsonValue;
 
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 
 public interface JsonSerializable
 {

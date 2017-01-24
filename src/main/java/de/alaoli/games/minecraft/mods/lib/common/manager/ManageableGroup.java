@@ -1,4 +1,4 @@
-package de.alaoli.games.minecraft.mods.yadm.manager;
+package de.alaoli.games.minecraft.mods.lib.common.manager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,8 +9,8 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 
 public abstract class ManageableGroup implements Manageable, JsonSerializable
 {

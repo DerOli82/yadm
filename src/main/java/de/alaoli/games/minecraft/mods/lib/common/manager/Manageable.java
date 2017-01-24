@@ -1,4 +1,4 @@
-package de.alaoli.games.minecraft.mods.yadm.manager;
+package de.alaoli.games.minecraft.mods.lib.common.manager;
 
 public interface Manageable
 {

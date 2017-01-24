@@ -1,7 +1,6 @@
-package de.alaoli.games.minecraft.mods.yadm.comparator;
+package de.alaoli.games.minecraft.mods.lib.common.comparator;
 
 import cpw.mods.fml.common.registry.GameRegistry;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import net.minecraft.block.Block;
 
 public class BlockComparator 
@@ -14,25 +13,11 @@ public class BlockComparator
 	
 	protected int blockMetaId = 0;
 	
+	private boolean ignoreMeta = false;
+	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
-	
-	public BlockComparator( String name )
-	{
-		String splitted[] = name.split( ":" );
-		
-		if( splitted.length < 2 ) { throw new DataException("Minecraft unique identifier requires <modid>:<itemid>."); }
-		
-		this.block = GameRegistry.findBlock( splitted[0], splitted[1] );
-		
-		if( block == null ) { throw new DataException("Block not found." ); }
-			
-		if( splitted.length > 2 )
-		{
-			this.blockMetaId = Integer.valueOf( splitted[2] );
-		}
-	}
 
 	public BlockComparator( Block block )
 	{
@@ -44,12 +29,25 @@ public class BlockComparator
 		this.block = block;
 		this.blockMetaId = metaId;
 	}
+
 	
-	
+	public BlockComparator( Block block, boolean ignoreMeta )
+	{
+		this.block = block;
+		this.ignoreMeta = ignoreMeta;
+	}
+
 	@Override
 	public int hashCode() 
 	{
-		return this.block.hashCode() + this.blockMetaId;
+		if( this.ignoreMeta )
+		{
+			return this.block.hashCode();
+		}
+		else
+		{
+			return this.block.hashCode() + this.blockMetaId;
+		}
 	}
 
 	@Override
@@ -57,13 +55,35 @@ public class BlockComparator
 	{
 		if( !(obj instanceof BlockComparator) ) { return false;}
 		
-		return this.block.equals( ((BlockComparator)obj).block ) &&
-				( this.blockMetaId == ((BlockComparator)obj).blockMetaId );
+		if( this.ignoreMeta )
+		{
+			return this.block.equals( ((BlockComparator)obj).block );
+		}
+		else
+		{
+			return this.block.equals( ((BlockComparator)obj).block ) &&
+					( this.blockMetaId == ((BlockComparator)obj).blockMetaId );
+		}
 	}
 
 	@Override
 	public String toString() 
 	{
-		return GameRegistry.findUniqueIdentifierFor( this.block ) + ":" + this.blockMetaId;
-	}	
+		StringBuilder result = new StringBuilder()
+			.append( GameRegistry.findUniqueIdentifierFor( this.block ) );
+			
+		if( this.ignoreMeta )
+		{
+			result.append( ":*" );
+		}
+		else
+		{
+			if( this.blockMetaId == 0 )
+			{
+				result.append( ":" );
+				result.append( this.blockMetaId );
+			}
+		}		
+		return result.toString();
+	}
 }
