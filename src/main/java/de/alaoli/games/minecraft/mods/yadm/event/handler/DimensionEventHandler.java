@@ -11,8 +11,13 @@ import cpw.mods.fml.relauncher.Side;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
+import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
+import de.alaoli.games.minecraft.mods.yadm.data.settings.WhitelistSetting;
+import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
+import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
 import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
 import de.alaoli.games.minecraft.mods.yadm.network.SyncDimensionsMessage;
 import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
@@ -20,7 +25,9 @@ import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldServerGeneric;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 public class DimensionEventHandler 
@@ -83,6 +90,38 @@ public class DimensionEventHandler
 	 * Methods - Forge Events
 	 ********************************************************************************/
 	
+    @SubscribeEvent
+    public void onEntityJoinWorld( EntityJoinWorldEvent event )
+    {
+    	//If is YADM dimension check whitelist
+    	if( ( !event.world.isRemote ) &&
+			( event.entity instanceof EntityPlayerMP ) &&
+			( dimensions.existsDimension( event.world.provider.dimensionId ) ) )
+    	{
+    		try
+    		{
+    			Dimension dimension = dimensions.findDimension( event.world.provider.dimensionId );
+    			
+    			if( dimension.hasSetting( SettingType.WHITELIST ) )
+    			{
+    				EntityPlayerMP player = (EntityPlayerMP)event.entity;
+    				WhitelistSetting setting = (WhitelistSetting)dimension.get( SettingType.WHITELIST );
+    				
+    				//Emergency teleport if player isn't whitelisted
+    				if( !setting.exists( player.getUniqueID() ) )
+					{
+    					player.addChatComponentMessage( new ChatComponentText( "You're not whitelisted for dimension '" + dimension + "'."));
+    					MinecraftForge.EVENT_BUS.post( new TeleportEvent( new DimensionDummy( 0 ), player ) );
+					}
+    			}
+    		}
+    		catch( DimensionException e )
+    		{
+    			Log.error( e.getMessage() );
+    		}
+    	}
+    }
+    
 	@SubscribeEvent
 	public void onWorldSave( WorldEvent.Save event )
 	{
