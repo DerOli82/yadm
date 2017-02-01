@@ -22,7 +22,7 @@ public class TeleportEventHandler
 	public static final TeleportEventHandler INSTANCE = new TeleportEventHandler(); 
 	protected static final TeleportPlayer players = PlayerManager.INSTANCE;
 	
-	private List<TeleportEvent> teleports = new ArrayList<TeleportEvent>();
+	private List<TeleportEvent> teleports = new ArrayList<>();
 	
 	/********************************************************************************
 	 * Methods

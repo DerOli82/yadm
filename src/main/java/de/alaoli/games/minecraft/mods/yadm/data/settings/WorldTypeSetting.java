@@ -5,9 +5,9 @@ import java.util.List;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import cpw.mods.fml.relauncher.ReflectionHelper;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
-import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.lib.common.network.Packageable;
 import de.alaoli.games.minecraft.mods.yadm.world.FindWorldType;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.Injectable;
@@ -25,7 +25,6 @@ public class WorldTypeSetting implements Setting, JsonSerializable, Packageable,
 	protected static final FindWorldType worldType = WorldBuilder.INSTANCE;
 	
 	private String name;
-
 	private WorldType type;
 	
 	/********************************************************************************
@@ -55,7 +54,7 @@ public class WorldTypeSetting implements Setting, JsonSerializable, Packageable,
 	}
 
 	@Override
-	public boolean isRequired() 
+	public boolean isSettingRequired() 
 	{
 		return false;
 	}

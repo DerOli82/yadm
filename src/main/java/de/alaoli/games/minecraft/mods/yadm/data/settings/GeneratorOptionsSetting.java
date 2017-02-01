@@ -5,9 +5,9 @@ import java.util.List;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import cpw.mods.fml.relauncher.ReflectionHelper;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
-import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.lib.common.network.Packageable;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.Injectable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldProvider;
@@ -41,7 +41,7 @@ public class GeneratorOptionsSetting implements Setting, JsonSerializable, Packa
 	}
 
 	@Override
-	public boolean isRequired() 
+	public boolean isSettingRequired() 
 	{
 		return false;
 	}

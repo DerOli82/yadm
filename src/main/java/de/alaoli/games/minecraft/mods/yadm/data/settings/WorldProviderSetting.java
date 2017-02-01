@@ -3,9 +3,9 @@ package de.alaoli.games.minecraft.mods.yadm.data.settings;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
-import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.lib.common.network.Packageable;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class WorldProviderSetting implements Setting, JsonSerializable, Packageable
@@ -23,7 +23,6 @@ public class WorldProviderSetting implements Setting, JsonSerializable, Packagea
 	 ********************************************************************************/
 				
 	private int id;
-	
 	private String name;
 
 	/********************************************************************************
@@ -63,7 +62,7 @@ public class WorldProviderSetting implements Setting, JsonSerializable, Packagea
 	}
 
 	@Override
-	public boolean isRequired() 
+	public boolean isSettingRequired() 
 	{
 		return true;
 	}

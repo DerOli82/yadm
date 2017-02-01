@@ -23,7 +23,7 @@ public class UpdateDimensionHandler implements IMessageHandler<UpdateDimensionMe
 
 		try
 		{
-			dimensions.findDimension( dimension.getId() ).update( dimension.get( SettingType.SPAWN) );
+			dimensions.findDimension( dimension.getId() ).updateSetting( dimension.getSetting( SettingType.SPAWN) );
 		}
 		catch( DimensionException e )
 		{

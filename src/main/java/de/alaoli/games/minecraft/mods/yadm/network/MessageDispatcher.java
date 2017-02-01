@@ -13,7 +13,6 @@ public class MessageDispatcher
 	private static byte id = 0;
 	
 	public static final SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel( YADM.MODID );;
-	
 	public static final EnumMap<Side,FMLEmbeddedChannel> channels = NetworkRegistry.INSTANCE.newChannel( YADM.MODID + "Channel", new SyncDimensionChannelHandler() );
 	
 	public static final void register()

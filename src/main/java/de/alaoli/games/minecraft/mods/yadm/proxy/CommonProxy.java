@@ -5,29 +5,32 @@ import java.io.IOException;
 import java.util.StringJoiner;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
-import de.alaoli.games.minecraft.mods.yadm.Config;
+import de.alaoli.games.minecraft.mods.lib.common.Config;
+import de.alaoli.games.minecraft.mods.lib.common.Initialize;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.command.YADMCommandGroup;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.yadm.config.ConfigDimensionSection;
+import de.alaoli.games.minecraft.mods.yadm.config.ConfigProviderSection;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.event.handler.DimensionEventHandler;
 import de.alaoli.games.minecraft.mods.yadm.event.handler.TeleportEventHandler;
 import de.alaoli.games.minecraft.mods.yadm.event.handler.WorldBorderEventHandler;
 import de.alaoli.games.minecraft.mods.yadm.event.handler.WorldGuardEventHandler;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
-import net.minecraftforge.common.config.Configuration;
 
-public class CommonProxy 
+public class CommonProxy implements Initialize
 {	
 	/********************************************************************************
-	 * Attributes
+	 * Attribute
 	 ********************************************************************************/
 	
 	protected static final JsonFileAdapter templateFiles = TemplateManager.INSTANCE;
@@ -35,32 +38,30 @@ public class CommonProxy
 	protected static final YADimensionManager dimensions = YADimensionManager.INSTANCE;
 	
 	/********************************************************************************
-	 * Methods - FML
+	 * Method - Implements 
 	 ********************************************************************************/
 	
-	/**
-	 * Load templates from JSON files and register network message dispatcher
-	 * 
-	 * @param FMLPreInitializationEvent event
-	 */
-	public void preInit( FMLPreInitializationEvent event ) 
+	@Override
+	public void preInit( FMLPreInitializationEvent event ) throws IOException, DataException
 	{
-		Config.init( new Configuration( event.getSuggestedConfigurationFile() ) );
-		
 		StringJoiner path = new StringJoiner( File.separator )
 			.add( event.getModConfigurationDirectory().toString() )
-			.add( YADM.MODID + "-templates" );
-		templateFiles.setSavePath( path.toString() );
+			.add( YADM.MODID );
+		Config config = new Config();
+			
+		config.setSavePath( path.toString() + ".json" );
+		config.registerSection( ConfigProviderSection.class );
+		config.registerSection( ConfigDimensionSection.class );
+		config.load();
+		config.cleanup();
+		
+		templateFiles.setSavePath( path.toString() + "-templates" );
 		
 		MessageDispatcher.register();
 	}
 	
-	/**
-	 * Register events
-	 * 
-	 * @param FMLInitializationEvent event
-	 */
-	public void init( FMLInitializationEvent event )
+	@Override
+	public void init( FMLInitializationEvent event ) throws IOException, DataException
 	{
 		DimensionEventHandler.register();
 		WorldBorderEventHandler.register();
@@ -77,13 +78,13 @@ public class CommonProxy
 		}		
 	}
 	
-	/**
-	 * Load players, dimensions and register server commands
-	 * 
-	 * @param FMLServerStartingEvent event
-	 * @throws DataException
-	 * @throws IOException
-	 */
+	@Override
+	public void postInit( FMLPostInitializationEvent event ) throws IOException, DataException {} 	
+	
+	/********************************************************************************
+	 * Method - Forge Event Handler
+	 ********************************************************************************/
+	
 	public void serverStarting( FMLServerStartingEvent event ) throws DataException, IOException
 	{
 		playerFiles.load();
@@ -94,12 +95,6 @@ public class CommonProxy
 		event.registerServerCommand( new YADMCommandGroup() );
 	}
 
-	/**
-	 * Save players, dimensions and cleanup
-	 * @param event
-	 * @throws DataException
-	 * @throws IOException
-	 */
 	public void serverStopped( FMLServerStoppedEvent event ) throws DataException, IOException 
 	{
 		playerFiles.save();
@@ -112,7 +107,7 @@ public class CommonProxy
 	}
 	
 	/********************************************************************************
-	 * Methods
+	 * Method
 	 ********************************************************************************/
 	
 	public void registerDimension( Dimension dimension )

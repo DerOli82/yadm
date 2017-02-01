@@ -1,8 +1,8 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-import de.alaoli.games.minecraft.mods.yadm.YADMException;
+import de.alaoli.games.minecraft.mods.lib.common.ModException;
 
-public class CommandException extends YADMException 
+public class CommandException extends ModException 
 {
 	public CommandException( String msg )
 	{

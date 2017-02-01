@@ -5,7 +5,7 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import de.alaoli.games.minecraft.mods.yadm.comparator.BlockComparator;
+import de.alaoli.games.minecraft.mods.lib.common.comparator.BlockComparator;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WhitelistSetting;
@@ -39,14 +39,14 @@ public class WorldGuardEventHandler
 	
 	protected boolean isWhitelisted( Dimension dimension, EntityPlayer player )
 	{
-		WorldGuardSetting worldGuard = (WorldGuardSetting)dimension.get( SettingType.WORLDGUARD );
+		WorldGuardSetting worldGuard = (WorldGuardSetting)dimension.getSetting( SettingType.WORLDGUARD );
 		
 		//Whitelist isn't allowed
 		if( !worldGuard.isWhitelistAllowed() ) { return false; }
 		
 		if( dimension.hasSetting( SettingType.WHITELIST ) )
 		{
-			WhitelistSetting whitelist = (WhitelistSetting)dimension.get( SettingType.WHITELIST );
+			WhitelistSetting whitelist = (WhitelistSetting)dimension.getSetting( SettingType.WHITELIST );
 
 			return whitelist.exists( player.getUniqueID() );
 		}
@@ -101,7 +101,7 @@ public class WorldGuardEventHandler
 			( !dimension.isOwner( event.entityPlayer )) && 
 			( !scm.canSendCommands( event.entityPlayer.getGameProfile() ) ) ) 
 		{
-			WorldGuardSetting worldGuard = (WorldGuardSetting)dimension.get( SettingType.WORLDGUARD );
+			WorldGuardSetting worldGuard = (WorldGuardSetting)dimension.getSetting( SettingType.WORLDGUARD );
 			event.setCanceled( true );
 			
 			switch( event.action )

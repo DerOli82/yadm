@@ -80,9 +80,9 @@ public class WhitelistCommand extends Command
 		
 		if( !dimension.hasSetting( SettingType.WHITELIST ) )
 		{
-			dimension.add( new WhitelistSetting() );
+			dimension.addSetting( new WhitelistSetting() );
 		}
-		WhitelistSetting setting = (WhitelistSetting)dimension.get( SettingType.WHITELIST );
+		WhitelistSetting setting = (WhitelistSetting)dimension.getSetting( SettingType.WHITELIST );
 		
 		if( !setting.isEditable() ) { throw new CommandException( "Whitelist isn't editable."); }
 		

@@ -1,6 +1,6 @@
 package de.alaoli.games.minecraft.mods.yadm.manager.player;
 
-import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
+import de.alaoli.games.minecraft.mods.lib.common.data.Coordinate;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;

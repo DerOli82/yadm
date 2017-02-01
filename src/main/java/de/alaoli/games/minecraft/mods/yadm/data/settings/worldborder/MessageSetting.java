@@ -6,13 +6,13 @@ import java.util.Set;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.event.PerformWorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
@@ -31,7 +31,7 @@ public class MessageSetting implements Setting, PerformWorldBorderEvent, JsonSer
 	}
 
 	@Override
-	public boolean isRequired() 
+	public boolean isSettingRequired() 
 	{
 		return false;
 	}

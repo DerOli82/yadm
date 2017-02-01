@@ -6,8 +6,9 @@ import java.util.Set;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.data.Coordinate;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
@@ -16,7 +17,6 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.event.PerformWorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
@@ -67,7 +67,7 @@ public class TravelSetting implements Setting, PerformWorldBorderEvent, JsonSeri
 	}
 
 	@Override
-	public boolean isRequired() 
+	public boolean isSettingRequired() 
 	{
 		return false;
 	}

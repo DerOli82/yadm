@@ -8,8 +8,8 @@ import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.network.FMLOutboundHandler;
 import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.relauncher.Side;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.Log;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
@@ -71,7 +71,7 @@ public class DimensionEventHandler
     	}
     	
     	//Sync dimensions
-    	if( !dimensions.isEmpty() )
+    	if( !dimensions.isManageableEmpty() )
     	{
 	    	StringBuilder msg = new StringBuilder()
     			.append( "Sync dimensions to Player '" )
@@ -106,7 +106,7 @@ public class DimensionEventHandler
     			if( dimension.hasSetting( SettingType.WHITELIST ) )
     			{
     				EntityPlayerMP player = (EntityPlayerMP)event.entity;
-    				WhitelistSetting setting = (WhitelistSetting)dimension.get( SettingType.WHITELIST );
+    				WhitelistSetting setting = (WhitelistSetting)dimension.getSetting( SettingType.WHITELIST );
     				ServerConfigurationManager scm = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager();
     				
     				//Teleport away if player isn't whitelisted excluding operator and owner

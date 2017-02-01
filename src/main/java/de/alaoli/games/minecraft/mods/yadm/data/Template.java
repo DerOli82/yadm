@@ -2,10 +2,12 @@ package de.alaoli.games.minecraft.mods.yadm.data;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.lib.common.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingGroup;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
-import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 
 public class Template extends SettingGroup implements Manageable, JsonSerializable
 {
@@ -14,7 +16,6 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 	 ********************************************************************************/
 	
 	private String name;
-
 	private String group;
 	
 	/********************************************************************************
@@ -40,7 +41,7 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 	}
 
 	@Override
-	public boolean isRequired() 
+	public boolean isSettingRequired() 
 	{
 		return true;
 	}
@@ -62,6 +63,12 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 	}
 	
 	@Override
+	public boolean hasManageableGroupName() 
+	{
+		return this.group != null;
+	}
+
+	@Override
 	public void setManageableName( String name ) 
 	{
 		this.name = name;
@@ -72,7 +79,14 @@ public class Template extends SettingGroup implements Manageable, JsonSerializab
 	{
 		return this.name;
 	}
-	
+
+
+	@Override
+	public boolean hasManageableName() 
+	{
+		return this.name != null;
+	}
+
 	/********************************************************************************
 	 * Methods - Implement JsonSerializable
 	 ********************************************************************************/

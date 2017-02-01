@@ -8,8 +8,8 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 
 public abstract class SettingGroup implements Setting, JsonSerializable
 {
@@ -20,13 +20,13 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 	/**
 	 * Required
 	 */
-	private Map<SettingType, Setting> settings = new HashMap<SettingType, Setting>();
+	private Map<SettingType, Setting> settings = new HashMap<>();
 	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
 	
-	public void add( Setting setting )
+	public void addSetting( Setting setting )
 	{
 		if( !this.settings.containsKey( setting.getSettingType() ) )
 		{
@@ -34,20 +34,20 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 		}
 	}
 	
-	public void add( Map<SettingType, Setting> settings )
+	public void addSettings( Map<SettingType, Setting> settings )
 	{
 		for( Entry<SettingType, Setting> setting : settings.entrySet() )
 		{
-			this.add( setting.getValue() );
+			this.addSetting( setting.getValue() );
 		}
 	}
 	
-	public void update( Setting setting )
+	public void updateSetting( Setting setting )
 	{
 		this.settings.put( setting.getSettingType(), setting );
 	}
 	
-	public void remove( Setting setting )
+	public void removeSetting( Setting setting )
 	{
 		if( this.settings.containsKey( setting.getSettingType() ) )
 		{
@@ -55,17 +55,17 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 		}
 	}
 	
-	public Setting get( SettingType type )
+	public Setting getSetting( SettingType type )
 	{
 		return this.settings.get( type ); 
 	}
 
-	public Setting get( String name )
+	public Setting getSetting( String name )
 	{
 		return this.settings.get( name ); 
 	}
 	
-	public Map<SettingType, Setting> getAll()
+	public Map<SettingType, Setting> getSettings()
 	{
 		return this.settings;
 	}
@@ -151,7 +151,7 @@ public abstract class SettingGroup implements Setting, JsonSerializable
 			if( setting == null ) { throw new DataException( "SettingType is unknown." ); }
 			
 			((JsonSerializable)setting).deserialize( settingValue );
-			this.add( setting );
+			this.addSetting( setting );
 		}
 		if( !this.hasRequiredSettings() ) { throw new DataException( "SettingGroup required settings are missing." ); }
 	}	

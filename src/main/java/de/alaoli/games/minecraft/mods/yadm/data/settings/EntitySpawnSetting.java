@@ -7,8 +7,8 @@ import java.util.Map.Entry;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
@@ -19,11 +19,11 @@ public class EntitySpawnSetting implements Setting, JsonSerializable
 	 * Attributes
 	 ********************************************************************************/
 
-	Map<EnumCreatureType, Integer> typeSpawnLimit = new HashMap<EnumCreatureType, Integer>();
-	Map<EnumCreatureType, Integer> typeSpawn = new HashMap<EnumCreatureType, Integer>();
+	Map<EnumCreatureType, Integer> typeSpawnLimit = new HashMap<>();
+	Map<EnumCreatureType, Integer> typeSpawn = new HashMap<>();
 	
-	Map<String, Integer> entitySpawnLimit = new HashMap<String, Integer>();
-	Map<String, Integer> entitySpawn = new HashMap<String, Integer>();
+	Map<String, Integer> entitySpawnLimit = new HashMap<>();
+	Map<String, Integer> entitySpawn = new HashMap<>();
 	
 	/********************************************************************************
 	 * Methods
@@ -152,7 +152,7 @@ public class EntitySpawnSetting implements Setting, JsonSerializable
 	}
 
 	@Override
-	public boolean isRequired() 
+	public boolean isSettingRequired() 
 	{
 		return false;
 	}	

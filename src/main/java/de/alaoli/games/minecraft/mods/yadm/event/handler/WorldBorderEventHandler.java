@@ -48,7 +48,7 @@ public class WorldBorderEventHandler
 			
 			if( dimension.hasSetting( SettingType.WORLDBORDER ) )
 			{
-				WorldBorderSetting border = (WorldBorderSetting)dimension.get( SettingType.WORLDBORDER );
+				WorldBorderSetting border = (WorldBorderSetting)dimension.getSetting( SettingType.WORLDBORDER );
 				
 				border.performWorldBorderEvent( new WorldBorderEvent( event, dimension ) );
 			}

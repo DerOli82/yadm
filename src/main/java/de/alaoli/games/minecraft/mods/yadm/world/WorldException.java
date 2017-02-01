@@ -1,8 +1,8 @@
 package de.alaoli.games.minecraft.mods.yadm.world;
 
-import de.alaoli.games.minecraft.mods.yadm.YADMException;
+import de.alaoli.games.minecraft.mods.lib.common.ModException;
 
-public class WorldException extends YADMException 
+public class WorldException extends ModException 
 {
 	public WorldException( String msg )
 	{

@@ -11,10 +11,10 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.FindPlayer;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportException;
@@ -29,19 +29,12 @@ public class WhitelistSetting implements Setting, TeleportModifier, JsonSerializ
 	
 	protected static final FindPlayer players = PlayerManager.INSTANCE;
 	
-	private Map<UUID, Player> users;
-	
-	private boolean editable;
+	private Map<UUID, Player> users = new HashMap<>();
+	private boolean editable = true;
 	
 	/********************************************************************************
 	 * Methods 
 	 ********************************************************************************/
-	
-	public WhitelistSetting()
-	{
-		this.users = new HashMap<UUID, Player>();
-		this.editable = true;
-	}
 	
 	public void add( Player player )
 	{
@@ -84,7 +77,7 @@ public class WhitelistSetting implements Setting, TeleportModifier, JsonSerializ
 	}
 
 	@Override
-	public boolean isRequired() 
+	public boolean isSettingRequired() 
 	{
 		return false;
 	}

@@ -9,9 +9,11 @@ import java.io.OutputStreamWriter;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.WriterConfig;
 
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonFileAdapter;
+import de.alaoli.games.minecraft.mods.lib.common.manager.Manageable;
+import de.alaoli.games.minecraft.mods.lib.common.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 
 public class TemplateGroup extends ManageableGroup implements JsonFileAdapter
 {
@@ -20,8 +22,7 @@ public class TemplateGroup extends ManageableGroup implements JsonFileAdapter
 	 ********************************************************************************/
 
 	private String savePath;
-	
-	private boolean dirty;
+	private boolean dirty = false;
 
 	/********************************************************************************
 	 * Methods
@@ -30,14 +31,12 @@ public class TemplateGroup extends ManageableGroup implements JsonFileAdapter
 	public TemplateGroup( String name )
 	{
 		super( name );
-		this.dirty = false;
 	}
 
 	public TemplateGroup( String name, String savePath )
 	{
 		super( name );
 		this.savePath = savePath;
-		this.dirty = false;
 	}
 		
 	/********************************************************************************
@@ -45,7 +44,7 @@ public class TemplateGroup extends ManageableGroup implements JsonFileAdapter
 	 ********************************************************************************/
 
 	@Override
-	public Manageable create() 
+	public Manageable createManageable() 
 	{
 		Manageable manageable = new Template();
 		manageable.setManageableGroupName( this.getManageableGroupName() );
@@ -124,6 +123,6 @@ public class TemplateGroup extends ManageableGroup implements JsonFileAdapter
 	@Override
 	public void cleanup()
 	{
-		this.clear();
+		this.clearManageable();
 	}
 }

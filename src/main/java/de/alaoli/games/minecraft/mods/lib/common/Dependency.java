@@ -1,4 +1,4 @@
-package de.alaoli.games.minecraft.mods.yadm;
+package de.alaoli.games.minecraft.mods.lib.common;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import java.util.StringJoiner;
 import org.apache.commons.io.FileUtils;
 
 import cpw.mods.fml.common.versioning.ComparableVersion;
+import de.alaoli.games.minecraft.mods.yadm.Log;
 
 public class Dependency 
 {

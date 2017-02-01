@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Properties;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import de.alaoli.games.minecraft.mods.lib.common.Dependency;
 
 @IFMLLoadingPlugin.MCVersion( value = "1.7.10" )
 @IFMLLoadingPlugin.Name( value = "YADMLoadingPlugin" )

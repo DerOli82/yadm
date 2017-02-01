@@ -15,11 +15,13 @@ import java.util.UUID;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.WriterConfig;
 
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonFileAdapter;
+import de.alaoli.games.minecraft.mods.lib.common.manager.Manageable;
+import de.alaoli.games.minecraft.mods.lib.common.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.DimensionTeleport;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.FindPlayer;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.ManagePlayers;
@@ -41,8 +43,8 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	
 	public static final PlayerManager INSTANCE = new PlayerManager();
 	
-	private Map<UUID, Player> mapppingId;
-	private boolean dirty;
+	private Map<UUID, Player> mapppingId = new HashMap<>();
+	private boolean dirty = false;
 	
 	/********************************************************************************
 	 * Methods
@@ -51,9 +53,6 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	private PlayerManager() 
 	{
 		super( "players" );
-		
-		this.mapppingId = new HashMap<UUID, Player>();
-		this.setDirty( false );
 	}
 
 	public Manageable get( UUID id )
@@ -62,7 +61,7 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 		if( this.mapppingId.containsKey( id ) ) { return this.mapppingId.get( id ); }
 		
 		//Searching
-		for( Entry<String, Manageable> entry : this.getAll() )
+		for( Entry<String, Manageable> entry : this.getManageable() )
 		{
 			if( ( entry.getValue() instanceof Player ) &&
 				( ((Player)entry.getValue()).getId().equals( id ) ) )
@@ -80,7 +79,7 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	 ********************************************************************************/	
 
 	@Override
-	public Manageable create() 
+	public Manageable createManageable() 
 	{
 		return new Player();
 	}
@@ -98,7 +97,7 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	@Override
 	public boolean existsPlayer( String name )
 	{
-		return this.exists( name );
+		return this.existsManageable( name );
 	}
 	
 	@Override
@@ -110,7 +109,7 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	@Override
 	public void addPlayer( Player player )
 	{
-		this.add( player );
+		this.addManageable( player );
 		this.setDirty( true );
 	}
 	
@@ -134,7 +133,7 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	@Override
 	public void removePlayer( String name )
 	{
-		Manageable player = this.get( name );
+		Manageable player = this.getManageable( name );
 		
 		if( player instanceof Player )
 		{
@@ -145,7 +144,7 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	@Override
 	public void removePlayer( Player player )
 	{
-		this.remove( player );
+		this.removeManageable( player );
 		this.setDirty( true );
 	}
 	
@@ -178,10 +177,10 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	public Player findPlayer( String name ) throws PlayerException
 	{
 		//Case sensitive
-		if( this.exists( name ) ) { return (Player)this.get( name ); }
+		if( this.existsManageable( name ) ) { return (Player)this.getManageable( name ); }
 		
 		//Not case sensitive
-		for( Entry<String, Manageable> entry : this.getAll() )
+		for( Entry<String, Manageable> entry : this.getManageable() )
 		{
 			if( ( entry.getValue() instanceof Player ) &&
 				( ((Player)entry.getValue()).getManageableName().toLowerCase().equals( name.toLowerCase() ) ) )
@@ -318,6 +317,6 @@ public class PlayerManager extends ManageableGroup implements ManagePlayers, Fin
 	public void cleanup()
 	{
 		this.mapppingId.clear();
-		this.clear();
+		this.clearManageable();
 	}		
 }

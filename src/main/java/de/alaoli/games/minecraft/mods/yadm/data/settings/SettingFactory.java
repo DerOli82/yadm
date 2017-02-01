@@ -1,6 +1,6 @@
 package de.alaoli.games.minecraft.mods.yadm.data.settings;
 
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder.KnockbackSetting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder.MessageSetting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder.TravelSetting;

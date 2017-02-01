@@ -3,13 +3,13 @@ package de.alaoli.games.minecraft.mods.yadm.command.manage;
 import de.alaoli.games.minecraft.mods.yadm.command.Command;
 import de.alaoli.games.minecraft.mods.yadm.command.CommandException;
 import de.alaoli.games.minecraft.mods.yadm.command.Permission;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldBorderSetting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.worldborder.TravelSetting;
-import de.alaoli.games.minecraft.mods.yadm.YADMException;
+import de.alaoli.games.minecraft.mods.lib.common.ModException;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
@@ -43,7 +43,6 @@ public class TravelCommand extends Command
 	{
 		return "travel";
 	}
-
 
 	@Override
 	public String getCommandUsage( ICommandSender sender ) 
@@ -84,7 +83,7 @@ public class TravelCommand extends Command
 		
 		if( !source.hasSetting( SettingType.WORLDBORDER ) ) { throw new CommandException( "Travel option requires a WorldBorder." ); }
 		
-		WorldBorderSetting border = (WorldBorderSetting)source.get( SettingType.WORLDBORDER );
+		WorldBorderSetting border = (WorldBorderSetting)source.getSetting( SettingType.WORLDBORDER );
 		
 		switch( cmd )
 		{
@@ -175,7 +174,7 @@ public class TravelCommand extends Command
 							target = dimensions.findDimension( targetId );
 							args.sender.addChatMessage( new ChatComponentText( "  - '" + side + "' border to '" + target + "'" ) );
 						}
-						catch( YADMException e )
+						catch( ModException e )
 						{
 							args.sender.addChatMessage( new ChatComponentText( "  - '" + side + "' border to '" + targetId + "'" ) );
 						}

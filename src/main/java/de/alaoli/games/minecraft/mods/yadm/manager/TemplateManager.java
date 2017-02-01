@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map.Entry;
 
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonFileAdapter;
+import de.alaoli.games.minecraft.mods.lib.common.manager.Manageable;
+import de.alaoli.games.minecraft.mods.lib.common.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.manager.template.FindTemplate;
 import de.alaoli.games.minecraft.mods.yadm.manager.template.TemplateException;
 
@@ -20,7 +22,7 @@ public class TemplateManager extends ManageableGroup implements FindTemplate, Js
 	public static final TemplateManager INSTANCE = new TemplateManager();
 	
 	private String savePath;
-	private boolean dirty;
+	private boolean dirty = false;
 	
 	/********************************************************************************
 	 * Methods
@@ -28,8 +30,7 @@ public class TemplateManager extends ManageableGroup implements FindTemplate, Js
 
 	private TemplateManager() 
 	{	
-		super( null );
-		this.dirty = false;
+		super( "templates" );
 	}
 	
 	/**
@@ -40,18 +41,18 @@ public class TemplateManager extends ManageableGroup implements FindTemplate, Js
 		ManageableGroup group = new TemplateGroup( "default", this.savePath );
 		
 		Template template = new Template( "default", "overworld" );
-		template.add( new WorldProviderSetting( WorldProviderSetting.OVERWORLD ) );
-		group.add( template );
+		template.addSetting( new WorldProviderSetting( WorldProviderSetting.OVERWORLD ) );
+		group.addManageable( template );
 		
 		template = new Template( "default", "nether" );
-		template.add( new WorldProviderSetting( WorldProviderSetting.NETHER ) );
-		group.add( template );
+		template.addSetting( new WorldProviderSetting( WorldProviderSetting.NETHER ) );
+		group.addManageable( template );
 		
 		template = new Template( "default", "end" );
-		template.add( new WorldProviderSetting( WorldProviderSetting.END ) );
-		group.add( template );
+		template.addSetting( new WorldProviderSetting( WorldProviderSetting.END ) );
+		group.addManageable( template );
 
-		this.add( group );
+		this.addManageable( group );
 		this.setDirty( true );
 		
 		try 
@@ -69,7 +70,7 @@ public class TemplateManager extends ManageableGroup implements FindTemplate, Js
 	 ********************************************************************************/	
 
 	@Override
-	public Manageable create() 
+	public Manageable createManageable() 
 	{
 		return null;
 	}
@@ -87,14 +88,14 @@ public class TemplateManager extends ManageableGroup implements FindTemplate, Js
 	@Override
 	public Template findTemplate( String group, String name ) throws TemplateException
 	{
-		Manageable manageable = this.get( group );
+		Manageable manageable = this.getManageable( group );
 		
 		if( ( manageable != null ) && 
 			( manageable instanceof ManageableGroup ) )
 		{
-			if( !((ManageableGroup)manageable).exists( name ) ) { throw new TemplateException( "Can't find template '" + group + ":" + name + "'" ); }
+			if( !((ManageableGroup)manageable).existsManageable( name ) ) { throw new TemplateException( "Can't find template '" + group + ":" + name + "'" ); }
 			
-			return (Template)((ManageableGroup)manageable).get( name );
+			return (Template)((ManageableGroup)manageable).getManageable( name );
 		}
 		throw new TemplateException( "Can't find template '" + group + ":" + name + "'" );
 	}
@@ -128,7 +129,7 @@ public class TemplateManager extends ManageableGroup implements FindTemplate, Js
 		
 		Manageable data;
 		
-		for( Entry<String, Manageable> entry : this.getAll() )
+		for( Entry<String, Manageable> entry : this.getManageable() )
 		{
 			data = entry.getValue();
 			
@@ -147,7 +148,7 @@ public class TemplateManager extends ManageableGroup implements FindTemplate, Js
 		
 		Manageable data;
 		
-		for( Entry<String, Manageable> entry : this.getAll() )
+		for( Entry<String, Manageable> entry : this.getManageable() )
 		{
 			data = entry.getValue();
 			
@@ -165,7 +166,7 @@ public class TemplateManager extends ManageableGroup implements FindTemplate, Js
 		if( this.isDirty() )
 		{
 			this.save();
-			this.clear();
+			this.clearManageable();
 		}
 		File folder	= new File( this.getSavePath() );
 		
@@ -187,14 +188,14 @@ public class TemplateManager extends ManageableGroup implements FindTemplate, Js
 				groupName = file.getName().replace( ".json", "" );
 				
 				//Initialize group 
-				if( this.exists( groupName ) )
+				if( this.existsManageable( groupName ) )
 				{
-					data = this.get( groupName );
+					data = this.getManageable( groupName );
 				}
 				else
 				{
 					data = new TemplateGroup( groupName, this.getSavePath() ); 
-					this.add( data );
+					this.addManageable( data );
 				}
 				
 				if( data instanceof JsonFileAdapter )
@@ -208,6 +209,6 @@ public class TemplateManager extends ManageableGroup implements FindTemplate, Js
 	@Override
 	public void cleanup()
 	{
-		this.clear();
+		this.clearManageable();
 	}
 }

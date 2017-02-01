@@ -2,7 +2,7 @@ package de.alaoli.games.minecraft.mods.yadm.event;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.Event;
-import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
+import de.alaoli.games.minecraft.mods.lib.common.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
@@ -50,7 +50,7 @@ public class TeleportEvent extends Event
 		{
 			if( this.dimension.hasSetting( SettingType.SPAWN ) )
 			{
-				SpawnSetting spawn = (SpawnSetting)this.dimension.get( SettingType.SPAWN );
+				SpawnSetting spawn = (SpawnSetting)this.dimension.getSetting( SettingType.SPAWN );
 				coordinate = spawn.getCoordinate();
 			}
 			else
@@ -74,7 +74,7 @@ public class TeleportEvent extends Event
 		
 		if( this.dimension.hasSetting( SettingType.WHITELIST ) )
 		{
-			WhitelistSetting setting = (WhitelistSetting) this.dimension.get( SettingType.WHITELIST );
+			WhitelistSetting setting = (WhitelistSetting) this.dimension.getSetting( SettingType.WHITELIST );
 			
 			return setting.exists( this.player.getUniqueID() );
 		}
@@ -87,7 +87,7 @@ public class TeleportEvent extends Event
 	public void prepare()
 	{
 		//Apply modifiers
-		for( Setting setting : dimension.getAll().values() )
+		for( Setting setting : dimension.getSettings().values() )
 		{
 			if( setting instanceof TeleportModifier )
 			{

@@ -2,7 +2,7 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 
 import java.io.IOException;
 
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import net.minecraft.util.ChatComponentText;
 

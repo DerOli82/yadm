@@ -3,8 +3,9 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
-import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+
+import de.alaoli.games.minecraft.mods.lib.common.data.Coordinate;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.DimensionDummy;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
@@ -42,7 +43,7 @@ public class Arguments
 		this.senderIsEntityPlayer = sender instanceof EntityPlayer;
 		this.senderIsOP = sender.canCommandSenderUseCommand( 2, "yadm" );
 		
-		this.args = new LinkedList<String>( Arrays.asList( args ) );
+		this.args = new LinkedList<>( Arrays.asList( args ) );
 	}
 
 	/**********************************************************************

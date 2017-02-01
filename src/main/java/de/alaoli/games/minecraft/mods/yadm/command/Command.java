@@ -3,7 +3,7 @@ package de.alaoli.games.minecraft.mods.yadm.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.alaoli.games.minecraft.mods.yadm.YADMException;
+import de.alaoli.games.minecraft.mods.lib.common.ModException;
 import de.alaoli.games.minecraft.mods.yadm.data.Player;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
 import net.minecraft.command.ICommand;
@@ -147,7 +147,7 @@ public abstract class Command implements ICommand
 		{
 			this.processCommand( new Arguments( sender, args ) );
 		}
-		catch( YADMException e )
+		catch( ModException e )
 		{
 			sender.addChatMessage( new ChatComponentText( e.getMessage() ) );
 		}

@@ -7,16 +7,17 @@ import java.util.UUID;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.lib.common.manager.Manageable;
+import de.alaoli.games.minecraft.mods.lib.common.network.Packageable;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingFactory;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingGroup;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
-import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.FindPlayer;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
-import de.alaoli.games.minecraft.mods.yadm.network.Packageable;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.Injectable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -142,7 +143,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	}
 
 	@Override
-	public boolean isRequired() 
+	public boolean isSettingRequired() 
 	{
 		return true;
 	}	
@@ -164,6 +165,12 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	}
 	
 	@Override
+	public boolean hasManageableGroupName() 
+	{	
+		return this.group != null;
+	}
+
+	@Override
 	public void setManageableName( String name ) 
 	{
 		this.name = name;
@@ -174,7 +181,14 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	{
 		return this.name;
 	}
-		
+	
+
+	@Override
+	public boolean hasManageableName() 
+	{
+		return this.name != null;
+	}
+	
 	/********************************************************************************
 	 * Methods - Implement JsonSerializable
 	 ********************************************************************************/
@@ -248,7 +262,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 		tagCompound.setString( "group", this.group );
 		tagCompound.setString( "name", this.name );
 		
-		for( Setting setting : this.getAll().values() )
+		for( Setting setting : this.getSettings().values() )
 		{
 			if( setting instanceof Packageable )
 			{
@@ -280,7 +294,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 			setting = SettingFactory.createNewInstance( settingCompound.getString( "type" ) ); 
 			
 			((Packageable)setting).readFromNBT(settingCompound);		
-			this.add(setting );
+			this.addSetting(setting );
 		}
 	}
 
@@ -310,7 +324,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 			targets.add( worldProvider );
 			targets.add( worldInfo );
 			
-			for( Setting setting : this.getAll().values() )
+			for( Setting setting : this.getSettings().values() )
 			{
 				if( setting instanceof Injectable )
 				{

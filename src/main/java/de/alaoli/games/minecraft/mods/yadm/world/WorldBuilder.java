@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -14,13 +13,13 @@ import java.util.StringJoiner;
 import org.apache.commons.io.FileUtils;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
-import de.alaoli.games.minecraft.mods.yadm.Config;
+import de.alaoli.games.minecraft.mods.lib.common.ModException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.Log;
-import de.alaoli.games.minecraft.mods.yadm.YADMException;
+import de.alaoli.games.minecraft.mods.yadm.config.ConfigProviderSection;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
 import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.DimensionFieldAccessor;
@@ -54,17 +53,14 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 	 ********************************************************************************/
 		
 	public static final WorldBuilder INSTANCE = new WorldBuilder();
-	
 	private static final JsonFileAdapter dimensionFiles = YADimensionManager.INSTANCE;
 	private static final ManageDimensions dimensionManager = YADimensionManager.INSTANCE;
 	
-	private int nextId;
+	private int nextId = ConfigProviderSection.beginsWithId;
 	
-	private Map<Integer, Class<? extends WorldProvider>> worldProviders;
-	private Map<String, WorldType> worldTypes;	
-	
-	private List<Integer> registeredWorldIds;
-	private Map<Integer, Dimension> worldsForDeletion; 
+	private Map<Integer, Class<? extends WorldProvider>> worldProviders = new Hashtable<>();
+	private Map<String, WorldType> worldTypes = new Hashtable<>();
+	private Map<Integer, Dimension> worldsForDeletion= new HashMap<>();; 
 	
 	/********************************************************************************
 	 * Methods
@@ -72,11 +68,6 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 	
 	private WorldBuilder() 
 	{
-		this.nextId = Config.Provider.beginsWithId;
-		this.worldProviders = new Hashtable<Integer, Class<? extends WorldProvider>>();
-		this.worldTypes = new Hashtable<String, WorldType>();
-		this.worldsForDeletion = new HashMap<Integer, Dimension>();
-		
 		this.initProvider();
 		this.initTypes();
 	}
@@ -127,7 +118,7 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 	{
 		Class<? extends WorldProvider> providerClass;
 		
-		switch( ((WorldProviderSetting)dimension.get( SettingType.WORLDPROVIDER )).getName() )
+		switch( ((WorldProviderSetting)dimension.getSetting( SettingType.WORLDPROVIDER )).getName() )
 		{
 			case WorldProviderSetting.NETHER :
 				providerClass = this.worldProviders.get( -1 );
@@ -190,7 +181,7 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
         WorldServer overworld = DimensionManager.getWorld(0);
         if (overworld == null)
         {
-            throw new YADMException("Cannot Hotload Dim: Overworld is not Loaded!");
+            throw new ModException("Cannot Hotload Dim: Overworld is not Loaded!");
         }
         try
         {
@@ -224,7 +215,7 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 	public void registerWorldProviderForDimension( Dimension dimension ) throws WorldException
 	{
 		StringBuilder msg;
-		WorldProviderSetting providerSetting = (WorldProviderSetting)dimension.get( SettingType.WORLDPROVIDER );
+		WorldProviderSetting providerSetting = (WorldProviderSetting)dimension.getSetting( SettingType.WORLDPROVIDER );
 		
 		try 
 		{
@@ -257,7 +248,7 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 	public void unregisterWorldProviderForDimension( Dimension dimension )
 	{
 		StringBuilder msg;
-		WorldProviderSetting providerSetting = (WorldProviderSetting)dimension.get( SettingType.WORLDPROVIDER );
+		WorldProviderSetting providerSetting = (WorldProviderSetting)dimension.getSetting( SettingType.WORLDPROVIDER );
 		
 		try
 		{

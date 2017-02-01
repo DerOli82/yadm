@@ -1,9 +1,10 @@
 package de.alaoli.games.minecraft.mods.yadm.manager.dimension;
 
 import java.util.Map.Entry;
-import java.util.Set;
 
-import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
+import de.alaoli.games.minecraft.mods.lib.common.manager.Manageable;
+
+import java.util.Set;
 
 public interface ListDimensions 
 {

@@ -11,15 +11,17 @@ import java.util.StringJoiner;
 
 import org.apache.commons.io.FileUtils;
 
-import de.alaoli.games.minecraft.mods.yadm.Config;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonFileAdapter;
+import de.alaoli.games.minecraft.mods.lib.common.manager.Manageable;
+import de.alaoli.games.minecraft.mods.lib.common.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
+import de.alaoli.games.minecraft.mods.yadm.config.ConfigDimensionSection;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.Template;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.FindDimension;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ListDimensions;
@@ -36,16 +38,13 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	 ********************************************************************************/
 	
 	public static final YADimensionManager INSTANCE = new YADimensionManager();
-	
 	private static final ManageWorlds worlds = WorldBuilder.INSTANCE;
 	
-	private int nextId;
+	private int nextId = ConfigDimensionSection.beginsWithId;
+	private boolean dirty = false;
 	
-	private boolean dirty;
-	
-	private Map<Integer, Dimension> mappingId;
-	
-	private Set<NBTTagCompound> nbtDimensions;
+	private Map<Integer, Dimension> mappingId = new HashMap<>();
+	private Set<NBTTagCompound> nbtDimensions = new HashSet<>();
 	
 	/********************************************************************************
 	 * Methods
@@ -53,11 +52,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	
 	private YADimensionManager() 
 	{
-		super( null );
-		
-		this.nextId = Config.Dimension.beginsWithId;
-		this.mappingId = new HashMap<Integer, Dimension>();
-		this.nbtDimensions = new HashSet<NBTTagCompound>();
+		super( "dimensions" );
 	}
 	
 	/**
@@ -80,9 +75,9 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 		if( this.mappingId.containsKey( id ) ) { return this.mappingId.get( id ); }
 		
 		//Searching
-		for( Entry<String, Manageable> groupEntry : this.getAll() )		
+		for( Entry<String, Manageable> groupEntry : this.getManageable() )		
 		{			
-			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )		
+			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getManageable() )		
 			{		
 				if( ( dimensionEntry.getValue() instanceof Dimension ) &&
 					( ((Dimension)dimensionEntry.getValue()).getId() == id ) )
@@ -98,14 +93,14 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	
 	protected Manageable get( String group, String name )
 	{
-		if( this.exists( group ) )
+		if( this.existsManageable( group ) )
 		{
-			Manageable manageable = this.get( group );
+			Manageable manageable = this.getManageable( group );
 			
 			if( ( manageable instanceof ManageableGroup ) &&
-			( ((ManageableGroup)manageable).exists( name ) ) )
+			( ((ManageableGroup)manageable).existsManageable( name ) ) )
 			{
-				return ((ManageableGroup)manageable).get( name );
+				return ((ManageableGroup)manageable).getManageable( name );
 			}
 		}
 		return null;
@@ -113,16 +108,16 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 
 	public Set<NBTTagCompound> getAsNBT()
 	{
-		if( ( !this.isEmpty() ) && 
+		if( ( !this.isManageableEmpty() ) && 
 			( this.nbtDimensions.isEmpty() ) )
 		{
 			StringBuilder msg;
 			Dimension dimension;
 			NBTTagCompound compound;
 			
-			for( Entry<String, Manageable> groupEntry : this.getAll() )
+			for( Entry<String, Manageable> groupEntry : this.getManageable() )
 			{	
-				for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
+				for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getManageable() )
 				{
 		    		dimension = (Dimension) dimensionEntry.getValue();
 					compound = new NBTTagCompound();
@@ -140,7 +135,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	 ********************************************************************************/	
 
 	@Override
-	public Manageable create() 
+	public Manageable createManageable() 
 	{
 		return null;
 	}	
@@ -154,9 +149,9 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	{
 		Dimension dimension;
 		
- 		for( Entry<String, Manageable> groupEntry : this.getAll() )	
+ 		for( Entry<String, Manageable> groupEntry : this.getManageable() )	
  		{			
- 			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )		
+ 			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getManageable() )		
   			{	
  				dimension = (Dimension) dimensionEntry.getValue();	
  					 
@@ -179,7 +174,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 			return;
 		}
 		StringBuilder msg;
-		WorldProviderSetting providerSetting = (WorldProviderSetting) dimension.get( SettingType.WORLDPROVIDER );
+		WorldProviderSetting providerSetting = (WorldProviderSetting) dimension.getSetting( SettingType.WORLDPROVIDER );
 		
 		try
 		{
@@ -212,9 +207,9 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	{
 		Dimension dimension;
 		
-		for( Entry<String, Manageable> groupEntry : this.getAll() )
+		for( Entry<String, Manageable> groupEntry : this.getManageable() )
 		{	
-			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
+			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getManageable() )
 			{
 				dimension = (Dimension) dimensionEntry.getValue();
 			
@@ -276,9 +271,9 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	@Override
 	public boolean existsDimension( String group, String name )
 	{
-		if( this.exists( group ) )
+		if( this.existsManageable( group ) )
 		{
-			return ((ManageableGroup)this.get( group )).exists( name );
+			return ((ManageableGroup)this.getManageable( group )).existsManageable( name );
 		}
 		return false;
 	}
@@ -286,23 +281,23 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	@Override
 	public void addDimension( Dimension dimension )
 	{
-		if( !this.exists( dimension.getManageableGroupName() ) )
+		if( !this.existsManageable( dimension.getManageableGroupName() ) )
 		{
-			this.add( new DimensionGroup( dimension.getManageableGroupName() ) );
+			this.addManageable( new DimensionGroup( dimension.getManageableGroupName() ) );
 		}
-		ManageableGroup group = (ManageableGroup)this.get( dimension.getManageableGroupName() );
+		ManageableGroup group = (ManageableGroup)this.getManageable( dimension.getManageableGroupName() );
 		
-		group.add( dimension );		
+		group.addManageable( dimension );		
 	}
 	
 	@Override
 	public void removeDimension( Dimension dimension )
 	{
-		if( this.exists( dimension.getManageableGroupName() ) )
+		if( this.existsManageable( dimension.getManageableGroupName() ) )
 		{
-			ManageableGroup group = (ManageableGroup)this.get( dimension.getManageableGroupName() );
+			ManageableGroup group = (ManageableGroup)this.getManageable( dimension.getManageableGroupName() );
 			
-			group.remove( dimension );
+			group.removeManageable( dimension );
 		}		
 	}
 	
@@ -317,7 +312,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	{
 		Dimension dimension = new Dimension( this.nextDimensionId(), group, name );
 		
-		dimension.add( template.getAll() );
+		dimension.addSettings( template.getSettings() );
 		YADM.proxy.registerDimension( dimension );
 		
 		this.addDimension( dimension );
@@ -387,7 +382,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	@Override
 	public Set<Entry<String, Manageable>> listDimensions()
 	{
-		return this.getAll();
+		return this.getManageable();
 	}
 	
 	/********************************************************************************
@@ -421,7 +416,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 		
 		Manageable data;
 		
-		for( Entry<String, Manageable> entry : this.getAll() )
+		for( Entry<String, Manageable> entry : this.getManageable() )
 		{
 			data = entry.getValue();
 			
@@ -440,7 +435,7 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 		
 		Manageable data;
 		
-		for( Entry<String, Manageable> entry : this.getAll() )
+		for( Entry<String, Manageable> entry : this.getManageable() )
 		{
 			data = entry.getValue();
 			
@@ -477,14 +472,14 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 				groupName = file.getName().replace( ".json", "" );
 				
 				//Initialize group 
-				if( this.exists( groupName ) )
+				if( this.existsManageable( groupName ) )
 				{
-					data = this.get( groupName );
+					data = this.getManageable( groupName );
 				}
 				else
 				{
 					data = new DimensionGroup( groupName ); 
-					this.add( data );
+					this.addManageable( data );
 				}
 				
 				if( data instanceof JsonFileAdapter )
@@ -499,6 +494,6 @@ public class YADimensionManager extends ManageableGroup implements ManageDimensi
 	public void cleanup()
 	{
 		this.mappingId.clear();
-		this.clear();
+		this.clearManageable();
 	}	
 }

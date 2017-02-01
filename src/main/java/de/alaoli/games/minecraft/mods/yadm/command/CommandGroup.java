@@ -12,20 +12,20 @@ import net.minecraft.util.ChatComponentText;
 
 public abstract class CommandGroup extends Command 
 {
-	public CommandGroup( Command parent ) 
-	{
-		super(parent);
-	}
-
 	/********************************************************************************
 	 * Attributes
 	 ********************************************************************************/
 	
-	private Map<String, Command> commands = new HashMap<String, Command>();
+	private Map<String, Command> commands = new HashMap<>();
 	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
+	
+	public CommandGroup( Command parent ) 
+	{
+		super(parent);
+	}
 	
 	public void add( Command command )
 	{

@@ -1,6 +1,6 @@
 package de.alaoli.games.minecraft.mods.yadm.command;
 
-import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
+import de.alaoli.games.minecraft.mods.lib.common.data.Coordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.event.TeleportEvent;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;

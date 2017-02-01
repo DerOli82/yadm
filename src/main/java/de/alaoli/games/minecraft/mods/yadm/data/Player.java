@@ -5,8 +5,9 @@ import java.util.UUID;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
-import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.lib.common.manager.Manageable;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class Player implements Manageable, JsonSerializable
@@ -16,9 +17,7 @@ public class Player implements Manageable, JsonSerializable
 	 ********************************************************************************/
 	
 	private UUID id;
-	
 	private String name;
-	
 	private Dimension dimension;
 	
 	/********************************************************************************
@@ -94,6 +93,12 @@ public class Player implements Manageable, JsonSerializable
 	}
 	
 	@Override
+	public boolean hasManageableGroupName() 
+	{
+		return true;
+	}
+
+	@Override
 	public void setManageableName( String name ) 
 	{
 		this.name = name;
@@ -103,6 +108,12 @@ public class Player implements Manageable, JsonSerializable
 	public String getManageableName() 
 	{
 		return this.name;
+	}
+
+	@Override
+	public boolean hasManageableName() 
+	{
+		return this.name != null;
 	}
 	
 	/********************************************************************************

@@ -11,14 +11,14 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import de.alaoli.games.minecraft.mods.yadm.YADMException;
+import de.alaoli.games.minecraft.mods.lib.common.ModException;
+import de.alaoli.games.minecraft.mods.lib.common.data.ChunkCoordinate;
+import de.alaoli.games.minecraft.mods.lib.common.data.Coordinate;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.yadm.comparator.PriorityComparator;
-import de.alaoli.games.minecraft.mods.yadm.data.ChunkCoordinate;
-import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.event.PerformWorldBorderEvent;
 import de.alaoli.games.minecraft.mods.yadm.event.WorldBorderEvent;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
 import net.minecraft.util.ChatComponentText;
 
 public class WorldBorderSetting implements Setting, JsonSerializable, PerformWorldBorderEvent
@@ -41,16 +41,14 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 	
 	private int radius;
 
-	private Map<BorderSide, PriorityQueue<PerformWorldBorderEvent>> actions;
+	private Map<BorderSide, PriorityQueue<PerformWorldBorderEvent>> actions= new HashMap<>();
 	
 	/********************************************************************************
 	 * Methods
 	 ********************************************************************************/
 
 	public WorldBorderSetting()
-	{
-		this.actions = new HashMap<BorderSide, PriorityQueue<PerformWorldBorderEvent>>();
-		
+	{ 
 		for( BorderSide side : BorderSide.values() )
 		{
 			this.actions.put(side, new PriorityQueue<PerformWorldBorderEvent>( new PriorityComparator()) );
@@ -257,7 +255,7 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 	}
 
 	@Override
-	public boolean isRequired() 
+	public boolean isSettingRequired() 
 	{
 		return false;
 	}
@@ -407,7 +405,7 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 			{
 				action.performWorldBorderEvent( event );
 			}
-			catch( YADMException e )
+			catch( ModException e )
 			{
 				
 				event.player.addChatComponentMessage( new ChatComponentText( e.getMessage() ) );
@@ -428,7 +426,7 @@ public class WorldBorderSetting implements Setting, JsonSerializable, PerformWor
 				{
 					action.performWorldBorderEvent( event );
 				}
-				catch( YADMException e )
+				catch( ModException e )
 				{
 					event.player.addChatComponentMessage( new ChatComponentText( e.getMessage() ) );
 				}

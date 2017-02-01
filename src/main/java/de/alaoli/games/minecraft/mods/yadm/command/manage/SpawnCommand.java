@@ -3,10 +3,10 @@ package de.alaoli.games.minecraft.mods.yadm.command.manage;
 import de.alaoli.games.minecraft.mods.yadm.command.Command;
 import de.alaoli.games.minecraft.mods.yadm.command.CommandException;
 import de.alaoli.games.minecraft.mods.yadm.command.Permission;
+import de.alaoli.games.minecraft.mods.lib.common.data.Coordinate;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
-import de.alaoli.games.minecraft.mods.yadm.data.Coordinate;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SpawnMode;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SpawnSetting;
@@ -84,7 +84,7 @@ public class SpawnCommand extends Command
 					//Ignore because optional
 					mode = SpawnMode.EXACT;
 				}
-				dimension.update( new SpawnSetting( coordinate, mode ) );
+				dimension.updateSetting( new SpawnSetting( coordinate, mode ) );
 				YADM.proxy.updateDimension( dimension );
 				
 				args.sender.addChatMessage( new ChatComponentText( "Change spawnpoint to " + coordinate + " (" + mode + ")" ) );
@@ -102,7 +102,7 @@ public class SpawnCommand extends Command
 					//Ignore because optional
 					mode = SpawnMode.EXACT;
 				}
-				dimension.update( new SpawnSetting( coordinate, mode ) );
+				dimension.updateSetting( new SpawnSetting( coordinate, mode ) );
 				YADM.proxy.updateDimension( dimension );
 				
 				args.sender.addChatMessage( new ChatComponentText( "Change spawnpoint to " + coordinate + " (" + mode + ")" ) );
@@ -112,11 +112,5 @@ public class SpawnCommand extends Command
 				this.sendUsage( args.sender );
 				break;
 		}
-		
-
-		
-
-		
-		
 	}
 }

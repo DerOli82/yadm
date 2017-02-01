@@ -11,10 +11,12 @@ import java.util.StringJoiner;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.WriterConfig;
 
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonFileAdapter;
+import de.alaoli.games.minecraft.mods.lib.common.manager.Manageable;
+import de.alaoli.games.minecraft.mods.lib.common.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonFileAdapter;
 import net.minecraftforge.common.DimensionManager;
 
 public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
@@ -23,7 +25,7 @@ public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 	 * Attribute
 	 ********************************************************************************/
 
-	private boolean dirty;
+	private boolean dirty = false;
 
 	/********************************************************************************
 	 * Methods
@@ -32,7 +34,6 @@ public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 	public DimensionGroup( String name )
 	{
 		super( name );
-		this.dirty = false;
 	}
 		
 	/********************************************************************************
@@ -40,7 +41,7 @@ public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 	 ********************************************************************************/	
 
 	@Override
-	public Manageable create() 
+	public Manageable createManageable() 
 	{
 		Manageable manageable = new Dimension();
 		manageable.setManageableGroupName( this.getManageableGroupName() );
@@ -85,7 +86,7 @@ public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 		String fileName = this.getSavePath() + File.separator + this.getManageableGroupName() + ".json";
 		
 		//Delete file if empty
-		if( this.isEmpty() )
+		if( this.isManageableEmpty() )
 		{
 			File file = new File( fileName );
 			
@@ -127,6 +128,6 @@ public class DimensionGroup extends ManageableGroup implements JsonFileAdapter
 	@Override
 	public void cleanup()
 	{
-		this.clear();
+		this.clearManageable();
 	}	
 }

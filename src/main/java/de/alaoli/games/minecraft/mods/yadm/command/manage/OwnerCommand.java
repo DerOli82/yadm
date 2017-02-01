@@ -39,7 +39,6 @@ public class OwnerCommand extends Command
 		return "owner";
 	}
 
-
 	@Override
 	public String getCommandUsage( ICommandSender sender ) 
 	{

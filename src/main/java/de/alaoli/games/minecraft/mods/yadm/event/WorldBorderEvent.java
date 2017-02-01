@@ -1,6 +1,6 @@
 package de.alaoli.games.minecraft.mods.yadm.event;
 
-import de.alaoli.games.minecraft.mods.yadm.data.ChunkCoordinate;
+import de.alaoli.games.minecraft.mods.lib.common.data.ChunkCoordinate;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.BorderSide;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
@@ -24,7 +24,7 @@ public class WorldBorderEvent
 		this.chunkEvent = chunkEvent;
 		this.dimension = dimension;
 		this.player = (EntityPlayer)chunkEvent.entity;
-		this.setting = (WorldBorderSetting)dimension.get( SettingType.WORLDBORDER );;
+		this.setting = (WorldBorderSetting)dimension.getSetting( SettingType.WORLDBORDER );;
 		this.currentChunk = new ChunkCoordinate( chunkEvent.newChunkX, chunkEvent.newChunkZ );
 		this.side = setting.intersectsBorder( this.currentChunk );
 	}

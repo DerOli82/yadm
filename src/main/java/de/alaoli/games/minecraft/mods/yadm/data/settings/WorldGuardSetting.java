@@ -7,9 +7,9 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
-import de.alaoli.games.minecraft.mods.yadm.comparator.BlockComparator;
-import de.alaoli.games.minecraft.mods.yadm.data.DataException;
-import de.alaoli.games.minecraft.mods.yadm.json.JsonSerializable;
+import de.alaoli.games.minecraft.mods.lib.common.comparator.BlockComparator;
+import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
+import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 
 public class WorldGuardSetting implements Setting, JsonSerializable
 {
@@ -21,7 +21,7 @@ public class WorldGuardSetting implements Setting, JsonSerializable
 	private boolean interactionAllowed = true;
 	private boolean allowFood = true;
 	
-	private Set<BlockComparator> leftClickWhitelist = new HashSet<BlockComparator>();
+	private Set<BlockComparator> leftClickWhitelist = new HashSet<>();
 	
 	/********************************************************************************
 	 * Methods
@@ -61,7 +61,7 @@ public class WorldGuardSetting implements Setting, JsonSerializable
 	}
 
 	@Override
-	public boolean isRequired() 
+	public boolean isSettingRequired() 
 	{
 		return false;
 	}

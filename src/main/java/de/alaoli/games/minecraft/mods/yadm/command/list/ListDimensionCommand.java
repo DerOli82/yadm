@@ -5,10 +5,10 @@ import java.util.Map.Entry;
 import de.alaoli.games.minecraft.mods.yadm.command.Command;
 import de.alaoli.games.minecraft.mods.yadm.command.CommandException;
 import de.alaoli.games.minecraft.mods.yadm.command.Permission;
+import de.alaoli.games.minecraft.mods.lib.common.manager.Manageable;
+import de.alaoli.games.minecraft.mods.lib.common.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.command.Arguments;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
-import de.alaoli.games.minecraft.mods.yadm.manager.Manageable;
-import de.alaoli.games.minecraft.mods.yadm.manager.ManageableGroup;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ListDimensions;
 import net.minecraft.util.ChatComponentText;
@@ -61,7 +61,7 @@ public class ListDimensionCommand extends Command
 		{	
 			args.sender.addChatMessage( new ChatComponentText( " - " + groupEntry.getValue().getManageableGroupName() + ":" ) );
 			
-			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getAll() )
+			for( Entry<String, Manageable> dimensionEntry : ((ManageableGroup)groupEntry.getValue()).getManageable() )
 			{
 				dimension = (Dimension)dimensionEntry.getValue();
 				msg = new StringBuilder()

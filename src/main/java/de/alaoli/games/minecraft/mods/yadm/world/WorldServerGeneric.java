@@ -41,7 +41,7 @@ public class WorldServerGeneric extends WorldServer
 	{
 		if( dimension.hasSetting( SettingType.SPAWN ) )
 		{
-			SpawnSetting setting = (SpawnSetting)dimension.get( SettingType.SPAWN );
+			SpawnSetting setting = (SpawnSetting)dimension.getSetting( SettingType.SPAWN );
 			
 			return new ChunkCoordinates( 
 				setting.getCoordinate().x,
@@ -61,7 +61,7 @@ public class WorldServerGeneric extends WorldServer
 		if( entity instanceof EntityPlayer )  { return super.spawnEntityInWorld( entity ); }
 		if( !this.dimension.hasSetting( SettingType.ENTITYSPAWN ) ) { return super.spawnEntityInWorld( entity ); }
 		
-    	EntitySpawnSetting setting = (EntitySpawnSetting)this.dimension.get( SettingType.ENTITYSPAWN );
+    	EntitySpawnSetting setting = (EntitySpawnSetting)this.dimension.getSetting( SettingType.ENTITYSPAWN );
     		
 		if( setting.isLimitReached( entity ) )
 		{
@@ -79,7 +79,7 @@ public class WorldServerGeneric extends WorldServer
 		if( !( entity instanceof EntityPlayer ) &&
 			( this.dimension.hasSetting( SettingType.ENTITYSPAWN ) ) )
 		{
-			EntitySpawnSetting setting = (EntitySpawnSetting)this.dimension.get( SettingType.ENTITYSPAWN );
+			EntitySpawnSetting setting = (EntitySpawnSetting)this.dimension.getSetting( SettingType.ENTITYSPAWN );
 			
 			setting.increase( entity );
 		}
@@ -92,7 +92,7 @@ public class WorldServerGeneric extends WorldServer
 		if( !( entity instanceof EntityPlayer ) &&
 			( this.dimension.hasSetting( SettingType.ENTITYSPAWN ) ) )
 		{
-			EntitySpawnSetting setting = (EntitySpawnSetting)this.dimension.get( SettingType.ENTITYSPAWN );
+			EntitySpawnSetting setting = (EntitySpawnSetting)this.dimension.getSetting( SettingType.ENTITYSPAWN );
 			
 			setting.decrease( entity );
 		}
