@@ -25,6 +25,7 @@ import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldServerGeneric;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -106,9 +107,12 @@ public class DimensionEventHandler
     			{
     				EntityPlayerMP player = (EntityPlayerMP)event.entity;
     				WhitelistSetting setting = (WhitelistSetting)dimension.get( SettingType.WHITELIST );
+    				ServerConfigurationManager scm = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager();
     				
-    				//Emergency teleport if player isn't whitelisted
-    				if( !setting.exists( player.getUniqueID() ) )
+    				//Teleport away if player isn't whitelisted excluding operator and owner
+    				if( ( !dimension.isOwner( player ) ) &&
+						( !scm.canSendCommands( player.getGameProfile() )) &&
+						( !setting.exists( player.getUniqueID() ) ) )
 					{
     					player.addChatComponentMessage( new ChatComponentText( "You're not whitelisted for dimension '" + dimension + "'."));
     					MinecraftForge.EVENT_BUS.post( new TeleportEvent( new DimensionDummy( 0 ), player ) );
