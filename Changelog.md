@@ -1,5 +1,11 @@
 # Changelog
 
+# Version 0.8.3
+- Prevent entering a dimension without being whitelisted
+
+# Version 0.8.2
+- Add ignore limit to EntitySpawnSetting
+
 # Version 0.8.1
 - Rollback food problem fix
 
