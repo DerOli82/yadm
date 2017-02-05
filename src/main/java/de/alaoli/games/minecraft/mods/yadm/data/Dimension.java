@@ -18,11 +18,11 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.FindPlayer;
 import de.alaoli.games.minecraft.mods.yadm.manager.player.PlayerException;
-import de.alaoli.games.minecraft.mods.yadm.world.interceptor.Injectable;
+import de.alaoli.games.minecraft.mods.yadm.world.Injectable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.world.WorldProvider;
+import net.minecraft.world.World;
 import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraft.world.storage.WorldInfo;
 
@@ -305,10 +305,10 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	@Override
 	public void injectInto( Object target )
 	{
-		if( target instanceof WorldProvider )
+		if( target instanceof World )
 		{
-			WorldProvider worldProvider = (WorldProvider)target;
-			WorldInfo worldInfo = worldProvider.worldObj.getWorldInfo();
+			World world = (World)target;
+			WorldInfo worldInfo = world.getWorldInfo();
 			Class clazz	= worldInfo.getClass();
 
 			//Get and reflect theWorldInfo
@@ -321,7 +321,7 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 				);
 			}
 			List targets = new ArrayList();;
-			targets.add( worldProvider );
+			targets.add( world );
 			targets.add( worldInfo );
 			
 			for( Setting setting : this.getSettings().values() )

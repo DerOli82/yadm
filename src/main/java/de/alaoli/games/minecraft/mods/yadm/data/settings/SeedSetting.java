@@ -9,7 +9,7 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.lib.common.network.Packageable;
-import de.alaoli.games.minecraft.mods.yadm.world.interceptor.Injectable;
+import de.alaoli.games.minecraft.mods.yadm.world.Injectable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.storage.WorldInfo;
 
@@ -68,8 +68,15 @@ public class SeedSetting implements Setting, JsonSerializable, Packageable, Inje
 		JsonObject json = new JsonObject();
 
 		json.add( "type", this.getSettingType().toString() );
-		json.add( "value", this.value );
 		
+		if( this.value != null )
+		{
+			json.add( "value", this.value );
+		}
+		else
+		{
+			json.add( "value", "*" );
+		}
 		return json;
 	}
 

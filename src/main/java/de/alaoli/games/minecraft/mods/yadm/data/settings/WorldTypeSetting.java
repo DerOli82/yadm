@@ -9,10 +9,10 @@ import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.lib.common.network.Packageable;
 import de.alaoli.games.minecraft.mods.yadm.world.FindWorldType;
+import de.alaoli.games.minecraft.mods.yadm.world.Injectable;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
-import de.alaoli.games.minecraft.mods.yadm.world.interceptor.Injectable;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.WorldProvider;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.storage.WorldInfo;
 
@@ -110,10 +110,10 @@ public class WorldTypeSetting implements Setting, JsonSerializable, Packageable,
 	@Override
 	public void injectInto( Object target )
 	{
-		if( target instanceof WorldProvider )
+		if( target instanceof World )
 		{
-			WorldProvider worldProvider = (WorldProvider)target;
-			worldProvider.terrainType = worldType.findWorldType( this.name );
+			World world = (World)target;
+			world.provider.terrainType = worldType.findWorldType( this.name );
 		}
 		else if( target instanceof WorldInfo )
 		{

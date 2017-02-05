@@ -8,9 +8,9 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.lib.common.network.Packageable;
-import de.alaoli.games.minecraft.mods.yadm.world.interceptor.Injectable;
+import de.alaoli.games.minecraft.mods.yadm.world.Injectable;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.WorldProvider;
+import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
 
 public class GeneratorOptionsSetting implements Setting, JsonSerializable, Packageable, Injectable
@@ -97,10 +97,10 @@ public class GeneratorOptionsSetting implements Setting, JsonSerializable, Packa
 	@Override
 	public void injectInto( Object target )
 	{
-		if( target instanceof WorldProvider )
+		if( target instanceof World )
 		{
-			WorldProvider worldProvider = (WorldProvider)target;
-			worldProvider.field_82913_c = this.value;
+			World world = (World)target;
+			world.provider.field_82913_c = this.value;
 		}
 		else if( target instanceof WorldInfo )
 		{

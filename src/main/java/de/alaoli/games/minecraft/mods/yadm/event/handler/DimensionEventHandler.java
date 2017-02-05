@@ -141,20 +141,6 @@ public class DimensionEventHandler
 	}
 
 	@SubscribeEvent
-	public void onLoadWorld( WorldEvent.Load event )
-	{
-		//Ugly workaround to prevent loading "vanilla" WorldServer
-		if( ( !event.world.isRemote ) &&
-			( dimensions.existsDimension( event.world.provider.dimensionId ) ) &&
-			( !(event.world instanceof WorldServerGeneric) ) )
-		{
-			Dimension dimension = dimensions.findDimension( event.world.provider.dimensionId );
-			worlds.getWorldServerForDimension( dimension );
-		}
-			
-	}
-	
-	@SubscribeEvent
 	public void onUnloadWorld( WorldEvent.Unload event )
 	{
 		//Cleanup deleted dimensions

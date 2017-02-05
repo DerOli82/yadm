@@ -12,7 +12,6 @@ import java.util.StringJoiner;
 
 import org.apache.commons.io.FileUtils;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.lib.common.ModException;
 import de.alaoli.games.minecraft.mods.lib.common.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.Log;
@@ -22,18 +21,6 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
-import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.DimensionFieldAccessor;
-import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.GetDimensionNameInterceptor;
-import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.RegisterWorldChunkManagerPostInterceptor;
-import de.alaoli.games.minecraft.mods.yadm.world.interceptor.provider.RegisterWorldChunkManagerPreInterceptor;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.NamingStrategy;
-import net.bytebuddy.description.modifier.Visibility;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
-import net.bytebuddy.implementation.FieldAccessor;
-import net.bytebuddy.implementation.MethodDelegation;
-import net.bytebuddy.implementation.SuperMethodCall;
-import net.bytebuddy.matcher.ElementMatchers;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldManager;
@@ -126,6 +113,7 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 				
 			case WorldProviderSetting.OVERWORLD :
 				providerClass = this.worldProviders.get( 0 );
+				//return new WorldProviderSurface();
 				break;
 				
 			case WorldProviderSetting.END :
@@ -137,34 +125,7 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 				providerClass = this.worldProviders.get( 0 );
 				break;
 		}		
-		String registerWorldChunkManagerMethodName = ReflectionHelper.findMethod( 
-			WorldProvider.class, (WorldProvider)providerClass.newInstance(), 
-			new String[]{ "func_76572_b", "registerWorldChunkManager" } 
-		).getName();
-		String getDimensionNameMethodName = ReflectionHelper.findMethod( 
-			WorldProvider.class, (WorldProvider)providerClass.newInstance(), 
-			new String[]{ "func_80007_l", "getDimensionName" } 
-		).getName();
-		
-		Class<?> dynamicType = new ByteBuddy()
-			.with( new NamingStrategy.SuffixingRandom( "YADM" ) )
-			.subclass( providerClass )
-			.defineField( "dimensionYADM", Dimension.class, Visibility.PROTECTED )
-			.implement( DimensionFieldAccessor.class )
-			.intercept( FieldAccessor.ofBeanProperty() )
-			.method( ElementMatchers.named( registerWorldChunkManagerMethodName ) )
-			.intercept( 
-				MethodDelegation.to( RegisterWorldChunkManagerPreInterceptor.class )
-				.andThen( SuperMethodCall.INSTANCE
-				.andThen( MethodDelegation.to( RegisterWorldChunkManagerPostInterceptor.class ) ) ) 
-			)
-			.method( ElementMatchers.named( getDimensionNameMethodName ) )
-			.intercept( MethodDelegation.to( GetDimensionNameInterceptor.class ) )
-			.make()
-			.load( getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER )
-			.getLoaded();
-		
-		return (WorldProvider) dynamicType.newInstance();
+		return providerClass.newInstance();
 	}	
 	
 	private int registerProvider( WorldProvider provider, boolean keepLoaded )
@@ -176,7 +137,7 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 		return nextId;
 	}
 	
-	private void initWorldServer( Dimension dimension )
+	public void initWorldServer( Dimension dimension )
 	{	
         WorldServer overworld = DimensionManager.getWorld(0);
         if (overworld == null)
@@ -327,6 +288,7 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 		}
 	}
 
+	/*
 	@Override
 	public WorldServer getWorldServerForDimension( Dimension dimension ) throws WorldException
 	{
@@ -354,7 +316,7 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 		
 		return worldServer;		
 	}
-
+*/
 	
 	/********************************************************************************
 	 * Methods - Implement FindWorldType
