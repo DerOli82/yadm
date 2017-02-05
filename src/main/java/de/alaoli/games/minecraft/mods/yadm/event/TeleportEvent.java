@@ -12,6 +12,7 @@ import de.alaoli.games.minecraft.mods.yadm.manager.player.TeleportModifier;
 import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.world.WorldServer;
 
@@ -44,7 +45,7 @@ public class TeleportEvent extends Event
 	{
 		this.dimension = dimension;
 		this.player = player;
-		this.target = worlds.getWorldServerForDimension( dimension );
+		this.target = MinecraftServer.getServer().worldServerForDimension( dimension.getId() );
 		
 		if( coordinate == null )
 		{
