@@ -9,7 +9,7 @@ public class DimensionTeleport extends Teleporter
 {
 	protected Coordinate coordinate;
 	protected WorldServer world;
-	
+
     public DimensionTeleport( WorldServer world, Coordinate coordinate )
     {
         super( world );
