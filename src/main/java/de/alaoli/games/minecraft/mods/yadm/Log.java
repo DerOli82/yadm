@@ -2,6 +2,7 @@ package de.alaoli.games.minecraft.mods.yadm;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import de.alaoli.games.minecraft.mods.yadm.config.ConfigLogSection;
 
 public class Log 
 {
@@ -13,7 +14,19 @@ public class Log
 	
 	/********************************************************************************
 	 * Methods
-	 ********************************************************************************/
+
+	/**
+	 * Logs a message object with the DEBUG level if enabled
+	 * 
+	 * @param String
+	 */
+	public static void debug( String msg )
+	{
+		if( ConfigLogSection.debugging )
+		{
+			LOGGER.info( msg );
+		}
+	}
 
 	/**
 	 * Logs a message object with the INFO level.

@@ -16,6 +16,7 @@ import de.alaoli.games.minecraft.mods.lib.common.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.YADM;
 import de.alaoli.games.minecraft.mods.yadm.command.YADMCommandGroup;
 import de.alaoli.games.minecraft.mods.yadm.config.ConfigDimensionSection;
+import de.alaoli.games.minecraft.mods.yadm.config.ConfigLogSection;
 import de.alaoli.games.minecraft.mods.yadm.config.ConfigProviderSection;
 import de.alaoli.games.minecraft.mods.yadm.data.Dimension;
 import de.alaoli.games.minecraft.mods.yadm.event.handler.DimensionEventHandler;
@@ -50,11 +51,12 @@ public class CommonProxy implements Initialize
 		Config config = new Config();
 			
 		config.setSavePath( path.toString() + ".json" );
-		config.registerSection( ConfigProviderSection.class );
-		config.registerSection( ConfigDimensionSection.class );
+		config.registerSection( new ConfigProviderSection() );
+		config.registerSection( new ConfigDimensionSection() );
+		config.registerSection( new ConfigLogSection() );
 		config.load();
 		config.cleanup();
-		
+
 		templateFiles.setSavePath( path.toString() + "-templates" );
 		
 		MessageDispatcher.register();
