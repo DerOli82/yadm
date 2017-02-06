@@ -23,13 +23,13 @@ public class Config implements JsonFileAdapter, JsonSerializable
 	 ********************************************************************************/
 	
 	private String savePath;
-	private Set<Class<? extends Section>> sections = new HashSet<>();
+	private Set<Section> sections = new HashSet<>();
 	
 	/********************************************************************************
 	 * Method
 	 ********************************************************************************/
 	
-	public void registerSection( Class<? extends Section> section )
+	public void registerSection( Section section )
 	{
 		this.sections.add( section );
 	}
@@ -92,24 +92,14 @@ public class Config implements JsonFileAdapter, JsonSerializable
 	{
 		if( !json.isObject() ) { throw new DataException( "Config isn't a JsonObject." ); }
 		
-		Section section;
 		JsonObject obj = json.asObject();
 		
-		for( Class<? extends Section> clazz : this.sections )
+		for( Section section : this.sections )
 		{
-			try 
+			//Deserialize section
+			if( obj.get( section.getSectionName() ) != null )
 			{
-				section = clazz.newInstance();
-				
-				//Deserialize section
-				if( obj.get( section.getSectionName() ) != null )
-				{
-					section.deserialize( obj.get( section.getSectionName() ) );
-				}
-			} 
-			catch ( InstantiationException | IllegalAccessException e ) 
-			{
-				throw new DataException( "Can't deserilize section '" + clazz.getName() + "'.", e );
+				section.deserialize( obj.get( section.getSectionName() ) );
 			}
 		}
 		
