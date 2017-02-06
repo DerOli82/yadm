@@ -30,6 +30,11 @@ public class YADMLoadingPlugin implements IFMLLoadingPlugin
 		Mixins.addConfiguration( "mixins.yadm.json" );
 	}
 	
+	/**
+	 * @deprecated
+	 * @return
+	 * @throws IOException
+	 */
 	public Properties getProperties() throws IOException
 	{
 		Properties properties = new Properties();
@@ -73,6 +78,9 @@ public class YADMLoadingPlugin implements IFMLLoadingPlugin
 	@Override
 	public void injectData( Map<String, Object> data )
 	{
+		/**
+		 * @deprecated
+		 * 
 		//Don't download in development environment
 		if( !(Boolean)data.get( "runtimeDeobfuscationEnabled" ) ) { return; }
 		
@@ -109,6 +117,6 @@ public class YADMLoadingPlugin implements IFMLLoadingPlugin
 		{
 			Log.error( "Something went wrong. Can't download dependencies!");
 			e.printStackTrace();
-		}
+		}*/
 	}
 }

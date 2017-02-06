@@ -11,6 +11,11 @@ import org.apache.commons.io.FileUtils;
 import cpw.mods.fml.common.versioning.ComparableVersion;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 
+/**
+ * @deprecated
+ * @author oliver
+ *
+ */
 public class Dependency 
 {
 	/********************************************************************************
