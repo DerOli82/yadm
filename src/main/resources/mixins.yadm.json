@@ -1,0 +1,12 @@
+{
+    "package": "de.alaoli.games.minecraft.mods.yadm.mixins",
+    "refmap": "mixins.yadm.refmap.json",
+    "priority": 1111,
+    "required": true,
+    "mixins": [
+        "WorldProviderMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
