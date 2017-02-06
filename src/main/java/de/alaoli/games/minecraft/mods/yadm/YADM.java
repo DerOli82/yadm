@@ -24,7 +24,7 @@ public class YADM implements Initialize
 
 	public static final String MODID	= "yadm";
 	public static final String NAME		= "YADM - Yes Another Dimension Manager";
-	public static final String VERSION	= "0.9.0";
+	public static final String VERSION	= "0.9.0-beta";
 
 	@SidedProxy(
 		clientSide = "de.alaoli.games.minecraft.mods.yadm.proxy.CommonProxy", 
