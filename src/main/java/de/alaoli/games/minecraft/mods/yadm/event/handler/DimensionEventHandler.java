@@ -22,7 +22,6 @@ import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
 import de.alaoli.games.minecraft.mods.yadm.network.SyncDimensionsMessage;
 import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
-import de.alaoli.games.minecraft.mods.yadm.world.WorldServerGeneric;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.server.management.ServerConfigurationManager;
@@ -125,7 +124,13 @@ public class DimensionEventHandler
     		}
     	}
     }
-    
+
+	@SubscribeEvent
+	public void onWorldLoad( WorldEvent.Load event )
+	{
+		Log.debug( "Load world class: " + event.world.getClass().getName() );
+	}
+	
 	@SubscribeEvent
 	public void onWorldSave( WorldEvent.Save event )
 	{
