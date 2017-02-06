@@ -1,6 +1,5 @@
 package de.alaoli.games.minecraft.mods.yadm;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,9 +10,7 @@ import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.Mixins;
 
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
-import de.alaoli.games.minecraft.mods.lib.common.Dependency;
 
 @IFMLLoadingPlugin.MCVersion( value = "1.7.10" )
 @IFMLLoadingPlugin.Name( value = "YADMLoadingPlugin" )

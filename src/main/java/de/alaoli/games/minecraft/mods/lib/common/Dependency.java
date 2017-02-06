@@ -16,6 +16,7 @@ import de.alaoli.games.minecraft.mods.yadm.Log;
  * @author oliver
  *
  */
+@Deprecated
 public class Dependency 
 {
 	/********************************************************************************
