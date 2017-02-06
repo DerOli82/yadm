@@ -7,6 +7,7 @@ import de.alaoli.games.minecraft.mods.yadm.manager.dimension.DimensionException;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.FindDimension;
 import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
@@ -68,7 +69,7 @@ public class InfoCommand extends Command
 		{
 			dimension = new DimensionDummy( args.sender.getEntityWorld().provider.dimensionId );
 		}
-		World world = worlds.getWorldServerForDimension( dimension );
+		World world = MinecraftServer.getServer().worldServerForDimension( dimension.getId() );
 		WorldInfo worldInfo = world.getWorldInfo();
 		
 		args.sender.addChatMessage( new ChatComponentText( "Name: " + world.provider.getDimensionName() ) );
