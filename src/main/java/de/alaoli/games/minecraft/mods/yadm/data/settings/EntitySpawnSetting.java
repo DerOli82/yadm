@@ -13,6 +13,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
 
+/**
+ * @deprecated
+ * @author oliver
+ *
+ */
 public class EntitySpawnSetting implements Setting, JsonSerializable
 {
 	/********************************************************************************
