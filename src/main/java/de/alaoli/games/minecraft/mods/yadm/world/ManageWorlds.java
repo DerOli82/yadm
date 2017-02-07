@@ -5,6 +5,8 @@ import net.minecraft.world.World;
 
 public interface ManageWorlds 
 {
+	public void init() throws WorldException;
+	
 	public void registerWorldProviderForDimension( Dimension dimension ) throws WorldException;
 	public void unregisterWorldProviderForDimension( Dimension dimension ) throws WorldException;
 	
