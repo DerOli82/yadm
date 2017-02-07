@@ -11,6 +11,7 @@ import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.lib.common.manager.Manageable;
 import de.alaoli.games.minecraft.mods.lib.common.network.Packageable;
+import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.Setting;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingFactory;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingGroup;
@@ -305,6 +306,8 @@ public class Dimension extends SettingGroup implements Manageable, JsonSerializa
 	@Override
 	public void injectInto( Object target )
 	{
+		Log.debug( "Inject into " + this + ": " );
+		
 		if( target instanceof World )
 		{
 			World world = (World)target;

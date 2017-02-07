@@ -9,6 +9,7 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.lib.common.network.Packageable;
+import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.world.Injectable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.storage.WorldInfo;
@@ -138,6 +139,7 @@ public class SeedSetting implements Setting, JsonSerializable, Packageable, Inje
 				this.getValue(), 
 				new String[] { "field_76100_a", "randomSeed" } 
 			);		
+			Log.debug( "  - Seed: " + this.getValue() +" into WorldInfo" );
 		}
 	}		
 	

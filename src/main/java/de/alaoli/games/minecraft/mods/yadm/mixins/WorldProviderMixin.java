@@ -25,8 +25,6 @@ public abstract class WorldProviderMixin
 		{
 			this.dimension = YADimensionManager.INSTANCE.findDimension( world.provider.dimensionId );
 
-			Log.debug( "Mixins: Inject into " + dimension );
-			
     		try 
     		{
     			dimension.injectInto( world );
@@ -43,9 +41,10 @@ public abstract class WorldProviderMixin
     {
 		Log.debug( "Mixins: post WorldProviderMixin.registerWorld" );
 		
-		if( this.dimension != null )
+		if( ( this.dimension != null ) && 
+			( this.dimension.getId() != world.provider.dimensionId ) )
 		{
-			Log.debug( "Mixins: Change Id " + world.provider.dimensionId + " => " + this.dimension.getId() );
+			Log.debug( "Mixins: Correcting Id " + world.provider.dimensionId + " => " + this.dimension.getId() );
 			
 			world.provider.dimensionId = this.dimension.getId();
 		}  		

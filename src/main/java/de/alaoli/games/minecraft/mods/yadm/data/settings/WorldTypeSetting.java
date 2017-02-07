@@ -8,11 +8,11 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import de.alaoli.games.minecraft.mods.lib.common.data.DataException;
 import de.alaoli.games.minecraft.mods.lib.common.json.JsonSerializable;
 import de.alaoli.games.minecraft.mods.lib.common.network.Packageable;
+import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.world.FindWorldType;
 import de.alaoli.games.minecraft.mods.yadm.world.Injectable;
 import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.storage.WorldInfo;
 
@@ -110,12 +110,7 @@ public class WorldTypeSetting implements Setting, JsonSerializable, Packageable,
 	@Override
 	public void injectInto( Object target )
 	{
-		if( target instanceof World )
-		{
-			World world = (World)target;
-			world.provider.terrainType = worldType.findWorldType( this.name );
-		}
-		else if( target instanceof WorldInfo )
+		if( target instanceof WorldInfo )
 		{
 			WorldInfo worldInfo = (WorldInfo)target;
 			
@@ -124,6 +119,7 @@ public class WorldTypeSetting implements Setting, JsonSerializable, Packageable,
 				worldType.findWorldType( this.name ), 
 				new String[] { "field_76098_b", "terrainType" } 
 			);			
+			Log.debug( "  - WorldType: " + this.name +" into WorldInfo" );
 		}
 	}		
 	
