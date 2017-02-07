@@ -27,6 +27,8 @@ import de.alaoli.games.minecraft.mods.yadm.manager.PlayerManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.TemplateManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.network.MessageDispatcher;
+import de.alaoli.games.minecraft.mods.yadm.world.ManageWorlds;
+import de.alaoli.games.minecraft.mods.yadm.world.WorldBuilder;
 
 public class CommonProxy implements Initialize
 {	
@@ -37,6 +39,7 @@ public class CommonProxy implements Initialize
 	protected static final JsonFileAdapter templateFiles = TemplateManager.INSTANCE;
 	protected static final JsonFileAdapter playerFiles = PlayerManager.INSTANCE;	
 	protected static final YADimensionManager dimensions = YADimensionManager.INSTANCE;
+	protected static final ManageWorlds worlds = WorldBuilder.INSTANCE;
 	
 	/********************************************************************************
 	 * Method - Implements 
@@ -65,6 +68,8 @@ public class CommonProxy implements Initialize
 	@Override
 	public void init( FMLInitializationEvent event ) throws IOException, DataException
 	{
+		worlds.init();
+		
 		DimensionEventHandler.register();
 		WorldBorderEventHandler.register();
 		WorldGuardEventHandler.register();

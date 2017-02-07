@@ -53,11 +53,7 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 	 * Methods
 	 ********************************************************************************/
 	
-	private WorldBuilder() 
-	{
-		this.initProvider();
-		this.initTypes();
-	}
+	private WorldBuilder() {}
 	
 	@SuppressWarnings( "unchecked" )
 	private void initProvider()
@@ -171,6 +167,20 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 	/********************************************************************************
 	 * Methods - Implement ManageWorlds
 	 ********************************************************************************/
+	
+	@Override
+	public void init() throws WorldException
+	{
+		try
+		{
+			this.initTypes();
+			this.initProvider();
+		}
+		catch( Exception e )
+		{
+			throw new WorldException( e.getMessage(), e );
+		}
+	}
 	
 	@Override
 	public void registerWorldProviderForDimension( Dimension dimension ) throws WorldException
