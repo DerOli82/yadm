@@ -1,7 +1,8 @@
 /*
 !/.gitignore
-!/uml
+!/lib
 !/src
+!/uml
 !/gradle
 !/gradlew
 !/gradlew.bat
