@@ -12,7 +12,6 @@ import java.util.StringJoiner;
 
 import org.apache.commons.io.FileUtils;
 
-import de.alaoli.games.minecraft.mods.lib.common.ModException;
 import de.alaoli.games.minecraft.mods.lib.common.json.JsonFileAdapter;
 import de.alaoli.games.minecraft.mods.yadm.Log;
 import de.alaoli.games.minecraft.mods.yadm.config.ConfigProviderSection;
@@ -21,17 +20,11 @@ import de.alaoli.games.minecraft.mods.yadm.data.settings.SettingType;
 import de.alaoli.games.minecraft.mods.yadm.data.settings.WorldProviderSetting;
 import de.alaoli.games.minecraft.mods.yadm.manager.YADimensionManager;
 import de.alaoli.games.minecraft.mods.yadm.manager.dimension.ManageDimensions;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldManager;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.storage.ISaveHandler;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
 
 public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 {
@@ -131,37 +124,6 @@ public class WorldBuilder implements ManageWorlds, FindWorldType, ListOptions
 			nextId++;
 		}
 		return nextId;
-	}
-	
-	public void initWorldServer( Dimension dimension )
-	{	
-        WorldServer overworld = DimensionManager.getWorld(0);
-        if (overworld == null)
-        {
-            throw new ModException("Cannot Hotload Dim: Overworld is not Loaded!");
-        }
-        try
-        {
-            DimensionManager.getProviderType(dimension.getId());
-        }
-        catch (Exception e)
-        {
-            System.err.println("Cannot Hotload Dim: " + e.getMessage());
-            return; // If a provider hasn't been registered then we can't hotload the dim
-        }
-        MinecraftServer mcServer = overworld.func_73046_m();
-        ISaveHandler savehandler = overworld.getSaveHandler();
-        WorldSettings worldSettings = new WorldSettings( overworld.getWorldInfo() );
-
-        WorldServer world = new WorldServerGeneric( mcServer, savehandler, overworld.getWorldInfo().getWorldName(), dimension, worldSettings, mcServer.theProfiler );
-        world.addWorldAccess( new WorldManager( mcServer, world ) );
-        
-        MinecraftForge.EVENT_BUS.post( new WorldEvent.Load( world ) );
-        if (!mcServer.isSinglePlayer())
-        {
-            world.getWorldInfo().setGameType( mcServer.getGameType() );
-        }
-        mcServer.setDifficultyForAllWorlds( mcServer.getDifficulty() );		
 	}
 	
 	/********************************************************************************
